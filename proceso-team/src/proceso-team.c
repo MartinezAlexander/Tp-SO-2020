@@ -16,11 +16,11 @@ int main(void) {
 
 	config = leer_config();
 
-	t_entrenador** entrenadores = leer_entrenadores(config);
+	t_list* entrenadores = leer_entrenadores(config);
 
-	entrenador_mostrar(entrenadores[0]);
-	entrenador_mostrar(entrenadores[1]);
-	entrenador_mostrar(entrenadores[2]);
+	entrenador_mostrar(list_get(entrenadores,0));
+	entrenador_mostrar(list_get(entrenadores,1));
+	entrenador_mostrar(list_get(entrenadores,2));
 
 	if(config != NULL)
 	{
@@ -28,7 +28,7 @@ int main(void) {
 	}
 }
 
-t_entrenador** leer_entrenadores(t_config* config){
+t_list* leer_entrenadores(t_config* config){
 	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
 	char** pokemones_entrenadores = config_get_array_value(config, "POKEMON_ENTRENADORES");
 	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
@@ -43,12 +43,11 @@ t_entrenador** leer_entrenadores(t_config* config){
 		printf("Error: no coindiden las cantidades de pos-pok-obj de entrenadores en config!");
 	}
 
-	t_entrenador** entrenadores = malloc(sizeof(t_entrenador) * numero_posiciones);
-
+	t_list* entrenadores = list_create();
 	for(int i = 0 ; i < numero_posiciones ; i++){
-		entrenadores[i] = entrenador_create(posiciones_entrenadores[i],
+		list_add(entrenadores,entrenador_create(posiciones_entrenadores[i],
 				pokemones_entrenadores[i],
-				objetivos_entrenadores[i]);
+				objetivos_entrenadores[i]));
 	}
 
 	return entrenadores;

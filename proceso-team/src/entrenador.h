@@ -13,6 +13,8 @@
 #include<stdint.h>
 #include<commons/string.h>
 #include<commons/config.h>
+#include<commons/collections/list.h>
+
 
 
 typedef enum{
@@ -29,10 +31,11 @@ typedef struct{
 typedef struct{
 	t_posicion posicion;
 	estado_planificacion estado;
-	char** objetivos;
-	char** pokemones_adquiridos;
+	t_list* objetivos;
+	t_list* pokemones_adquiridos;
 
 } t_entrenador;
+
 
 /*
 typedef struct{
@@ -45,6 +48,6 @@ typedef struct{
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos);
 
 void entrenador_mostrar(t_entrenador* entrenador);
-
+t_list* array_to_list(char** adquiridos);
 
 #endif /* PROCESO_TEAM_SRC_ENTRENADOR_H_ */
