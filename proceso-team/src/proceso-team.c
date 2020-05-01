@@ -22,6 +22,15 @@ int main(void) {
 	entrenador_mostrar(list_get(entrenadores,1));
 	entrenador_mostrar(list_get(entrenadores,2));
 
+	t_list* objetivos_globales = sumar_objetivos(entrenadores);
+
+	// list_sort(objetivos_globales, strcmp());  TODO
+    // No supe usar list_sort()
+
+	for(int i=0; i<list_size(objetivos_globales); i++){
+		printf("%s\n", list_get(objetivos_globales,i));
+	}
+
 	if(config != NULL)
 	{
 		config_destroy(config);
@@ -59,6 +68,14 @@ int cantidad_de_elementos(char** array){
 	return cantidad;
 }
 
+t_list* sumar_objetivos(t_list* entrenadores){
+	t_list* objetivos_globales = list_create();
+	for(int x=0; x<list_size(entrenadores); x++){
+		t_entrenador* entrenador = list_get(entrenadores, x);
+		list_add_all(objetivos_globales, entrenador->objetivos);
+		}
+return objetivos_globales;
+}
 
 t_config* leer_config(void)
 {

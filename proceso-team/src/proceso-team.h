@@ -21,6 +21,7 @@
 
 t_config* leer_config(void);
 t_list* leer_entrenadores(t_config* config);
+t_list* sumar_objetivos(t_list* entrenadores);
 int cantidad_de_elementos(char** array);
 
 #endif /* PROCESO_TEAM_SRC_PROCESO_TEAM_H_ */
