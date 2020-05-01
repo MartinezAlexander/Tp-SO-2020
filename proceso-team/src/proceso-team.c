@@ -8,10 +8,66 @@
  ============================================================================
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "proceso-team.h"
 
 int main(void) {
-	puts("!!!este es el proceso team!!!"); /* prints !!!Hello World!!! */
-	return EXIT_SUCCESS;
+
+	t_config* config;
+
+	config = leer_config();
+
+	t_entrenador** entrenadores = leer_entrenadores(config);
+
+	entrenador_mostrar(entrenadores[0]);
+	entrenador_mostrar(entrenadores[1]);
+	entrenador_mostrar(entrenadores[2]);
+
+	if(config != NULL)
+	{
+		config_destroy(config);
+	}
+}
+
+t_entrenador** leer_entrenadores(t_config* config){
+	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
+	char** pokemones_entrenadores = config_get_array_value(config, "POKEMON_ENTRENADORES");
+	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
+
+	int numero_posiciones = cantidad_de_elementos(posiciones_entrenadores);
+	int numero_pok_entrenadores = cantidad_de_elementos(pokemones_entrenadores);
+	int numero_obj_entrenadores = cantidad_de_elementos(objetivos_entrenadores);
+
+	//Error si no coinciden las cantidades
+	if(numero_posiciones != numero_pok_entrenadores
+			|| numero_pok_entrenadores != numero_obj_entrenadores){
+		printf("Error: no coindiden las cantidades de pos-pok-obj de entrenadores en config!");
+	}
+
+	t_entrenador** entrenadores = malloc(sizeof(t_entrenador) * numero_posiciones);
+
+	for(int i = 0 ; i < numero_posiciones ; i++){
+		entrenadores[i] = entrenador_create(posiciones_entrenadores[i],
+				pokemones_entrenadores[i],
+				objetivos_entrenadores[i]);
+	}
+
+	return entrenadores;
+}
+
+int cantidad_de_elementos(char** array){
+	int cantidad = 0;
+	while(array[cantidad] != NULL) cantidad++;
+	return cantidad;
+}
+
+
+t_config* leer_config(void)
+{
+	t_config *config;//Puede que este mal el path
+	if((config = config_create("src/team.config")) == NULL)
+	{
+		printf("No pude leer la config\n");
+		exit(2);
+	}
+	return config;
 }
