@@ -11,70 +11,84 @@
 #include "proceso-team.h"
 
 int main(void) {
-
+	//Variables de un proceso team
 	t_config* config;
 
+	t_list* entrenadores;
+	t_list* objetivo_global;
+
+	uint32_t tiempo_de_reconexion;
+	uint32_t retardo_cpu;
+
+	char* algoritmo_planificacion; //estructura para todo esto
+	uint32_t quantum;
+	uint32_t estimacion_inicial;
+
+	char* ip_broker;
+	char* puerto_broker;
+
+	t_log* logger;
+
+
+	//Leer archivo config y settear variables
 	config = leer_config();
 
-	t_list* entrenadores = leer_entrenadores(config);
+	entrenadores = leer_entrenadores(config);
+	objetivo_global = obtener_objetivo_global(entrenadores);
 
-	entrenador_mostrar(list_get(entrenadores,0));
-	entrenador_mostrar(list_get(entrenadores,1));
-	entrenador_mostrar(list_get(entrenadores,2));
+	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
+	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");
 
-	t_list* objetivos_globales = sumar_objetivos(entrenadores);
+	algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
+	quantum = config_get_int_value(config, "QUANTUM");
+	estimacion_inicial = config_get_int_value(config, "ESTIMACION_INICIAL");
 
-	// list_sort(objetivos_globales, strcmp());  TODO
-    // No supe usar list_sort()
+	ip_broker = config_get_string_value(config, "IP_BROKER");
+	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
 
-	for(int i=0; i<list_size(objetivos_globales); i++){
-		printf("%s\n", list_get(objetivos_globales,i));
-	}
+	char* path_logger = config_get_string_value(config, "LOG_FILE");
+	logger = iniciar_logger(path_logger);
 
-	if(config != NULL)
-	{
-		config_destroy(config);
-	}
+
+
+
+	//Conectarse a las colas del broker
+
+	//Enviar mensaje GET al broker segun objetivos globales
+
+	//Abrir socket de escucha para el Gameboy
+
+
+
+
+	terminar_programa(logger, config);
 }
 
-t_list* leer_entrenadores(t_config* config){
-	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
-	char** pokemones_entrenadores = config_get_array_value(config, "POKEMON_ENTRENADORES");
-	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
 
-	int numero_posiciones = cantidad_de_elementos(posiciones_entrenadores);
-	int numero_pok_entrenadores = cantidad_de_elementos(pokemones_entrenadores);
-	int numero_obj_entrenadores = cantidad_de_elementos(objetivos_entrenadores);
 
-	//Error si no coinciden las cantidades
-	if(numero_posiciones != numero_pok_entrenadores
-			|| numero_pok_entrenadores != numero_obj_entrenadores){
-		printf("Error: no coindiden las cantidades de pos-pok-obj de entrenadores en config!");
-	}
 
-	t_list* entrenadores = list_create();
-	for(int i = 0 ; i < numero_posiciones ; i++){
-		list_add(entrenadores,entrenador_create(posiciones_entrenadores[i],
-				pokemones_entrenadores[i],
-				objetivos_entrenadores[i]));
-	}
-
-	return entrenadores;
-}
-
-int cantidad_de_elementos(char** array){
-	int cantidad = 0;
-	while(array[cantidad] != NULL) cantidad++;
-	return cantidad;
-}
-
-t_list* sumar_objetivos(t_list* entrenadores){
+t_list* obtener_objetivo_global(t_list* entrenadores){
 	t_list* objetivos_globales = list_create();
-	for(int x=0; x<list_size(entrenadores); x++){
-		t_entrenador* entrenador = list_get(entrenadores, x);
+
+	for(int i = 0; i < list_size(entrenadores); i++){
+		t_entrenador* entrenador = list_get(entrenadores, i);
 		list_add_all(objetivos_globales, entrenador->objetivos);
-		}
-return objetivos_globales;
+	}
+
+	list_sort(objetivos_globales, strcmp);
+
+	return objetivos_globales;
+}
+
+t_log* iniciar_logger(char* path)
+{
+	t_log* logger;
+	if((logger = log_create(path,"team",true,LOG_LEVEL_INFO)) == NULL)
+	{
+		printf("No se pudo crear el log\n");
+		exit(1);
+	}
+	return logger;
 }
 
 t_config* leer_config(void)
@@ -86,4 +100,17 @@ t_config* leer_config(void)
 		exit(2);
 	}
 	return config;
+}
+
+void terminar_programa(t_log* logger, t_config* config){
+
+	if(logger != NULL)
+	{
+		log_info(logger, "finalizando programa...");
+		log_destroy(logger);
+	}
+	if(config != NULL)
+	{
+		config_destroy(config);
+	}
 }

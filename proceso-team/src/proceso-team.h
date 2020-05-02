@@ -19,9 +19,11 @@
 #include "entrenador.h"
 
 
-t_config* leer_config(void);
-t_list* leer_entrenadores(t_config* config);
-t_list* sumar_objetivos(t_list* entrenadores);
+t_list* obtener_objetivo_global(t_list* entrenadores);
 int cantidad_de_elementos(char** array);
+
+void terminar_programa(t_log* logger, t_config* config);
+t_config* leer_config(void);
+t_log* iniciar_logger(char*);
 
 #endif /* PROCESO_TEAM_SRC_PROCESO_TEAM_H_ */

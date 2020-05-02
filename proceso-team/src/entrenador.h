@@ -50,4 +50,7 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 void entrenador_mostrar(t_entrenador* entrenador);
 t_list* array_to_list(char** adquiridos);
 
+t_list* leer_entrenadores(t_config* config);
+int cantidad_de_elementos(char** array);
+
 #endif /* PROCESO_TEAM_SRC_ENTRENADOR_H_ */

@@ -7,25 +7,55 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	entrenador->posicion.x = atoi(posiciones_separadas[0]);
 	entrenador->posicion.y = atoi(posiciones_separadas[1]);
 
-	/*
-	 * Nos quedo duda de si aca hay que hacer un malloc a los char**
-	 */
-	char** adquiridos_array = string_split(pokemones, "|");
-	entrenador->pokemones_adquiridos = array_to_list(adquiridos_array);
-	char** objetivos_array = string_split(objetivos, "|");
-	entrenador->objetivos = array_to_list(objetivos_array);
+	entrenador->pokemones_adquiridos = array_to_list(string_split(pokemones, "|"));
+	entrenador->objetivos = array_to_list(string_split(objetivos, "|"));
 	entrenador->estado = NEW;
 
 	return entrenador;
 }
 
 t_list* array_to_list(char** adquiridos){
+
 	t_list* lista = list_create();
-	for(int i=0; adquiridos[i]!=NULL; i++){
+	for(int i = 0; adquiridos[i]!=NULL ; i++){
 		list_add(lista,adquiridos[i]);
 	}
 	return lista;
 }
+
+
+t_list* leer_entrenadores(t_config* config){
+	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
+	char** pokemones_entrenadores = config_get_array_value(config, "POKEMON_ENTRENADORES");
+	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
+
+	int numero_posiciones = cantidad_de_elementos(posiciones_entrenadores);
+	int numero_pok_entrenadores = cantidad_de_elementos(pokemones_entrenadores);
+	int numero_obj_entrenadores = cantidad_de_elementos(objetivos_entrenadores);
+
+	//Error si no coinciden las cantidades
+	if(numero_posiciones != numero_pok_entrenadores
+			|| numero_pok_entrenadores != numero_obj_entrenadores){
+		printf("Error: no coindiden las cantidades de pos-pok-obj de entrenadores en config!");
+	}
+
+	t_list* entrenadores = list_create();
+	for(int i = 0 ; i < numero_posiciones ; i++){
+		list_add(entrenadores,entrenador_create(posiciones_entrenadores[i],
+				pokemones_entrenadores[i],
+				objetivos_entrenadores[i]));
+	}
+
+	return entrenadores;
+}
+
+
+int cantidad_de_elementos(char** array){
+	int cantidad = 0;
+	while(array[cantidad] != NULL) cantidad++;
+	return cantidad;
+}
+
 
 void entrenador_mostrar(t_entrenador* entrenador){
 	printf("Mostrando entrenador: \n");
