@@ -26,4 +26,8 @@ void terminar_programa(t_log* logger, t_config* config);
 t_config* leer_config(void);
 t_log* iniciar_logger(char*);
 
+void enviar_get_objetivo(t_list* objetivo_global);
+void iniciar_conexion_broker(char* ip, char* puerto);
+void iniciar_puerto_de_escucha();
+
 #endif /* PROCESO_TEAM_SRC_PROCESO_TEAM_H_ */

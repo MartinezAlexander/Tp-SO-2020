@@ -20,7 +20,8 @@ int main(void) {
 	uint32_t tiempo_de_reconexion;
 	uint32_t retardo_cpu;
 
-	char* algoritmo_planificacion; //estructura para todo esto
+	//TODO estructura para algoritmos
+	char* algoritmo_planificacion;
 	uint32_t quantum;
 	uint32_t estimacion_inicial;
 
@@ -50,21 +51,42 @@ int main(void) {
 	logger = iniciar_logger(path_logger);
 
 
-
-
 	//Conectarse a las colas del broker
+	iniciar_conexion_broker(ip_broker, puerto_broker);
 
 	//Enviar mensaje GET al broker segun objetivos globales
+	enviar_get_objetivo(objetivo_global);
 
 	//Abrir socket de escucha para el Gameboy
-
+	iniciar_puerto_de_escucha();
 
 
 
 	terminar_programa(logger, config);
 }
 
+void iniciar_conexion_broker(char* ip, char* puerto){
 
+}
+
+void enviar_get_objetivo(t_list* objetivo_global){
+
+	char* ultima_especie_enviada = "";
+	for(int i = 0 ; i < list_size(objetivo_global) ; i++){
+		char* pokemon = list_get(objetivo_global, i);
+
+		if(strcmp(pokemon, ultima_especie_enviada) != 0){
+			//TODO: Envio mensaje get al broker
+			printf("Enviando especie GET al broker: %s\n", pokemon);
+			//
+			ultima_especie_enviada = pokemon;
+		}
+	}
+}
+
+void iniciar_puerto_de_escucha(){
+
+}
 
 
 t_list* obtener_objetivo_global(t_list* entrenadores){
