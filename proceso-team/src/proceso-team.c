@@ -1,10 +1,11 @@
 /*
  ============================================================================
  Name        : proceso-team.c
- Author      : 
- Version     :
+ Author      : Grupo 7 - SO
+ Version     : v1.0
  Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
+ Description : Administrar distintos entrenadores “planificándolos” dentro de
+			   un mapa de dos coordenadas.
  ============================================================================
  */
 

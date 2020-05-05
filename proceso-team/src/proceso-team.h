@@ -1,12 +1,5 @@
-/*
- * proceso-team.h
- *
- *  Created on: 1 may. 2020
- *      Author: utnso
- */
-
-#ifndef PROCESO_TEAM_SRC_PROCESO_TEAM_H_
-#define PROCESO_TEAM_SRC_PROCESO_TEAM_H_
+#ifndef PROCESO_TEAM_H
+#define PROCESO_TEAM_H
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -30,4 +23,4 @@ void enviar_get_objetivo(t_list* objetivo_global);
 void iniciar_conexion_broker(char* ip, char* puerto);
 void iniciar_puerto_de_escucha();
 
-#endif /* PROCESO_TEAM_SRC_PROCESO_TEAM_H_ */
+#endif

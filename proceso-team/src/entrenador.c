@@ -4,8 +4,9 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	char** posiciones_separadas = string_split(posicion, "|");
-	entrenador->posicion.x = atoi(posiciones_separadas[0]);
-	entrenador->posicion.y = atoi(posiciones_separadas[1]);
+	entrenador->posicion = *posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
+	/*entrenador->posicion.posicionX = atoi(posiciones_separadas[0]);
+	entrenador->posicion.posicionY = atoi(posiciones_separadas[1]);*/
 
 	entrenador->pokemones_adquiridos = array_to_list(string_split(pokemones, "|"));
 	entrenador->objetivos = array_to_list(string_split(objetivos, "|"));
@@ -59,12 +60,13 @@ int cantidad_de_elementos(char** array){
 
 void entrenador_mostrar(t_entrenador* entrenador){
 	printf("Mostrando entrenador: \n");
-	printf("Posicion: %d,%d \n", entrenador->posicion.x, entrenador->posicion.y );
+	printf("Posicion: %d,%d \n", *posicion_get_X(&entrenador->posicion), *posicion_get_Y(&entrenador->posicion));
 	printf("Objetivos: [");
 
 
 	for(int i=0; i<list_size(entrenador->objetivos); i++){
-		printf(" %s ", list_get(entrenador->objetivos,i));
+		char* objetivos = (char*)list_get(entrenador->objetivos,i);
+		printf(" %s ", objetivos);
 	}
 
 	printf("] \n");
@@ -72,7 +74,8 @@ void entrenador_mostrar(t_entrenador* entrenador){
 	printf("Pokemones: [");
 
 	for(int i=0; i<list_size(entrenador->pokemones_adquiridos); i++){
-		printf(" %s ", list_get(entrenador->pokemones_adquiridos,i));
+		char* pokemones = (char*)list_get(entrenador->pokemones_adquiridos,i);
+		printf(" %s ", pokemones);
 	}
 
 	printf("] \n");

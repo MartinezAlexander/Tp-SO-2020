@@ -1,12 +1,5 @@
-/*
- * entrenador.h
- *
- *  Created on: 1 may. 2020
- *      Author: utnso
- */
-
-#ifndef PROCESO_TEAM_SRC_ENTRENADOR_H_
-#define PROCESO_TEAM_SRC_ENTRENADOR_H_
+#ifndef ENTRENADOR_H
+#define ENTRENADOR_H
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -14,19 +7,11 @@
 #include<commons/string.h>
 #include<commons/config.h>
 #include<commons/collections/list.h>
-
-
+#include <mensajes/posiciones.h>
 
 typedef enum{
 	NEW, READY, EXEC, BLOCKED, EXIT
 } estado_planificacion;
-
-
-/* Habria que importarla de mensajes*/
-typedef struct{
-	uint32_t x;
-	uint32_t y;
-} t_posicion;
 
 typedef struct{
 	t_posicion posicion;
@@ -53,4 +38,4 @@ t_list* array_to_list(char** adquiridos);
 t_list* leer_entrenadores(t_config* config);
 int cantidad_de_elementos(char** array);
 
-#endif /* PROCESO_TEAM_SRC_ENTRENADOR_H_ */
+#endif
