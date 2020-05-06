@@ -87,7 +87,8 @@ void procesar_mensajes(int* socket){
 			procesar_caught((t_caught_pokemon*) mensaje);
 			break;
 		default:
-			printf("Mensaje no correspondiente al proceso team\n");
+			printf("Mensaje no correspondiente al proceso team (op: %d) \n", operacion);
+			break;
 	}
 }
 
@@ -96,13 +97,16 @@ void procesar_localized(t_localized_pokemon* localized_pokemon){
 }
 
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon){
-	if(cumplio_objetivo_global())
-		free(appeared_pokemon);
-	else if(pokemon_dentro_de_objetivos(appeared_pokemon->nombre)){
+	printf("Procesando mensaje APPEARED\n");
+	printf("Recibo %s\n\n", appeared_pokemon->nombre);
+
+	if(cumplio_objetivo_global(objetivo_global, entrenadores)){
+		//free(appeared_pokemon);
+	}else if(pokemon_dentro_de_objetivos(objetivo_global, appeared_pokemon->nombre)){
 		//Verifico si ya estoy procesando un localized de la misma especie
 		//Planifico entrenador
 	}else{
-		free(appeared_pokemon);
+		//free(appeared_pokemon);
 	}
 }
 
@@ -110,44 +114,6 @@ void procesar_caught(t_caught_pokemon* caught_pokemon){
 
 }
 
-int cumplio_objetivo_global(){
-
-	//Junto todos los adquiridos en una lista
-	t_list* adquiridos = list_create();
-	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-
-		t_entrenador* entrenador = list_get(entrenadores, i);
-		list_add_all(adquiridos, entrenador->pokemones_adquiridos);
-	}
-
-	//La ordeno para poder compararlas
-	list_sort(adquiridos, strcmp);
-
-	//Comparo con los objetivos
-	for(int i = 0 ; i < list_size(adquiridos) ; i++){
-		char* pk1 = list_get(adquiridos, i);
-		char* pk2 = list_get(objetivo_global, i);
-
-		printf("Comparo %s con %s\n", pk1, pk2);
-
-		if(string_equals_ignore_case(pk1,pk2) != 1) return 0;
-	}
-
-	//En caso de que tenga una lista de adquiridos mas corta y se de que
-	//todos los elementos sean iguales a los primeros de los objetivos
-	//(todavia no cumplio el objetivo), verifico que sean del mismo tamaño
-	//para asegurarme de que no pase esto
-	return list_size(adquiridos) == list_size(objetivo_global);
-}
-
-
-int pokemon_dentro_de_objetivos(char* pokemon){
-	for(int i = 0 ; i < list_size(objetivo_global); i++){
-		if(string_equals_ignore_case(list_get(objetivo_global, i),pokemon) == 1)
-			return 1;
-	}
-	return 0;
-}
 
 void enviar_get_objetivo(t_list* objetivo_global){
 
@@ -164,18 +130,6 @@ void enviar_get_objetivo(t_list* objetivo_global){
 	}
 }
 
-t_list* obtener_objetivo_global(t_list* entrenadores){
-	t_list* objetivos_globales = list_create();
-
-	for(int i = 0; i < list_size(entrenadores); i++){
-		t_entrenador* entrenador = list_get(entrenadores, i);
-		list_add_all(objetivos_globales, entrenador->objetivos);
-	}
-
-	list_sort(objetivos_globales, strcmp);
-
-	return objetivos_globales;
-}
 
 t_log* iniciar_logger(char* path)
 {

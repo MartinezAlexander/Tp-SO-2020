@@ -17,9 +17,8 @@
 #include<mensajes/caught_pokemon.h>
 
 #include "entrenador.h"
+#include "objetivos.h"
 
-
-t_list* obtener_objetivo_global(t_list* entrenadores);
 int cantidad_de_elementos(char** array);
 
 void terminar_programa(t_log* logger, t_config* config);
@@ -34,8 +33,7 @@ void procesar_mensajes(int* socket);
 void procesar_localized(t_localized_pokemon* localized_pokemon);
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon);
 void procesar_caught(t_caught_pokemon* caught_pokemon);
-int cumplio_objetivo_global();
-int pokemon_dentro_de_objetivos(char* pokemon);
+
 
 #endif
 
