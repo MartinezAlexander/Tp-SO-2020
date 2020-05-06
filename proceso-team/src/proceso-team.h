@@ -8,6 +8,13 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 #include<commons/collections/list.h>
+#include<mensajes/server.h>
+#include<mensajes/mensajes.h>
+#include<mensajes/localized_pokemon.h>
+#include<mensajes/appeared_pokemon.h>
+#include<mensajes/get_pokemon.h>
+#include<mensajes/catch_pokemon.h>
+#include<mensajes/caught_pokemon.h>
 
 #include "entrenador.h"
 
@@ -23,4 +30,12 @@ void enviar_get_objetivo(t_list* objetivo_global);
 void iniciar_conexion_broker(char* ip, char* puerto);
 void iniciar_puerto_de_escucha();
 
+void procesar_mensajes(int* socket);
+void procesar_localized(t_localized_pokemon* localized_pokemon);
+void procesar_appeared(t_appeared_pokemon* appeared_pokemon);
+void procesar_caught(t_caught_pokemon* caught_pokemon);
+int cumplio_objetivo_global();
+int pokemon_dentro_de_objetivos(char* pokemon);
+
 #endif
+
