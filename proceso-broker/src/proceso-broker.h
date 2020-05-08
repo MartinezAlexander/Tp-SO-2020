@@ -8,8 +8,6 @@
 #include<commons/string.h>
 #include<commons/config.h>
 #include<readline/readline.h>
-#include<commons/collections/list.h>
-#include<commons/collections/queue.h>
 #include<mensajes/server.h>
 #include<mensajes/mensajes.h>
 #include<mensajes/localized_pokemon.h>
@@ -17,13 +15,7 @@
 #include<mensajes/get_pokemon.h>
 #include<mensajes/catch_pokemon.h>
 #include<mensajes/caught_pokemon.h>
-
-
-//estructura de cola con sus respectivos suscriptores
-typedef struct{
-	t_queue* queue;
-	t_list* suscriptores;
-}t_cola_mensajeria;
+#include "cola.h"
 
 typedef struct{
 	uint32_t id;
@@ -32,8 +24,10 @@ typedef struct{
 }t_mensaje_id;
 
 
-t_cola_mensajeria* cola_mensajeria_create();
+
 t_log* iniciar_logger(char* path);
 t_config* leer_config(void);
+void inicializar_colas_mensajeria();
+void inicializar_variables_globales();
 
 #endif /* PROCESO_BROKER_H_ */

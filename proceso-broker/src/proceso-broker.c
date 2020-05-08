@@ -36,8 +36,8 @@ t_cola_mensajeria* cola_mensajeria_caught;
 uint32_t ultimo_id = 0;
 
 void inicializar_variables_globales(){
-	tamano_memoria = config_get_string_value(config, "TAMANO_MEMORIA");
-	tamano_minimo_particion = config_get_string_value(config, "TAMANO_MINIMO_PARTICION");
+	tamano_memoria = config_get_int_value(config, "TAMANO_MEMORIA");
+	tamano_minimo_particion = config_get_int_value(config, "TAMANO_MINIMO_PARTICION");
 
 	algoritmo_particion_libre = config_get_string_value(config, "ALGORITMO_PARTICION_LIBRE");
 	algoritmo_reemplazo = config_get_string_value(config, "ALGORITMO_REEMPLAZO");
@@ -46,7 +46,7 @@ void inicializar_variables_globales(){
 	ip_broker = config_get_string_value(config, "IP_BROKER");
 	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
 
-	frecuencia_compactacion = config_get_string_value(config, "FRECUENCIA_COMPACTACION");
+	frecuencia_compactacion = config_get_int_value(config, "FRECUENCIA_COMPACTACION");
 
 	char* path_logger = config_get_string_value(config, "LOG_FILE");
 	logger = iniciar_logger(path_logger);
@@ -70,19 +70,11 @@ int main(void) {
 
 	inicializar_colas_mensajeria();
 
-	queue_push(cola_mensajeria_caught->queue, "adsasds");
-	printf("test: %s", queue_pop(cola_mensajeria_caught->queue));
-
 
 	return EXIT_SUCCESS;
 }
 
-t_cola_mensajeria* cola_mensajeria_create(){
-	t_cola_mensajeria* cola_mensajeria = malloc(sizeof(t_cola_mensajeria));
-	cola_mensajeria->queue = queue_create();
-	cola_mensajeria->suscriptores = list_create();
-	return cola_mensajeria;
-}
+
 
 t_log* iniciar_logger(char* path){
 	t_log* logger;
