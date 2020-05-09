@@ -1,12 +1,12 @@
 #include "localized_pokemon.h"
 #include <commons/string.h>
 
-t_localized_pokemon* localized_pokemon_create(char* nombre, t_list* posiciones){
+t_localized_pokemon* localized_pokemon_create(char* nombre,uint32_t cantidadPosiciones, t_posicion* posiciones){
 	t_localized_pokemon* localized_pokemon = malloc( sizeof(t_localized_pokemon) );
 	localized_pokemon->nombre = nombre;
 	localized_pokemon->tamanio_nombre = strlen(nombre) + 1;
+	localized_pokemon->cantidadPos = cantidadPosiciones;
 	localized_pokemon->posiciones = posiciones;
-	localized_pokemon->cantidadPos = (uint32_t)list_size(posiciones);
 	return localized_pokemon;
 }
 
@@ -33,9 +33,9 @@ t_buffer* localized_pokemon_to_buffer(t_localized_pokemon* localized_pokemon){
 
 	//Por cada posicion segun la cantidad, hago memcpy de x e y.
 	for(int i = 0 ; i < localized_pokemon->cantidadPos ; i++){
-		memcpy(stream + offset, posiciones_get_X(localized_pokemon->posiciones,i), sizeof(uint32_t));
+		memcpy(stream + offset, &(localized_pokemon->posiciones[i].posicionX), sizeof(uint32_t));
 		offset += sizeof(uint32_t);
-		memcpy(stream + offset, posiciones_get_Y(localized_pokemon->posiciones,i), sizeof(uint32_t));
+		memcpy(stream + offset, &(localized_pokemon->posiciones[i].posicionY), sizeof(uint32_t));
 		offset += sizeof(uint32_t);
 	}
 
@@ -57,14 +57,12 @@ t_localized_pokemon* localized_pokemon_from_buffer(t_buffer* buffer){
 	memcpy(&(localized_pokemon->cantidadPos), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);
 
-	localized_pokemon->posiciones = posiciones_create();
+	localized_pokemon->posiciones = malloc(sizeof(t_posicion) * localized_pokemon->cantidadPos);
 	for(int i = 0 ; i < localized_pokemon->cantidadPos ; i++){
-		t_posicion* posicion = malloc(sizeof(t_posicion));
-		memcpy(&(posicion->posicionX), stream, sizeof(uint32_t));
+		memcpy(&(localized_pokemon->posiciones[i].posicionX), stream, sizeof(uint32_t));
 		stream += sizeof(uint32_t);
-		memcpy(&(posicion->posicionY), stream, sizeof(uint32_t));
+		memcpy(&(localized_pokemon->posiciones[i].posicionY), stream, sizeof(uint32_t));
 		stream += sizeof(uint32_t);
-		list_add(localized_pokemon->posiciones,posicion);
 	}
 
 	return localized_pokemon;
@@ -77,9 +75,7 @@ void localized_pokemon_mostrar(t_localized_pokemon* localized_pokemon){
 	printf("Cantidad de posiciones: %d\n",localized_pokemon->cantidadPos);
 	printf("Posiciones: \n");
 	for(int i=0; i<localized_pokemon->cantidadPos; i++){
-		uint32_t x = *posiciones_get_X(localized_pokemon->posiciones,i);
-		uint32_t y = *posiciones_get_Y(localized_pokemon->posiciones,i);
-		printf("Posicion numero %d: x = %d , y = %d \n",i+1,x,y);
+		printf("Posicion numero %d: x = %d , y = %d \n",i+1,localized_pokemon->posiciones[i].posicionX,localized_pokemon->posiciones[i].posicionY);
 	}
 	puts("------------");
 }
@@ -87,16 +83,14 @@ void localized_pokemon_mostrar(t_localized_pokemon* localized_pokemon){
 char* localized_pokemon_to_string(t_localized_pokemon* localized_pokemon){
 	char* mensaje = string_from_format("Mensaje - Localized Pokemon:\nNombre: %s\nTamanio de nombre: %d\nCantidad de posiciones: %d\nPosiciones: \n",localized_pokemon->nombre,localized_pokemon->tamanio_nombre,localized_pokemon->cantidadPos);
 	for(int i=0; i<localized_pokemon->cantidadPos; i++){
-		uint32_t x = *posiciones_get_X(localized_pokemon->posiciones,i);
-		uint32_t y = *posiciones_get_Y(localized_pokemon->posiciones,i);
-		char* posicion = string_from_format("Posicion numero %d: x = %d , y = %d \n",i+1,x,y);
-		string_append(&mensaje,posicion);
+			char* posicion = string_from_format("Posicion numero %d: x = %d , y = %d \n",i+1,localized_pokemon->posiciones[i].posicionX,localized_pokemon->posiciones[i].posicionY);
+			string_append(&mensaje,posicion);
 	}
 	string_append(&mensaje,"------------");
 	return mensaje;
 }
 
 void localized_pokemon_destroy(t_localized_pokemon* localized_pokemon){
-	posiciones_destroy(localized_pokemon->posiciones);
+	free(localized_pokemon->posiciones);
 	free(localized_pokemon);
 }

@@ -5,8 +5,8 @@
 #include "get_pokemon.h"
 #include "localized_pokemon.h"
 #include "new_pokemon.h"
-#include "cadena.h"
 #include <sys/socket.h>
+#include "id_proceso.h"
 
 void* serializar_paquete(t_paquete* paquete, int *bytes)
 {
@@ -36,13 +36,13 @@ t_paquete* empaquetar_buffer(t_buffer* buffer, op_code codigo){
 }
 
 //TODO
-void enviar_mensaje(void* mensaje,op_code codigo, int socket_cliente)
+void enviar_mensaje(void* mensaje,op_code codigo, int socket_cliente, int32_t id, int32_t id_c)
 {
 	t_buffer* buffer;
 
 	switch(codigo){
-		case MENSAJE:
-			buffer = cadena_to_buffer((char*)mensaje);
+		case PROCESO:
+			buffer = id_proceso_to_buffer((t_proceso*)mensaje);
 			break;
 		case NEW_POKEMON:
 			buffer = new_pokemon_to_buffer((t_new_pokemon*) mensaje);
@@ -66,6 +66,19 @@ void enviar_mensaje(void* mensaje,op_code codigo, int socket_cliente)
 			break;
 	}
 
+	int nuevo_tamanio = buffer->size + 2 * sizeof(int32_t);
+	void* nuevo_stream = malloc(nuevo_tamanio);
+	int offset = 0;
+	memcpy(nuevo_stream + offset, &id, sizeof(int32_t));
+	offset += sizeof(int32_t);
+	memcpy(nuevo_stream + offset, &id_c, sizeof(int32_t));
+	offset += sizeof(int32_t);
+	memcpy(nuevo_stream + offset, buffer->stream, buffer->size);
+	offset += buffer->size;
+	buffer->size = nuevo_tamanio;
+	buffer->stream = nuevo_stream;
+
+
 	t_paquete* paquete = empaquetar_buffer(buffer,codigo);
 
 	int size_serializado;
@@ -78,7 +91,7 @@ void enviar_mensaje(void* mensaje,op_code codigo, int socket_cliente)
 	free(paquete);
 }
 
-void* recibir_mensaje(int socket_cliente, op_code* codigo_operacion)
+void* recibir_mensaje(int socket_cliente, op_code* codigo_operacion, int32_t* id, int32_t* id_c)
 {
 	op_code operacion;
 	recv(socket_cliente, &operacion, sizeof(operacion),0);
@@ -89,10 +102,17 @@ void* recibir_mensaje(int socket_cliente, op_code* codigo_operacion)
 	buffer->stream = malloc(buffer->size);
 	recv(socket_cliente, buffer->stream, buffer->size,0);
 
+	memcpy(id,buffer->stream,sizeof(int32_t));
+	buffer->stream += sizeof(int32_t);
+	memcpy(id_c, buffer->stream, sizeof(int32_t));
+	buffer->stream += sizeof(int32_t);
+
+	buffer->size -= sizeof(int32_t) * 2;
+
 	void* mensaje;
 	switch(operacion){
-			case MENSAJE:
-				 mensaje = cadena_from_buffer(buffer);
+			case PROCESO:
+				 mensaje = id_proceso_from_buffer(buffer);
 				break;
 			case NEW_POKEMON:
 				 mensaje = new_pokemon_from_buffer(buffer);

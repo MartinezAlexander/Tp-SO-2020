@@ -8,7 +8,7 @@ typedef struct{
 	uint32_t tamanio_nombre;
 	char* nombre;
 	uint32_t cantidadPos;
-	t_list* posiciones;
+	t_posicion* posiciones;
 } t_localized_pokemon;
 
 /*
@@ -19,7 +19,7 @@ ej: t_localized_pokemon* localized_mensaje = localized_pokemon_create("pikachu",
 posiciones debe ser el tipo t_posicion* es decir una lista de posiciones la cual se creara 
 utilizando las funciones incluidas en posiciones.h
 */
-t_localized_pokemon* localized_pokemon_create(char* nombre, t_list* posiciones);
+t_localized_pokemon* localized_pokemon_create(char* nombre,uint32_t cantidadPos, t_posicion* posiciones);
 
 /*
 localized_pokemon_codigo te retorna el codigo de operacion cuando recibe un localized pokemon

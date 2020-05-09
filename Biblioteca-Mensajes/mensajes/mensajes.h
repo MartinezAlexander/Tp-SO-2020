@@ -6,6 +6,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef enum{
+	BROKER = 1,
+	TEAM,
+	GAMECARD,
+	SUSCRIPTOR
+}t_proceso;
+
 typedef enum
 {
 	NEW_POKEMON = 1,
@@ -14,7 +21,7 @@ typedef enum
     APPEARED_POKEMON,
     CATCH_POKEMON,
     CAUGHT_POKEMON,
-    MENSAJE
+    PROCESO
 }op_code;
 
 typedef struct{
@@ -53,7 +60,7 @@ utilizar a la hora de serializar el mensaje y por ultimo el socket a traves del
 cual enviara el mensaje.
 ej: enviar_mensaje((t_new_pokemon*)new_mensaje,NEW_POKEMON,socket);
 */
-void enviar_mensaje(void* mensaje,op_code codigo, int socket_cliente);
+void enviar_mensaje(void* mensaje,op_code codigo, int socket_cliente, int32_t id, int32_t id_c);
 
 /*
 recibir_mensaje es un metodo que se encarga de recibir los mensajes que lleguen
@@ -70,6 +77,6 @@ if(codigo == NEW_POKEMON){
 }
 al final de esto tenemos un mensaje new pokemon listo para utilizar.
 */
-void* recibir_mensaje(int socket_cliente, op_code* codigo_operacion);
+void* recibir_mensaje(int socket_cliente, op_code* codigo_operacion, int32_t* id, int32_t* id_c);
 
 #endif 
