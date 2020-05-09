@@ -32,7 +32,8 @@ typedef struct{
 
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos);
 
-void entrenador_mostrar(t_entrenador* entrenador);
+void entrenador_mostrar(t_entrenador *entrenador);
+int checkear_exec_entrenador(t_entrenador *entrenador);
 t_list* array_to_list(char** adquiridos);
 
 t_list* leer_entrenadores(t_config* config);

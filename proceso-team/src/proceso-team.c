@@ -21,9 +21,7 @@ uint32_t tiempo_de_reconexion;
 uint32_t retardo_cpu;
 
 //TODO estructura para algoritmos
-char* algoritmo_planificacion;
-uint32_t quantum;
-uint32_t estimacion_inicial;
+t_planificador *planificador;
 
 char* ip_broker;
 char* puerto_broker;
@@ -42,15 +40,18 @@ int main(void) {
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");
 
-	algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
-	quantum = config_get_int_value(config, "QUANTUM");
-	estimacion_inicial = config_get_int_value(config, "ESTIMACION_INICIAL");
+	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
+	uint32_t quantum = config_get_int_value(config, "QUANTUM");
+	uint32_t estimacion_inicial = config_get_int_value(config, "ESTIMACION_INICIAL");
+	planificador = planificador_create(algoritmo_planificacion, quantum, estimacion_inicial);
 
 	ip_broker = config_get_string_value(config, "IP_BROKER");
 	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
 
 	char* path_logger = config_get_string_value(config, "LOG_FILE");
 	logger = iniciar_logger(path_logger);
+
+	//Planificar
 
 	//Conectarse a las colas del broker
 	iniciar_conexion_broker(ip_broker, puerto_broker);

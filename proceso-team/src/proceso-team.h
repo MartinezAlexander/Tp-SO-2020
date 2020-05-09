@@ -18,6 +18,7 @@
 
 #include "entrenador.h"
 #include "objetivos.h"
+#include "planificacion.h"
 
 int cantidad_de_elementos(char** array);
 

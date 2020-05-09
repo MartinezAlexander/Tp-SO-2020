@@ -5,8 +5,6 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 
 	char** posiciones_separadas = string_split(posicion, "|");
 	entrenador->posicion = *posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
-	/*entrenador->posicion.posicionX = atoi(posiciones_separadas[0]);
-	entrenador->posicion.posicionY = atoi(posiciones_separadas[1]);*/
 
 	entrenador->pokemones_adquiridos = array_to_list(string_split(pokemones, "|"));
 	entrenador->objetivos = array_to_list(string_split(objetivos, "|"));
@@ -82,4 +80,9 @@ void entrenador_mostrar(t_entrenador* entrenador){
 
 	printf("Estado: %d \n\n", entrenador->estado);
 
+}
+
+int checkear_exec_entrenador(t_entrenador *entrenador)
+{
+	return(entrenador->estado == EXEC);
 }
