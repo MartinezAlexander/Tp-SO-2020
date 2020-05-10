@@ -1,5 +1,74 @@
 #include "entrenador.h"
 
+
+void ejecutar_entrenador(t_entrenador* entrenador){
+
+	int termine = mover_proxima_posicion(entrenador);
+
+	if(termine){
+		enviar_catch(entrenador);
+	}
+}
+
+void enviar_catch(t_entrenador* entrenador){
+	//Conecto con broker
+	//Recibo id
+	//Paso a bloqueado
+	entrenador->estado = BLOCKED;
+	printf("LLegue a destino, me bloqueo esperando rta \n\n");
+}
+
+//TODO averiguar que haya que usar sleep y no otra cosa.
+//TODO ver otra forma de hacer este asco
+
+//Devuelve 0 si se movio, 1 si ya esta en la posicion del objetivo
+int mover_proxima_posicion(t_entrenador* entrenador){
+
+	//Obtengo direccion
+	int dirX = entrenador->objetivo_actual->posicion.posicionX - entrenador->posicion.posicionX;
+
+
+	if(dirX > 0){
+		entrenador->posicion.posicionX++;
+		//Retardo
+		sleep(retardo_cpu);
+	}else if(dirX < 0){
+		entrenador->posicion.posicionX--;
+		//Retardo
+		sleep(retardo_cpu);
+	}else{
+
+		int dirY = entrenador->objetivo_actual->posicion.posicionY - entrenador->posicion.posicionY;
+
+		if(dirY > 0){
+			entrenador->posicion.posicionY++;
+			//Retardo
+			sleep(retardo_cpu);
+		}else if(dirY < 0){
+			entrenador->posicion.posicionY--;
+			//Retardo
+			sleep(retardo_cpu);
+		}else{
+			printf("No me muevo\n");
+			return 1;
+		}
+	}
+
+	printf("Me movi a [%d , %d]\n", entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
+
+
+	return 0;
+}
+
+t_pokemon* pokemon_create(char* nombre, t_posicion posicion){
+	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
+
+	pokemon->nombre = nombre;
+	pokemon->posicion = posicion;
+
+	return pokemon;
+}
+
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos){
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
@@ -9,6 +78,8 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	entrenador->pokemones_adquiridos = array_to_list(string_split(pokemones, "|"));
 	entrenador->objetivos = array_to_list(string_split(objetivos, "|"));
 	entrenador->estado = NEW;
+
+	entrenador->objetivo_actual = NULL;
 
 	return entrenador;
 }

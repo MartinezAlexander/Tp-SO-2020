@@ -16,9 +16,25 @@
 #include<mensajes/catch_pokemon.h>
 #include<mensajes/caught_pokemon.h>
 
+
 #include "entrenador.h"
 #include "objetivos.h"
 #include "planificacion.h"
+
+
+
+//Variables de un proceso team
+t_config* config;
+
+t_list* objetivo_global;
+
+uint32_t tiempo_de_reconexion;
+
+char* ip_broker;
+char* puerto_broker;
+
+t_log* logger;
+
 
 int cantidad_de_elementos(char** array);
 
@@ -35,6 +51,7 @@ void procesar_localized(t_localized_pokemon* localized_pokemon);
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon);
 void procesar_caught(t_caught_pokemon* caught_pokemon);
 
+void test();
 
 #endif
 

@@ -11,23 +11,6 @@
 
 #include "proceso-team.h"
 
-//Variables de un proceso team
-t_config* config;
-
-t_list* entrenadores;
-t_list* objetivo_global;
-
-uint32_t tiempo_de_reconexion;
-uint32_t retardo_cpu;
-
-//TODO estructura para algoritmos
-t_planificador *planificador;
-
-char* ip_broker;
-char* puerto_broker;
-
-t_log* logger;
-
 
 int main(void) {
 
@@ -50,8 +33,9 @@ int main(void) {
 
 	char* path_logger = config_get_string_value(config, "LOG_FILE");
 	logger = iniciar_logger(path_logger);
+/*
 
-	//Planificar
+
 
 	//Conectarse a las colas del broker
 	iniciar_conexion_broker(ip_broker, puerto_broker);
@@ -61,8 +45,56 @@ int main(void) {
 
 	//Abrir socket de escucha para el Gameboy
 	iniciar_puerto_de_escucha();
+*/
+	test();
+
 
 	terminar_programa(logger, config);
+}
+
+void test(){
+	//Test de verdad
+	//Inicio los hilos de los entrenadores
+	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+		planificador_iniciar_hilo_entrenador(list_get(entrenadores, i));
+	}
+
+	//nuevo APPEARED
+	t_appeared_pokemon* msj = appeared_pokemon_create("Pikachu", 5, 3);
+	//agarramos el pokemon
+	t_pokemon* pokemon = pokemon_create(msj->nombre, msj->posicion);
+	//entrenador_entrar_a_planificacion(pokemon)
+	entrenador_entrar_a_planificacion(pokemon);
+
+	//nuevo APPEARED
+	t_appeared_pokemon* nuevo_msj = appeared_pokemon_create("Charmander", 1, 3);
+	//agarramos el pokemon
+	t_pokemon* nuevo_pokemon = pokemon_create(nuevo_msj->nombre, nuevo_msj->posicion);
+	//entrenador_entrar_a_planificacion(pokemon)
+	entrenador_entrar_a_planificacion(nuevo_pokemon);
+
+	//Deberia pasar:
+
+	//Encolado entrenador en [5,5]
+	//Entrenador en [5,5] pasa a ejecucion
+	//Encolado entrenador en [1,2]
+	// .. 2 seg ..
+	//Me movi a [5, 4]
+	// .. 2 seg ..
+	//Me movi a [5, 3]
+	//Llegue a destino, entrenador bloqueado
+	//Entrenador en [1,2] pasa a ejecucion
+	// .. 2 seg ..
+	//Me movi a [1, 3]
+	//Llegue a destino, entrenador bloqueado
+
+
+	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+		t_entrenador* ent = list_get(entrenadores, i);
+		pthread_join(ent->hilo, NULL);
+	}
+
+	printf("\n\n");
 }
 
 void iniciar_conexion_broker(char* ip, char* puerto){
