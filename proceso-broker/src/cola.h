@@ -22,8 +22,16 @@
 typedef struct{
 	t_queue* queue;
 	t_list* suscriptores;
+	pthread_t hilo;
+	//semaforo
 }t_cola_mensajeria;
 
+typedef struct{
+	int socket;
+	int32_t pid;
+}t_suscriptor;
+
+t_suscriptor* suscriptor_create(int socket, int32_t pid);
 t_cola_mensajeria* cola_mensajeria_create();
 
 
