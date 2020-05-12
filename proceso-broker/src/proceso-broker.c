@@ -29,17 +29,17 @@ void inicializar_variables_globales(){
 
 void inicializar_colas_mensajeria(){
 	cola_mensajeria_new = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_new->hilo),NULL,procesar_new_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_new->hilo),NULL,(void*)procesar_new_pokemon,NULL);
 	cola_mensajeria_appeared = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_appeared->hilo),NULL,procesar_appeared_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_appeared->hilo),NULL,(void*)procesar_appeared_pokemon,NULL);
 	cola_mensajeria_get = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_get->hilo),NULL,procesar_get_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_get->hilo),NULL,(void*)procesar_get_pokemon,NULL);
 	cola_mensajeria_localized = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_localized->hilo),NULL,procesar_localized_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_localized->hilo),NULL,(void*)procesar_localized_pokemon,NULL);
 	cola_mensajeria_catch = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_catch->hilo),NULL,procesar_catch_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_catch->hilo),NULL,(void*)procesar_catch_pokemon,NULL);
 	cola_mensajeria_caught = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_caught->hilo),NULL,procesar_caught_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_caught->hilo),NULL,(void*)procesar_caught_pokemon,NULL);
 }
 
 pthread_t prueba;
@@ -89,6 +89,8 @@ void administrar_mensajes(int* socket){
 		case CAUGHT_POKEMON:
 			queue_push(cola_mensajeria_caught->queue,mensaje->mensaje);
 			break;
+		default:
+			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
 	}
 	//pthread_create(&prueba,NULL,(void*)mostrar,NULL);
 }
@@ -115,6 +117,8 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 		case CAUGHT_POKEMON:
 			list_add(cola_mensajeria_caught->suscriptores, suscriptor);
 			break;
+		default:
+			printf("SUSCRIPTOR NO VALIDO \n\n");
 	}
 	puts("SUSCRIBI A: ");
 	suscripcion_proceso_mostrar(suscripcion);
@@ -194,11 +198,10 @@ t_log* iniciar_logger(char* path){
 
 t_config* leer_config(void){
 	t_config *config;//Puede que este mal el path
-	if((config = config_create("src/broker.config")) == NULL)
+	if((config = config_create("/home/utnso/workspace/tp-2020-1c-Grupo-7-SO/proceso-broker/src/broker.config")) == NULL)
 	{
 		printf("No pude leer la config\n");
 		exit(2);
 	}
 	return config;
 }
-
