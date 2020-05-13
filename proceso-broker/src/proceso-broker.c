@@ -25,6 +25,8 @@ void inicializar_variables_globales(){
 
 	char* path_logger = config_get_string_value(config, "LOG_FILE");
 	logger = iniciar_logger(path_logger);
+
+	ultimo_id = 0;
 }
 
 void inicializar_colas_mensajeria(){
@@ -72,22 +74,34 @@ void administrar_mensajes(int* socket){
 			procesar_suscripcion(mensaje, socket);
 			break;
 		case NEW_POKEMON:
-			queue_push(cola_mensajeria_new->queue,mensaje->mensaje);
+			ultimo_id++;
+			mensaje->id = ultimo_id;//validar id = -1
+			queue_push(cola_mensajeria_new->queue,mensaje);
 			break;
 		case LOCALIZED_POKEMON:
-			queue_push(cola_mensajeria_localized->queue,mensaje->mensaje);
+			ultimo_id++;
+			mensaje->id = ultimo_id;//validar id = -1
+			queue_push(cola_mensajeria_localized->queue,mensaje);
 			break;
 		case GET_POKEMON:
-			queue_push(cola_mensajeria_get->queue,mensaje->mensaje);
+			ultimo_id++;
+			mensaje->id = ultimo_id;//validar id = -1
+			queue_push(cola_mensajeria_get->queue,mensaje);
 			break;
 		case APPEARED_POKEMON:
-			queue_push(cola_mensajeria_appeared->queue,mensaje->mensaje);
+			ultimo_id++;
+			mensaje->id = ultimo_id;//validar id = -1
+			queue_push(cola_mensajeria_appeared->queue,mensaje);
 			break;
 		case CATCH_POKEMON:
-			queue_push(cola_mensajeria_catch->queue,mensaje->mensaje);
+			ultimo_id++;
+			mensaje->id = ultimo_id;//validar id = -1
+			queue_push(cola_mensajeria_catch->queue,mensaje);
 			break;
 		case CAUGHT_POKEMON:
-			queue_push(cola_mensajeria_caught->queue,mensaje->mensaje);
+			ultimo_id++;
+			mensaje->id = ultimo_id; //validar id = -1
+			queue_push(cola_mensajeria_caught->queue,mensaje);
 			break;
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
@@ -95,27 +109,35 @@ void administrar_mensajes(int* socket){
 	//pthread_create(&prueba,NULL,(void*)mostrar,NULL);
 }
 
+
+
 void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
 	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
 	switch(suscripcion->cola_suscripcion){
 		case NEW_POKEMON:
 			list_add(cola_mensajeria_new->suscriptores, suscriptor);
+			//mandar mensajes viejos de la cache
 			break;
 		case LOCALIZED_POKEMON:
 			list_add(cola_mensajeria_localized->suscriptores, suscriptor);
+			//mandar mensajes viejos de la cache
 			break;
 		case GET_POKEMON:
 			list_add(cola_mensajeria_get->suscriptores, suscriptor);
+			//mandar mensajes viejos de la cache
 			break;
 		case APPEARED_POKEMON:
 			list_add(cola_mensajeria_appeared->suscriptores, suscriptor);
+			//mandar mensajes viejos de la cache
 			break;
 		case CATCH_POKEMON:
 			list_add(cola_mensajeria_catch->suscriptores, suscriptor);
+			//mandar mensajes viejos de la cache
 			break;
 		case CAUGHT_POKEMON:
 			list_add(cola_mensajeria_caught->suscriptores, suscriptor);
+			//mandar mensajes viejos de la cache
 			break;
 		default:
 			printf("SUSCRIPTOR NO VALIDO \n\n");
@@ -127,10 +149,13 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 void procesar_new_pokemon(){
 	while(1){
 		if(!queue_is_empty(cola_mensajeria_new->queue)){
-			t_new_pokemon* pokemon = (t_new_pokemon*)queue_pop(cola_mensajeria_new->queue);
-			printf("saco de la cola a: \n");
-			new_pokemon_mostrar(pokemon);
-			sleep(2);
+			if(!list_is_empty(cola_mensajeria_new->suscriptores)){
+				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_new->queue);
+				//guardar pokemon en la cache
+				printf("saco de la cola a: \n");
+				envio_a_suscriptores(cola_mensajeria_new->suscriptores,pokemon);
+				new_pokemon_mostrar((t_new_pokemon*)pokemon->mensaje);
+			}
 		}
 	}
 }
@@ -138,51 +163,73 @@ void procesar_new_pokemon(){
 void procesar_localized_pokemon(t_mensaje* mensaje){
 	while(1){
 		if(!queue_is_empty(cola_mensajeria_localized->queue)){
-			t_localized_pokemon* pokemon = (t_localized_pokemon*)queue_pop(cola_mensajeria_localized->queue);
-			printf("saco de la cola a: \n");
-			localized_pokemon_mostrar(pokemon);
-			sleep(2);
+			if(!list_is_empty(cola_mensajeria_localized->suscriptores)){
+				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_localized->queue);
+				//guardar pokemon en la cache
+				printf("saco de la cola a: \n");
+				envio_a_suscriptores(cola_mensajeria_localized->suscriptores,pokemon);
+				localized_pokemon_mostrar((t_localized_pokemon*)pokemon->mensaje);
+			}
 		}
 	}
 }
 void procesar_get_pokemon(t_mensaje* mensaje){
 	while(1){
 		if(!queue_is_empty(cola_mensajeria_get->queue)){
-			t_get_pokemon* pokemon = (t_get_pokemon*)queue_pop(cola_mensajeria_get->queue);
-			printf("saco de la cola a: \n");
-			get_pokemon_mostrar(pokemon);
-			sleep(2);
+			if(!list_is_empty(cola_mensajeria_get->suscriptores)){
+				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_get->queue);
+				//guardar pokemon en la cache
+				printf("saco de la cola a: \n");
+				envio_a_suscriptores(cola_mensajeria_get->suscriptores,pokemon);
+				get_pokemon_mostrar((t_get_pokemon*)pokemon->mensaje);
+			}
 		}
 	}
 }
 void procesar_appeared_pokemon(t_mensaje* mensaje){
 	while(1){
 		if(!queue_is_empty(cola_mensajeria_appeared->queue)){
-			t_appeared_pokemon* pokemon = (t_appeared_pokemon*)queue_pop(cola_mensajeria_appeared->queue);
-			printf("saco de la cola a: \n");
-			appeared_pokemon_mostrar(pokemon);
-			sleep(2);
+			if(!list_is_empty(cola_mensajeria_appeared->suscriptores)){
+				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_appeared->queue);
+				//guardar pokemon en la cache
+				printf("saco de la cola a: \n");
+				envio_a_suscriptores(cola_mensajeria_appeared->suscriptores,pokemon);
+				appeared_pokemon_mostrar((t_appeared_pokemon*)pokemon->mensaje);
+			}
 		}
 	}
 }
 void procesar_catch_pokemon(t_mensaje* mensaje){
 	while(1){
 		if(!queue_is_empty(cola_mensajeria_catch->queue)){
-			t_catch_pokemon* pokemon = (t_catch_pokemon*)queue_pop(cola_mensajeria_catch->queue);
-			printf("saco de la cola a: \n");
-			catch_pokemon_mostrar(pokemon);
-			sleep(2);
+			if(!list_is_empty(cola_mensajeria_catch->suscriptores)){
+				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_catch->queue);
+				//guardar pokemon en la cache
+				printf("saco de la cola a: \n");
+				envio_a_suscriptores(cola_mensajeria_catch->suscriptores,pokemon);
+				catch_pokemon_mostrar((t_catch_pokemon*)pokemon->mensaje);
+			}
 		}
 	}
 }
 void procesar_caught_pokemon(t_mensaje* mensaje){
 	while(1){
 		if(!queue_is_empty(cola_mensajeria_caught->queue)){
-			t_caught_pokemon* pokemon = (t_caught_pokemon*)queue_pop(cola_mensajeria_caught->queue);
-			printf("saco de la cola a: \n");
-			caught_pokemon_mostrar(pokemon);
-			sleep(2);
+			if(!list_is_empty(cola_mensajeria_caught->suscriptores)){
+				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_caught->queue);
+				//guardar pokemon en la cache
+				printf("saco de la cola a: \n");
+				envio_a_suscriptores(cola_mensajeria_caught->suscriptores,pokemon);
+				caught_pokemon_mostrar((t_caught_pokemon*)pokemon->mensaje);
+			}
 		}
+	}
+}
+
+void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
+	for(int i = 0; i < list_size(suscriptores); i++){
+		t_suscriptor* suscriptor = list_get(suscriptores,i);
+		enviar_mensaje(mensaje,suscriptor->socket);
 	}
 }
 
