@@ -60,6 +60,7 @@ int mover_proxima_posicion(t_entrenador* entrenador){
 	return 0;
 }
 
+//TODO mover a Biblioteca
 t_pokemon* pokemon_create(char* nombre, t_posicion posicion){
 	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
 
@@ -84,24 +85,15 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	return entrenador;
 }
 
-t_list* array_to_list(char** adquiridos){
-
-	t_list* lista = list_create();
-	for(int i = 0; adquiridos[i]!=NULL ; i++){
-		list_add(lista,adquiridos[i]);
-	}
-	return lista;
-}
-
 
 t_list* leer_entrenadores(t_config* config){
 	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
 	char** pokemones_entrenadores = config_get_array_value(config, "POKEMON_ENTRENADORES");
 	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
 
-	int numero_posiciones = cantidad_de_elementos(posiciones_entrenadores);
-	int numero_pok_entrenadores = cantidad_de_elementos(pokemones_entrenadores);
-	int numero_obj_entrenadores = cantidad_de_elementos(objetivos_entrenadores);
+	int numero_posiciones = array_cantidad_de_elementos(posiciones_entrenadores);
+	int numero_pok_entrenadores = array_cantidad_de_elementos(pokemones_entrenadores);
+	int numero_obj_entrenadores = array_cantidad_de_elementos(objetivos_entrenadores);
 
 	//Error si no coinciden las cantidades
 	if(numero_posiciones != numero_pok_entrenadores
@@ -117,13 +109,6 @@ t_list* leer_entrenadores(t_config* config){
 	}
 
 	return entrenadores;
-}
-
-
-int cantidad_de_elementos(char** array){
-	int cantidad = 0;
-	while(array[cantidad] != NULL) cantidad++;
-	return cantidad;
 }
 
 
@@ -153,7 +138,7 @@ void entrenador_mostrar(t_entrenador* entrenador){
 
 }
 
-int checkear_exec_entrenador(t_entrenador *entrenador)
+int entrenador_en_ejecucion(t_entrenador *entrenador)
 {
 	return(entrenador->estado == EXEC);
 }

@@ -26,6 +26,7 @@ int main(void) {
 	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
 	uint32_t quantum = config_get_int_value(config, "QUANTUM");
 	uint32_t estimacion_inicial = config_get_int_value(config, "ESTIMACION_INICIAL");
+
 	planificador = planificador_create(algoritmo_planificacion, quantum, estimacion_inicial);
 
 	ip_broker = config_get_string_value(config, "IP_BROKER");
@@ -56,7 +57,7 @@ void test(){
 	//Test de verdad
 	//Inicio los hilos de los entrenadores
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-		planificador_iniciar_hilo_entrenador(list_get(entrenadores, i));
+		planificador_iniciar_hilo_entrenador(planificador, list_get(entrenadores, i));
 	}
 
 	//nuevo APPEARED
@@ -64,14 +65,14 @@ void test(){
 	//agarramos el pokemon
 	t_pokemon* pokemon = pokemon_create(msj->nombre, msj->posicion);
 	//entrenador_entrar_a_planificacion(pokemon)
-	entrenador_entrar_a_planificacion(pokemon);
+	entrenador_entrar_a_planificacion(planificador, pokemon);
 
 	//nuevo APPEARED
 	t_appeared_pokemon* nuevo_msj = appeared_pokemon_create("Charmander", 1, 3);
 	//agarramos el pokemon
 	t_pokemon* nuevo_pokemon = pokemon_create(nuevo_msj->nombre, nuevo_msj->posicion);
 	//entrenador_entrar_a_planificacion(pokemon)
-	entrenador_entrar_a_planificacion(nuevo_pokemon);
+	entrenador_entrar_a_planificacion(planificador, nuevo_pokemon);
 
 	//Deberia pasar:
 

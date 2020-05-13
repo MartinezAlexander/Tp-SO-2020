@@ -35,8 +35,8 @@ char* puerto_broker;
 
 t_log* logger;
 
+t_planificador *planificador;
 
-int cantidad_de_elementos(char** array);
 
 void terminar_programa(t_log* logger, t_config* config);
 t_config* leer_config(void);
