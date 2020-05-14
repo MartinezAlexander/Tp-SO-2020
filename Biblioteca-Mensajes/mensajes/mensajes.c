@@ -27,11 +27,11 @@ t_mensaje* mensaje_con_id_create(void* mensaje, op_code codigo, int32_t id){
 	return nuevo_mensaje;
 }
 
-t_mensaje* mensaje_con_id_correlativo_create(void* mensaje, op_code codigo, int32_t id, int32_t id_c){
+t_mensaje* mensaje_con_id_correlativo_create(void* mensaje, op_code codigo, int32_t id_c){
 	t_mensaje* nuevo_mensaje = malloc( sizeof(t_mensaje) );
 	nuevo_mensaje->codigo = codigo;
 	nuevo_mensaje->mensaje = mensaje;
-	nuevo_mensaje->id = id;
+	nuevo_mensaje->id = (-1);
 	nuevo_mensaje->id_correlativo = id_c;
 	return nuevo_mensaje;
 }

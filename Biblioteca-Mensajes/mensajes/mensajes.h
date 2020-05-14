@@ -99,7 +99,7 @@ mensaje_con_id_correlativo_create recibe cualquier tipo de mensaje, su codigo y 
 id del mensaje, mas su id correlativo para crear un t_mensaje para poder enviarlo a
 traves de un socket
 */
-t_mensaje* mensaje_con_id_correlativo_create(void* mensaje, op_code codigo, int32_t id, int32_t id_c);
+t_mensaje* mensaje_con_id_correlativo_create(void* mensaje, op_code codigo, int32_t id_c);
 
 /*
 mensaje_obtener_id recibe un t_mensaje y le devuelve el id que posee, en caso de no
