@@ -8,24 +8,17 @@
 #include<commons/config.h>
 #include<commons/collections/list.h>
 #include<mensajes/posiciones.h>
+#include<mensajes/pokemon.h>
 #include<semaphore.h>
 #include<pthread.h>
 #include<unistd.h>
 
 #include "array_utils.h"
 
-//#include "planificacion.h"
-
 
 uint32_t retardo_cpu;
 
 t_list* entrenadores;
-
-//TODO mover a Bibilioteca
-typedef struct{
-	char* nombre;
-	t_posicion posicion;
-} t_pokemon;
 
 typedef enum{
 	NEW, READY, EXEC, BLOCKED, EXIT
@@ -51,8 +44,6 @@ void enviar_catch(t_entrenador* entrenador);
 void ejecutar_entrenador(t_entrenador* entrenador);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);
-
-t_pokemon* pokemon_create(char* nombre, t_posicion posicion);
 
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos);
 t_list* leer_entrenadores(t_config* config);

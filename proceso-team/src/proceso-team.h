@@ -15,6 +15,9 @@
 #include<mensajes/get_pokemon.h>
 #include<mensajes/catch_pokemon.h>
 #include<mensajes/caught_pokemon.h>
+#include<mensajes/pokemon.h>
+#include<mensajes/suscripcion.h>
+#include<mensajes/client.h>
 
 #include "entrenador.h"
 #include "objetivos.h"
@@ -44,7 +47,8 @@ t_config* leer_config(void);
 t_log* iniciar_logger(char*);
 
 void enviar_get_objetivo(t_list* objetivo_global);
-void iniciar_conexion_broker(char* ip, char* puerto);
+void iniciar_conexion_broker();
+int iniciar_suscripcion_broker(op_code cola);
 void iniciar_puerto_de_escucha();
 
 void procesar_mensajes(int* socket);

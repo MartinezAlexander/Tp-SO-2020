@@ -8,6 +8,7 @@
 #include<commons/config.h>
 #include<commons/collections/list.h>
 #include<commons/collections/queue.h>
+#include<mensajes/pokemon.h>
 #include<mensajes/posiciones.h>
 #include<pthread.h>
 #include<semaphore.h>

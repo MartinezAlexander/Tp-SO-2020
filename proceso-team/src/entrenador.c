@@ -60,16 +60,6 @@ int mover_proxima_posicion(t_entrenador* entrenador){
 	return 0;
 }
 
-//TODO mover a Biblioteca
-t_pokemon* pokemon_create(char* nombre, t_posicion posicion){
-	t_pokemon* pokemon = malloc(sizeof(t_pokemon));
-
-	pokemon->nombre = nombre;
-	pokemon->posicion = posicion;
-
-	return pokemon;
-}
-
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos){
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
