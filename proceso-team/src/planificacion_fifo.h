@@ -12,7 +12,7 @@
 #include<semaphore.h>
 #include<commons/collections/queue.h>
 #include "entrenador.h"
-#include "proceso-team.h"
+#include "planificador.h"
 
 void comenzar_ciclo_fifo(t_entrenador* entrenador);
 void finalizar_ciclo_fifo(t_entrenador* entrenador);

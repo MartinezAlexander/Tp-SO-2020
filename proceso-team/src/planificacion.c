@@ -1,7 +1,7 @@
 #include "planificacion.h"
 
 
-void planificador_iniciar_hilo_entrenador(t_planificador* planificador, t_entrenador* entrenador){
+void planificador_iniciar_hilo_entrenador(t_entrenador* entrenador){
 	sem_init(&(entrenador->semaforo), 0, 0);
 
 	void* planificacion_correspondiente;
@@ -17,31 +17,11 @@ void planificador_iniciar_hilo_entrenador(t_planificador* planificador, t_entren
 	pthread_create(&(entrenador->hilo), NULL, planificacion_correspondiente, entrenador);
 }
 
-tipo_planificacion obtener_algoritmo(char* algoritmo){
-	if(strcmp(algoritmo,"FIFO")) return FIFO;
-	else if(strcmp(algoritmo,"RR")) return RR;
-	else if(strcmp(algoritmo,"SJF_CD")) return SJF_CD;
-	else if(strcmp(algoritmo,"SJF_SD")) return SJF_SD;
-	else{
-		printf("\n --Algoritmo de planificacion invalido--\n\n");
-		exit(2);
-	}
-}
-
-t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t estimacion_inicial)
-{
-	t_planificador* planificador = malloc(sizeof(t_planificador));
-	planificador->algoritmo_planificacion = obtener_algoritmo(algoritmo);
-	planificador->quantum = quantum;
-	planificador->estimacion_inicial = estimacion_inicial;
-	planificador->cola = queue_create();
-    return planificador;
-}
 
 
 //TODO t_pokemon en bibliotec + funciones necesarias para pasarlo de un mensaje
 
-void entrenador_entrar_a_planificacion(t_planificador* planificador, t_pokemon* pokemon){
+void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Filtro entrenadores disponibles
 	t_list* entrenadores_disponibles = list_filter(entrenadores, (void*)entrenador_disponible);
@@ -53,12 +33,12 @@ void entrenador_entrar_a_planificacion(t_planificador* planificador, t_pokemon* 
 	entrenador_mas_cercano->objetivo_actual = pokemon;
 
 	//Agrego entrenador a la cola del planificador
-	encolar(planificador, entrenador_mas_cercano);
+	encolar(entrenador_mas_cercano);
 
 	//Planificador comprueba si hay alguien ejecutando
 		//En caso contrario pone a ejecutar al primero de la cola
 	if(puedo_ejecutar()){
-		ejecutar_proximo(planificador);
+		ejecutar_proximo();
 	}
 }
 
@@ -73,7 +53,7 @@ void ejecutar_hilo_fifo(t_entrenador* entrenador){
 }
 
 
-void ejecutar_proximo(t_planificador* planificador){
+void ejecutar_proximo(){
 	switch(planificador->algoritmo_planificacion){
 		case FIFO:
 			ejecutar_proximo_fifo();
@@ -89,7 +69,7 @@ int entrenador_disponible(t_entrenador *entrenador)
 	return entrenador->estado == NEW || entrenador->estado == BLOCKED;
 }
 
-void encolar(t_planificador* planificador, t_entrenador* entrenador)
+void encolar(t_entrenador* entrenador)
 {
 	printf("Encolado entrenador en [%d , %d]\n", entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
     entrenador->estado = READY;

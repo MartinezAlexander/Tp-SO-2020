@@ -34,9 +34,6 @@ int main(void) {
 
 	char* path_logger = config_get_string_value(config, "LOG_FILE");
 	logger = iniciar_logger(path_logger);
-/*
-
-
 
 	//Conectarse a las colas del broker
 	iniciar_conexion_broker(ip_broker, puerto_broker);
@@ -46,8 +43,9 @@ int main(void) {
 
 	//Abrir socket de escucha para el Gameboy
 	iniciar_puerto_de_escucha();
-*/
-	test();
+
+
+//	test();
 
 
 	terminar_programa(logger, config);
@@ -57,7 +55,7 @@ void test(){
 	//Test de verdad
 	//Inicio los hilos de los entrenadores
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-		planificador_iniciar_hilo_entrenador(planificador, list_get(entrenadores, i));
+		planificador_iniciar_hilo_entrenador(list_get(entrenadores, i));
 	}
 
 	//nuevo APPEARED
@@ -65,14 +63,14 @@ void test(){
 	//agarramos el pokemon
 	t_pokemon* pokemon = pokemon_create(msj->nombre, msj->posicion);
 	//entrenador_entrar_a_planificacion(pokemon)
-	entrenador_entrar_a_planificacion(planificador, pokemon);
+	entrenador_entrar_a_planificacion(pokemon);
 
 	//nuevo APPEARED
 	t_appeared_pokemon* nuevo_msj = appeared_pokemon_create("Charmander", 1, 3);
 	//agarramos el pokemon
 	t_pokemon* nuevo_pokemon = pokemon_create(nuevo_msj->nombre, nuevo_msj->posicion);
 	//entrenador_entrar_a_planificacion(pokemon)
-	entrenador_entrar_a_planificacion(planificador, nuevo_pokemon);
+	entrenador_entrar_a_planificacion(nuevo_pokemon);
 
 	//Deberia pasar:
 
@@ -98,33 +96,40 @@ void test(){
 	printf("\n\n");
 }
 
-void iniciar_conexion_broker(char* ip, char* puerto){
+void iniciar_conexion_broker(){/*
+	socket_appeared = iniciar_suscripcion_broker(APPEARED_POKEMON);
+	socket_caught = iniciar_suscripcion_broker(CAUGHT_POKEMON);
+	socket_localized = iniciar_suscripcion_broker(LOCALIZED_POKEMON);
 
+	//TODO esto en un hilo para cada cola
+	while(1){
+		t_mensaje* mensaje_appeared = recibir_mensaje(socket_appeared);
+		procesar_appeared((t_appeared_pokemon*) mensaje_appeared->mensaje);
+
+		t_mensaje* mensaje_caught = recibir_mensaje(socket_caught);
+		procesar_appeared((t_caught_pokemon*) mensaje_caught->mensaje);
+
+		t_mensaje* mensaje_localized = recibir_mensaje(socket_localized);
+		procesar_appeared((t_localized_pokemon*) mensaje_localized->mensaje);
+	}*/
+}
+
+int iniciar_suscripcion_broker(op_code cola){
+	/*
+	t_suscripcion* suscripcion = suscripcion_proceso_create(TEAM, getpid(), cola);
+	t_mensaje* mensaje = mensaje_simple_create((void*) suscripcion, SUSCRIPCION);
+
+	int socket = crear_conexion(ip_broker, puerto_broker);
+	enviar_mensaje(mensaje, socket);
+*/
+	return socket;
 }
 
 void iniciar_puerto_de_escucha(){
-	iniciar_servidor("127.0.0.2", "5002",(void*) procesar_mensajes);
+	//TODO
+	//iniciar_servidor("127.0.0.2", "5002",(void*) procesar_mensajes);
 }
 
-void procesar_mensajes(int* socket){
-	op_code operacion;
-	void* mensaje = recibir_mensaje(*socket, &operacion);
-
-	switch(operacion){
-		case LOCALIZED_POKEMON:
-			procesar_localized((t_localized_pokemon*) mensaje);
-			break;
-		case APPEARED_POKEMON:
-			procesar_appeared((t_appeared_pokemon*) mensaje);
-			break;
-		case CAUGHT_POKEMON:
-			procesar_caught((t_caught_pokemon*) mensaje);
-			break;
-		default:
-			printf("Mensaje no correspondiente al proceso team (op: %d) \n", operacion);
-			break;
-	}
-}
 
 void procesar_localized(t_localized_pokemon* localized_pokemon){
 
@@ -137,8 +142,10 @@ void procesar_appeared(t_appeared_pokemon* appeared_pokemon){
 	if(cumplio_objetivo_global(objetivo_global, entrenadores)){
 		//free(appeared_pokemon);
 	}else if(pokemon_dentro_de_objetivos(objetivo_global, appeared_pokemon->nombre)){
-		//Verifico si ya estoy procesando un localized de la misma especie
+		//TODO Verifico si ya estoy procesando un localized de la misma especie
 		//Planifico entrenador
+		t_pokemon* pokemon_nuevo; //TODO funcion para appeared->t_pokemon
+		entrenador_entrar_a_planificacion(pokemon_nuevo);
 	}else{
 		//free(appeared_pokemon);
 	}

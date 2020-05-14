@@ -16,11 +16,10 @@
 #include<mensajes/catch_pokemon.h>
 #include<mensajes/caught_pokemon.h>
 
-
 #include "entrenador.h"
 #include "objetivos.h"
+#include "planificador.h"
 #include "planificacion.h"
-
 
 
 //Variables de un proceso team
@@ -35,7 +34,9 @@ char* puerto_broker;
 
 t_log* logger;
 
-t_planificador *planificador;
+int socket_appeared;
+int socket_caught;
+int socket_localized;
 
 
 void terminar_programa(t_log* logger, t_config* config);
