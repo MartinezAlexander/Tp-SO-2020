@@ -3,11 +3,11 @@
 
 #include "mensajes.h"
 #include "posiciones.h"
+#include "pokemon.h"
 
 typedef struct{
     uint32_t tamanio_nombre;
-    char* nombre;
-    t_posicion posicion;
+    t_pokemon pokemon;
     uint32_t cantidad;
 } t_new_pokemon;
 
