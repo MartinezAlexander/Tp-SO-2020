@@ -105,8 +105,7 @@ t_list* localized_pokemon_get_list(t_localized_pokemon* localized_pokemon){
 	t_list* pokemons = list_create();
 
 	for(int i = 0 ; i < localized_pokemon->cantidadPos ; i++){
-		t_pokemon* pokemon = pokemon_create(localized_pokemon->nombre,
-				list_get(localized_pokemon->posiciones, i));
+		t_pokemon* pokemon = pokemon_create(localized_pokemon->nombre,*((t_posicion*)list_get(localized_pokemon->posiciones, i)));
 
 		list_add(pokemons, pokemon);
 	}
