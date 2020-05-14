@@ -7,7 +7,7 @@
 
 typedef struct{
     uint32_t tamanio_nombre;
-    t_pokemon pokemon;
+    t_pokemon* pokemon;
     uint32_t cantidad;
 } t_new_pokemon;
 
