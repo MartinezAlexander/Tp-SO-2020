@@ -5,7 +5,7 @@
  Version     : v1.0
  Copyright   : Your copyright notice
  Description : Proceso game boy sirve para testear los demas procesos por
-    		   separado.
+ separado.
  ============================================================================
  */
 
@@ -20,17 +20,11 @@
 #include <mensajes/caught_pokemon.h>
 #include <mensajes/localized_pokemon.h>
 #include <commons/string.h>
+#include <mensajes/suscripcion.h>
 
-typedef enum{
-	BROKER = 1,
-	TEAM,
-	GAMECARD,
-	SUSCRIPTOR
-}t_proceso;
-
-t_proceso obtener_id_proceso(char* id){
+t_proceso obtener_id_proceso(char* id) {
 	t_proceso id_proceso;
-	if(string_equals_ignore_case(id,"BROKER")){
+	if (string_equals_ignore_case(id, "BROKER")) {
 		id_proceso = BROKER;
 	}
 	if (string_equals_ignore_case(id, "TEAM")) {
@@ -45,19 +39,19 @@ t_proceso obtener_id_proceso(char* id){
 	return id_proceso;
 }
 
-op_code obtener_tipo_mensaje(char* tipo){
+op_code obtener_tipo_mensaje(char* tipo) {
 	op_code codigo;
 	if (string_equals_ignore_case(tipo, "NEW_POKEMON")) {
 		codigo = NEW_POKEMON;
 	}
 	if (string_equals_ignore_case(tipo, "APPEARED_POKEMON")) {
-		codigo  = APPEARED_POKEMON;
+		codigo = APPEARED_POKEMON;
 	}
 	if (string_equals_ignore_case(tipo, "GET_POKEMON")) {
-		codigo  = GET_POKEMON;
+		codigo = GET_POKEMON;
 	}
 	if (string_equals_ignore_case(tipo, "CATCH_POKEMON")) {
-		codigo  = CATCH_POKEMON;
+		codigo = CATCH_POKEMON;
 	}
 	if (string_equals_ignore_case(tipo, "CAUGHT_POKEMON")) {
 		codigo = CAUGHT_POKEMON;
@@ -65,53 +59,89 @@ op_code obtener_tipo_mensaje(char* tipo){
 	if (string_equals_ignore_case(tipo, "LOCALIZED_POKEMON")) {
 		codigo = LOCALIZED_POKEMON;
 	}
-	return codigo ;
+	return codigo;
 }
 
-void* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id){
-	void* mensaje_procesado = NULL;
-
-	if(codigo == NEW_POKEMON && id==BROKER){
-		uint32_t x = (uint32_t)atoi(mensaje[4]);
-		uint32_t y = (uint32_t)atoi(mensaje[5]);
-		uint32_t cantidad = (uint32_t)atoi(mensaje[6]);
-		mensaje_procesado = (void*)new_pokemon_create(mensaje[3],x,y,cantidad);
+uint32_t atrapo_pokemon(char* confirmacion) {
+	uint32_t atrapado;
+	if (string_equals_ignore_case(confirmacion, "OK")) {
+		atrapado = 1;
 	}
-
-	if(codigo == APPEARED_POKEMON && id==BROKER){
-		//crear mensaje appeared y agregarle un id
+	if (string_equals_ignore_case(confirmacion, "FAIL")) {
+		atrapado = 0;
 	}
+	return atrapado;
+}
+t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
+	void* mensaje_creado = NULL;
+	t_mensaje* mensaje_procesado = NULL;
 
-	if(codigo == CATCH_POKEMON && id==BROKER){
+	if (id == BROKER && codigo == NEW_POKEMON) {
 		uint32_t x = (uint32_t) atoi(mensaje[4]);
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
-		mensaje_procesado = (void*)catch_pokemon_create(mensaje[3],x,y);
+		uint32_t cantidad = (uint32_t) atoi(mensaje[6]);
+		mensaje_creado = (void*) new_pokemon_create(mensaje[3], x, y, cantidad);
+		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
 	}
 
-	if (codigo == CAUGHT_POKEMON && id == BROKER) {
-		// crear mensaje caught y agregar id
-	}
-
-	if (codigo == GET_POKEMON && id == BROKER) {
-		mensaje_procesado = (void*)get_pokemon_create(mensaje[3]);
-	}
-
-	if (codigo == APPEARED_POKEMON && id == TEAM) {
+	if (id == BROKER && codigo == APPEARED_POKEMON) {
 		uint32_t x = (uint32_t) atoi(mensaje[4]);
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
-		mensaje_procesado = (void*)appeared_pokemon_create(mensaje[3], x, y);
+		int32_t id_c = atoi(mensaje[6]);
+		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
+		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
+				codigo, -1, id_c);
+		/*Modificar mensaje_con_id_correlativo_create*/
 	}
 
-	if (codigo == NEW_POKEMON && id == GAMECARD) {
-		//crear un new pokemon y agregarle el id
+	if (id == BROKER && codigo == CATCH_POKEMON) {
+		uint32_t x = (uint32_t) atoi(mensaje[4]);
+		uint32_t y = (uint32_t) atoi(mensaje[5]);
+		mensaje_creado = (void*) catch_pokemon_create(mensaje[3], x, y);
+		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
 	}
 
-	if (codigo == CATCH_POKEMON && id == GAMECARD) {
-		//crear un catch pokemon y agregarle un id
+	if (id == BROKER && codigo == CAUGHT_POKEMON) {
+		int32_t id_c = atoi(mensaje[3]);
+		uint32_t situacion = atrapo_pokemon(mensaje[4]);
+		mensaje_creado = (void*) caught_pokemon_create(situacion);
+		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
+				codigo, -1, id_c);
 	}
 
-	if (codigo == GET_POKEMON && id == GAMECARD) {
-		mensaje_procesado = (void*)get_pokemon_create(mensaje[3]);
+	if (id == BROKER && codigo == GET_POKEMON) {
+		mensaje_creado = (void*) get_pokemon_create(mensaje[3]);
+		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
+	}
+
+	if (id == TEAM && codigo == APPEARED_POKEMON) {
+		uint32_t x = (uint32_t) atoi(mensaje[4]);
+		uint32_t y = (uint32_t) atoi(mensaje[5]);
+		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
+		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
+	}
+
+	if (id == GAMECARD && codigo == NEW_POKEMON) {
+		uint32_t x = (uint32_t) atoi(mensaje[4]);
+		uint32_t y = (uint32_t) atoi(mensaje[5]);
+		uint32_t cantidad = (uint32_t) atoi(mensaje[6]);
+		int32_t id_m = atoi(mensaje[7]);
+		mensaje_creado = (void*) new_pokemon_create(mensaje[3], x, y, cantidad);
+		mensaje_procesado = mensaje_con_id_create(mensaje_creado, codigo, id_m);
+	}
+
+	if (id == GAMECARD && codigo == CATCH_POKEMON) {
+		uint32_t x = (uint32_t) atoi(mensaje[4]);
+		uint32_t y = (uint32_t) atoi(mensaje[5]);
+		int32_t id_m = atoi(mensaje[6]);
+		mensaje_creado = (void*) catch_pokemon_create(mensaje[3], x, y);
+		mensaje_procesado = mensaje_con_id_create(mensaje_creado, codigo, id_m);
+	}
+
+	if (id == GAMECARD && codigo == GET_POKEMON) {
+		int32_t id_m = atoi(mensaje[4]);
+		mensaje_creado = (void*) get_pokemon_create(mensaje[3]);
+		mensaje_procesado = mensaje_con_id_create(mensaje_creado, codigo, id_m);
 	}
 
 	return mensaje_procesado;
@@ -125,22 +155,22 @@ void* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id){
 #define PUERTO_TEAM "5002"
 #define PUERTO_GAMECARD "5001"
 
-void enviar_a(t_proceso id, void* mensaje, op_code codigo){
+void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	int socket;
-	switch(id){
+	switch (id) {
 	case BROKER:
-		socket = crear_conexion(IP_BROKER,PUERTO_BROKER);
-		enviar_mensaje(mensaje,codigo,socket);
+		socket = crear_conexion(IP_BROKER, PUERTO_BROKER);
+		enviar_mensaje(mensaje, socket);
 		liberar_conexion(socket);
 		break;
 	case TEAM:
 		socket = crear_conexion(IP_TEAM, PUERTO_TEAM);
-		enviar_mensaje(mensaje, codigo, socket);
+		enviar_mensaje(mensaje, socket);
 		liberar_conexion(socket);
 		break;
 	case GAMECARD:
 		socket = crear_conexion(IP_GAMECARD, PUERTO_GAMECARD);
-		enviar_mensaje(mensaje, codigo, socket);
+		enviar_mensaje(mensaje, socket);
 		liberar_conexion(socket);
 		break;
 	case SUSCRIPTOR:
@@ -150,10 +180,11 @@ void enviar_a(t_proceso id, void* mensaje, op_code codigo){
 	}
 }
 
-int main(int arg, char** args){
+int main(int arg, char** args) {
 	t_proceso id_proceso = obtener_id_proceso(args[1]);
 	op_code tipo_mensaje = obtener_tipo_mensaje(args[2]);
-	void* mensaje_procesado = procesar_mensaje(args,tipo_mensaje, id_proceso);
-	enviar_a(id_proceso,mensaje_procesado, tipo_mensaje);
+	t_mensaje* mensaje_procesado = procesar_mensaje(args, tipo_mensaje,
+			id_proceso);
+	enviar_a(id_proceso, mensaje_procesado);
 	return 0;
 }
