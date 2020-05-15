@@ -1,6 +1,10 @@
 #include "entrenador.h"
 
 
+void iniciarlizar_diccionario_catch(){
+	mensajes_catch_pendientes = dictionary_create();
+}
+
 void ejecutar_entrenador(t_entrenador* entrenador){
 
 	int termine = mover_proxima_posicion(entrenador);
@@ -11,11 +15,18 @@ void ejecutar_entrenador(t_entrenador* entrenador){
 }
 
 void enviar_catch(t_entrenador* entrenador){
-	//Conecto con broker
-	//Recibo id
-	//Paso a bloqueado
 	entrenador->estado = BLOCKED;
 	printf("LLegue a destino, me bloqueo esperando rta \n\n");
+	//Conecto con broker
+	int socket = crear_conexion(ip_broker, puerto_broker);
+	t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
+			entrenador->objetivo_actual->posicion.posicionX, entrenador->objetivo_actual->posicion.posicionY);
+	t_mensaje* mensaje = mensaje_simple_create(mensaje_catch, CATCH_POKEMON);
+	//Recibo id
+	//TODO se queda esperando a que le llegue mensaje recibir_mensaje()???
+	t_mensaje* respuesta = recibir_mensaje(socket);
+	//Agrego el id con mi entrenador al diccionario
+	dictionary_put(mensajes_catch_pendientes, respuesta->id, entrenador);
 }
 
 //TODO averiguar que haya que usar sleep y no otra cosa.

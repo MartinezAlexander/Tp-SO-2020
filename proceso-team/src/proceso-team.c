@@ -97,21 +97,41 @@ void iniciar_conexion_broker(){
 	socket_caught = iniciar_suscripcion_broker(CAUGHT_POKEMON);
 	socket_localized = iniciar_suscripcion_broker(LOCALIZED_POKEMON);
 
-	//TODO esto en un hilo para cada cola
+	pthread_t hilo_cola_appeared;
+	pthread_t hilo_cola_caught;
+	pthread_t hilo_cola_localized;
+
+	pthread_create(&hilo_cola_appeared, NULL, recibir_mensaje_appeared, socket_appeared);
+	pthread_create(&hilo_cola_caught, NULL, recibir_mensaje_caught, socket_caught);
+	pthread_create(&hilo_cola_localized, NULL, recibir_mensaje_localized, socket_localized);
+}
+
+void recibir_mensaje_appeared(int socket_appeared){
 	while(1){
 		t_mensaje* mensaje_appeared = recibir_mensaje(socket_appeared);
+		//TODO mandar ack al broker
 		procesar_appeared((t_appeared_pokemon*) mensaje_appeared->mensaje);
+	}
+}
 
+void recibir_mensaje_caught(int socket_caught){
+	while(1){
 		t_mensaje* mensaje_caught = recibir_mensaje(socket_caught);
-		procesar_caught((t_caught_pokemon*) mensaje_caught->mensaje);
+		//TODO mandar ack al broker
+		procesar_caught((t_caught_pokemon*) mensaje_caught->mensaje, mensaje_caught->id_correlativo);
+	}
+}
 
+void recibir_mensaje_localized(int socket_localized){
+	while(1){
 		t_mensaje* mensaje_localized = recibir_mensaje(socket_localized);
+		//TODO mandar ack al broker
+
 		procesar_localized((t_localized_pokemon*) mensaje_localized->mensaje);
 	}
 }
 
 int iniciar_suscripcion_broker(op_code cola){
-
 	t_suscripcion* suscripcion = suscripcion_proceso_create(TEAM, getpid(), cola);
 	t_mensaje* mensaje = mensaje_simple_create((void*) suscripcion, SUSCRIPCION);
 
@@ -122,10 +142,31 @@ int iniciar_suscripcion_broker(op_code cola){
 }
 
 void iniciar_puerto_de_escucha(){
-	//TODO
-	//iniciar_servidor("127.0.0.2", "5002",(void*) procesar_mensajes);
+	//TODO definir ip y puerto del server por config por ahi??
+	char* ip = "127.0.0.2";
+	char* puerto = "5002";
+	iniciar_servidor(ip, puerto,(void*) procesar_mensajes_directos);
 }
 
+//Se encarga de procesar todos los mensajes que lleguen directamente de un gameboy
+void procesar_mensajes_directos(int* socket){
+	t_mensaje* mensaje = recibir_mensaje(socket);
+
+	switch(mensaje->codigo){
+		case APPEARED_POKEMON:
+			procesar_appeared((t_appeared_pokemon*)mensaje->mensaje);
+			break;
+		case CAUGHT_POKEMON:
+			procesar_caught((t_caught_pokemon*)mensaje->mensaje, mensaje->id_correlativo);
+			break;
+		case LOCALIZED_POKEMON:
+			procesar_localized((t_localized_pokemon*)mensaje->mensaje);
+			break;
+		default:
+			printf("\n--Mensaje directo recibido no procesable--\n");
+			break;
+	}
+}
 
 void procesar_localized(t_localized_pokemon* localized_pokemon){
 
@@ -146,8 +187,19 @@ void procesar_appeared(t_appeared_pokemon* appeared_pokemon){
 	}
 }
 
-void procesar_caught(t_caught_pokemon* caught_pokemon){
-	//TODO leer enunciado y ver que hace en respuesta a l caught
+void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo){
+	//Validar id mensaje
+		//Descarto en caso de que no sea valido
+	//Caught positivo
+		//Asigno pokemon al entrenador
+		//Cumplio sus objetivos?
+			//Entrenador pasa a EXIT
+		//Alcanzo la cantidad de pokemones que necesita?
+			//Entrenador pasa a BLOCKED, a la espera de deadlock
+		//Hay mas pokemon para atrapar?
+			//Entrenador pasa a READY
+		//Caso contratio queda bloqueado
+			//(habria que ver que tipo de bloqueo, ya que ahora no esta esperando una rta)
 }
 
 

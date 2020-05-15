@@ -7,13 +7,17 @@
 #include<commons/string.h>
 #include<commons/config.h>
 #include<commons/collections/list.h>
+#include<commons/collections/dictionary.h>
 #include<mensajes/posiciones.h>
 #include<mensajes/pokemon.h>
 #include<semaphore.h>
 #include<pthread.h>
 #include<unistd.h>
+#include<mensajes/mensajes.h>
+#include<mensajes/client.h>
 
 #include "array_utils.h"
+#include "variables_globales.h"
 
 
 uint32_t retardo_cpu;
@@ -37,7 +41,8 @@ typedef struct{
 } t_entrenador;
 
 
-
+t_dictionary* mensajes_catch_pendientes;
+void iniciarlizar_diccionario_catch();
 
 int mover_proxima_posicion(t_entrenador* entrenador);
 void enviar_catch(t_entrenador* entrenador);

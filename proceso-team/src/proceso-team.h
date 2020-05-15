@@ -19,23 +19,12 @@
 #include<mensajes/suscripcion.h>
 #include<mensajes/client.h>
 
+#include "variables_globales.h"
 #include "entrenador.h"
 #include "objetivos.h"
 #include "planificador.h"
 #include "planificacion.h"
 
-
-//Variables de un proceso team
-t_config* config;
-
-t_list* objetivo_global;
-
-uint32_t tiempo_de_reconexion;
-
-char* ip_broker;
-char* puerto_broker;
-
-t_log* logger;
 
 int socket_appeared;
 int socket_caught;
@@ -49,12 +38,17 @@ t_log* iniciar_logger(char*);
 void enviar_get_objetivo(t_list* objetivo_global);
 void iniciar_conexion_broker();
 int iniciar_suscripcion_broker(op_code cola);
-void iniciar_puerto_de_escucha();
 
-void procesar_mensajes(int* socket);
+void recibir_mensaje_appeared(int socket_appeared);
+void recibir_mensaje_caught(int socket_caught);
+void recibir_mensaje_localized(int socket_localized);
+
+void iniciar_puerto_de_escucha();
+void procesar_mensajes_directos(int* socket);
+
 void procesar_localized(t_localized_pokemon* localized_pokemon);
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon);
-void procesar_caught(t_caught_pokemon* caught_pokemon);
+void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo);
 
 void test();
 
