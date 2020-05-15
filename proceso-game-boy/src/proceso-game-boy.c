@@ -9,18 +9,7 @@
  ============================================================================
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mensajes/client.h>
-#include <mensajes/mensajes.h>
-#include <mensajes/appeared_pokemon.h>
-#include <mensajes/new_pokemon.h>
-#include <mensajes/get_pokemon.h>
-#include <mensajes/catch_pokemon.h>
-#include <mensajes/caught_pokemon.h>
-#include <mensajes/localized_pokemon.h>
-#include <commons/string.h>
-#include <mensajes/suscripcion.h>
+#include "proceso-game-boy.h"
 
 t_proceso obtener_id_proceso(char* id) {
 	t_proceso id_proceso;
@@ -72,6 +61,7 @@ uint32_t atrapo_pokemon(char* confirmacion) {
 	}
 	return atrapado;
 }
+
 t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 	void* mensaje_creado = NULL;
 	t_mensaje* mensaje_procesado = NULL;
@@ -147,29 +137,21 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 	return mensaje_procesado;
 }
 
-//Debemos leerlo del archivo de configuracion
-#define IP_BROKER "127.0.0.1"
-#define IP_TEAM "127.0.0.2"
-#define IP_GAMECARD "127.0.0.3"
-#define PUERTO_BROKER "5003"
-#define PUERTO_TEAM "5002"
-#define PUERTO_GAMECARD "5001"
-
 void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	int socket;
 	switch (id) {
 	case BROKER:
-		socket = crear_conexion(IP_BROKER, PUERTO_BROKER);
+		socket = crear_conexion(ip_broker, puerto_broker);
 		enviar_mensaje(mensaje, socket);
 		liberar_conexion(socket);
 		break;
 	case TEAM:
-		socket = crear_conexion(IP_TEAM, PUERTO_TEAM);
+		socket = crear_conexion(ip_team, puerto_team);
 		enviar_mensaje(mensaje, socket);
 		liberar_conexion(socket);
 		break;
 	case GAMECARD:
-		socket = crear_conexion(IP_GAMECARD, PUERTO_GAMECARD);
+		socket = crear_conexion(ip_gamecard, puerto_gamecard);
 		enviar_mensaje(mensaje, socket);
 		liberar_conexion(socket);
 		break;
@@ -180,7 +162,26 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	}
 }
 
+void inicializar_variables() {
+	ip_broker = config_get_string_value(config, "IP_BROKER");
+	ip_team = config_get_string_value(config, "IP_TEAM");
+	ip_gamecard = config_get_string_value(config, "IP_GAMECARD");
+
+	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
+	puerto_team = config_get_string_value(config, "PUERTO_TEAM");
+	puerto_gamecard = config_get_string_value(config, "PUERTO_GAMECARD");
+
+	char* path_logger = config_get_string_value(config, "LOG_FILE");
+
+	logger = iniciar_logger(path_logger);
+}
+
 int main(int arg, char** args) {
+
+	config = leer_config();
+
+	inicializar_variables();
+
 	t_proceso id_proceso = obtener_id_proceso(args[1]);
 	op_code tipo_mensaje = obtener_tipo_mensaje(args[2]);
 	t_mensaje* mensaje_procesado = procesar_mensaje(args, tipo_mensaje,
@@ -188,3 +189,41 @@ int main(int arg, char** args) {
 	enviar_a(id_proceso, mensaje_procesado);
 	return 0;
 }
+
+t_log* iniciar_logger(char* path) {
+
+	t_log* logger;
+
+	if ((logger = log_create(path, "gameboy", true, LOG_LEVEL_INFO)) == NULL) {
+		printf("No se pudo crear el log\n");
+		exit(1);
+	}
+
+	return logger;
+}
+
+t_config* leer_config(void) {
+
+	t_config* config =
+			config_create(
+					"/home/utnso/workspace/tp-2020-1c-Grupo-7-SO/proceso-game-boy/gameboy.config");
+
+	if (config == NULL) {
+		printf("No puede leer la config\n");
+		exit(2);
+	}
+	return config;
+}
+
+void terminar_programa(t_log* logger, t_config* config) {
+
+	if (logger != NULL) {
+		log_info(logger, "finalizando programa...");
+		log_destroy(logger);
+	}
+
+	if (config != NULL) {
+		config_destroy(config);
+	}
+}
+
