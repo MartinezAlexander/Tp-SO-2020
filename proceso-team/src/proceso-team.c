@@ -188,18 +188,38 @@ void procesar_appeared(t_appeared_pokemon* appeared_pokemon){
 }
 
 void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo){
+
+	char* key_id = string_itoa(id_correlativo);
 	//Validar id mensaje
-		//Descarto en caso de que no sea valido
-	//Caught positivo
-		//Asigno pokemon al entrenador
-		//Cumplio sus objetivos?
-			//Entrenador pasa a EXIT
-		//Alcanzo la cantidad de pokemones que necesita?
-			//Entrenador pasa a BLOCKED, a la espera de deadlock
-		//Hay mas pokemon para atrapar?
-			//Entrenador pasa a READY
-		//Caso contratio queda bloqueado
+	if(!dictionary_has_key(mensajes_catch_pendientes, key_id)){
+		//TODO Descarto en caso de que no sea valido
+	}else{
+		t_entrenador* entrenador = dictionary_get(mensajes_catch_pendientes, key_id);
+		//Valido resultado del caught
+		if(caught_pokemon->atrapado){
+
+			entrenador_atrapar_objetivo(entrenador);
+
+			//Actualizo el estado del entrenador
+			if(cumplio_objetivo_entrenador(entrenador)){
+				entrenador->estado = EXIT;
+			}else{
+				if(entrenador_estado_deadlock(entrenador)){
+					entrenador->estado = BLOCKED_DEADLOCK;
+				}else{
+					//Caso si puedo seguir atrapando
+					encolar(entrenador);
+				}
+			}
+		}else{
+			//Caso contratio queda bloqueado
 			//(habria que ver que tipo de bloqueo, ya que ahora no esta esperando una rta)
+			entrenador_resetear_objetivo(entrenador);
+			entrenador->estado = BLOCKED;
+		}
+
+		dictionary_remove(mensajes_catch_pendientes, key_id);
+	}
 }
 
 

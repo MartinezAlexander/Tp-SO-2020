@@ -52,7 +52,6 @@ void ejecutar_hilo_fifo(t_entrenador* entrenador){
 	}
 }
 
-
 void ejecutar_proximo(){
 	switch(planificador->algoritmo_planificacion){
 		case FIFO:
@@ -62,8 +61,6 @@ void ejecutar_proximo(){
 	}
 }
 
-
-// TODO: Hay distintos tipos de bloqueado ??
 int entrenador_disponible(t_entrenador *entrenador)
 {
 	return entrenador->estado == NEW || entrenador->estado == BLOCKED;

@@ -22,7 +22,6 @@ int pokemon_dentro_de_objetivos(t_list* objetivos, char* pokemon){
 }
 
 int cumplio_objetivo_global(t_list* objetivo_global, t_list* entrenadores){
-
 	//Junto todos los adquiridos en una lista
 	t_list* adquiridos = list_create();
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
@@ -30,6 +29,9 @@ int cumplio_objetivo_global(t_list* objetivo_global, t_list* entrenadores){
 		t_entrenador* entrenador = list_get(entrenadores, i);
 		list_add_all(adquiridos, entrenador->pokemones_adquiridos);
 	}
+
+	//Si no tienen mismo tamaño ya se que no son iguales
+	if(list_size(adquiridos) != list_size(objetivo_global)) return 0;
 
 	//La ordeno para poder compararlas
 	list_sort(adquiridos, strcmp);
@@ -42,9 +44,5 @@ int cumplio_objetivo_global(t_list* objetivo_global, t_list* entrenadores){
 		if(string_equals_ignore_case(pk1,pk2) != 1) return 0;
 	}
 
-	//En caso de que tenga una lista de adquiridos mas corta y se de que
-	//todos los elementos sean iguales a los primeros de los objetivos
-	//(todavia no cumplio el objetivo), verifico que sean del mismo tamaño
-	//para asegurarme de que no pase esto
-	return list_size(adquiridos) == list_size(objetivo_global);
+	return 1;
 }

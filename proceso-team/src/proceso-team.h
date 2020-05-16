@@ -18,6 +18,7 @@
 #include<mensajes/pokemon.h>
 #include<mensajes/suscripcion.h>
 #include<mensajes/client.h>
+#include<commons/collections/dictionary.h>
 
 #include "variables_globales.h"
 #include "entrenador.h"

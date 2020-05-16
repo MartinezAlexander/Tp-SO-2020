@@ -15,17 +15,22 @@
 #include<unistd.h>
 #include<mensajes/mensajes.h>
 #include<mensajes/client.h>
+#include<mensajes/catch_pokemon.h>
+#include<mensajes/caught_pokemon.h>
 
 #include "array_utils.h"
 #include "variables_globales.h"
+#include "objetivos.h"
 
 
 uint32_t retardo_cpu;
 
 t_list* entrenadores;
 
+//Blocked by catch -> bloqueado a la espera de un mensaje caught, luego de enviar el catch
+//Blocked -> bloqueado por respuesta negativa del caught
 typedef enum{
-	NEW, READY, EXEC, BLOCKED, EXIT
+	NEW, READY, EXEC, BLOCKED_DEADLOCK, BLOCKED, BLOCKED_BY_CATCH, EXIT
 } estado_planificacion;
 
 typedef struct{
@@ -53,6 +58,12 @@ int entrenador_en_ejecucion(t_entrenador *entrenador);
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos);
 t_list* leer_entrenadores(t_config* config);
 void entrenador_mostrar(t_entrenador *entrenador);
+
+void entrenador_resetear_objetivo(t_entrenador* entrenador);
+void entrenador_atrapar_objetivo(t_entrenador* entrenador);
+
+int entrenador_estado_deadlock(t_entrenador* entrenador);
+int cumplio_objetivo_entrenador(t_entrenador* entrenador);
 
 
 #endif

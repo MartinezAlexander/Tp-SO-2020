@@ -22,4 +22,5 @@ t_list* obtener_objetivo_global(t_list* entrenadores);
 int pokemon_dentro_de_objetivos(t_list* objetivos, char* pokemon);
 int cumplio_objetivo_global(t_list* objetivo_global, t_list* entrenadores);
 
+
 #endif /* OBJETIVOS_H_ */

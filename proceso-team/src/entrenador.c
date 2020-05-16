@@ -15,18 +15,20 @@ void ejecutar_entrenador(t_entrenador* entrenador){
 }
 
 void enviar_catch(t_entrenador* entrenador){
-	entrenador->estado = BLOCKED;
+	entrenador->estado = BLOCKED_BY_CATCH;
 	printf("LLegue a destino, me bloqueo esperando rta \n\n");
 	//Conecto con broker
 	int socket = crear_conexion(ip_broker, puerto_broker);
 	t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
 			entrenador->objetivo_actual->posicion.posicionX, entrenador->objetivo_actual->posicion.posicionY);
 	t_mensaje* mensaje = mensaje_simple_create(mensaje_catch, CATCH_POKEMON);
+	//Enviar mensaje
 	//Recibo id
 	//TODO se queda esperando a que le llegue mensaje recibir_mensaje()???
 	t_mensaje* respuesta = recibir_mensaje(socket);
 	//Agrego el id con mi entrenador al diccionario
-	dictionary_put(mensajes_catch_pendientes, respuesta->id, entrenador);
+	char* key_id = string_itoa(respuesta->id);
+	dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
 }
 
 //TODO averiguar que haya que usar sleep y no otra cosa.
@@ -142,4 +144,38 @@ void entrenador_mostrar(t_entrenador* entrenador){
 int entrenador_en_ejecucion(t_entrenador *entrenador)
 {
 	return(entrenador->estado == EXEC);
+}
+
+void entrenador_atrapar_objetivo(t_entrenador* entrenador){
+	char* nuevo_pokemon = entrenador->objetivo_actual->especie;
+	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
+
+	entrenador_resetear_objetivo(entrenador);
+}
+
+void entrenador_resetear_objetivo(t_entrenador* entrenador){
+	entrenador->objetivo_actual = NULL;
+}
+
+int cumplio_objetivo_entrenador(t_entrenador* entrenador){
+	//Si no tienen mismo tamaño ya se que no son iguales
+	if(list_size(entrenador->objetivos) != list_size(entrenador->pokemones_adquiridos)) return 0;
+
+	//La ordeno para poder compararlas
+	list_sort(entrenador->objetivos, strcmp);
+	list_sort(entrenador->pokemones_adquiridos, strcmp);
+
+	//Comparo con los objetivos
+	for(int i = 0 ; i < list_size(entrenador->pokemones_adquiridos) ; i++){
+		char* pk1 = list_get(entrenador->pokemones_adquiridos, i);
+		char* pk2 = list_get(entrenador->objetivos, i);
+
+		if(string_equals_ignore_case(pk1,pk2) != 1) return 0;
+	}
+
+	return 1;
+}
+
+int entrenador_estado_deadlock(t_entrenador* entrenador){
+	return list_size(entrenador->objetivos) == list_size(entrenador->pokemones_adquiridos);
 }

@@ -8,6 +8,14 @@
 #ifndef VARIABLES_GLOBALES_H_
 #define VARIABLES_GLOBALES_H_
 
+#include<stdio.h>
+#include<stdlib.h>
+#include<commons/log.h>
+#include<commons/string.h>
+#include<commons/config.h>
+#include<readline/readline.h>
+#include<commons/collections/list.h>
+
 t_config* config;
 
 t_list* objetivo_global;
