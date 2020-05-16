@@ -17,6 +17,8 @@ void ejecutar_entrenador(t_entrenador* entrenador){
 void enviar_catch(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED_BY_CATCH;
 	printf("LLegue a destino, me bloqueo esperando rta \n\n");
+/*
+
 	//Conecto con broker
 	int socket = crear_conexion(ip_broker, puerto_broker);
 	t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
@@ -29,9 +31,9 @@ void enviar_catch(t_entrenador* entrenador){
 	//Agrego el id con mi entrenador al diccionario
 	char* key_id = string_itoa(respuesta->id);
 	dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
+*/
 }
 
-//TODO averiguar que haya que usar sleep y no otra cosa.
 //TODO ver otra forma de hacer este asco
 
 //Devuelve 0 si se movio, 1 si ya esta en la posicion del objetivo

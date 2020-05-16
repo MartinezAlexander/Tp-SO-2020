@@ -40,10 +40,10 @@ int main(void) {
 
 	//Enviar mensaje GET al broker segun objetivos globales
 	enviar_get_objetivo(objetivo_global);
-
+*/
 	//Abrir socket de escucha para el Gameboy
 	iniciar_puerto_de_escucha();
-*/
+
 
 //	test();
 
@@ -101,9 +101,9 @@ void iniciar_conexion_broker(){
 	pthread_t hilo_cola_caught;
 	pthread_t hilo_cola_localized;
 
-	pthread_create(&hilo_cola_appeared, NULL, recibir_mensaje_appeared, socket_appeared);
-	pthread_create(&hilo_cola_caught, NULL, recibir_mensaje_caught, socket_caught);
-	pthread_create(&hilo_cola_localized, NULL, recibir_mensaje_localized, socket_localized);
+	pthread_create(&hilo_cola_appeared, NULL, (void*)recibir_mensaje_appeared, &socket_appeared);
+	pthread_create(&hilo_cola_caught, NULL, (void*)recibir_mensaje_caught, &socket_caught);
+	pthread_create(&hilo_cola_localized, NULL, (void*)recibir_mensaje_localized, &socket_localized);
 }
 
 void recibir_mensaje_appeared(int socket_appeared){
@@ -150,7 +150,7 @@ void iniciar_puerto_de_escucha(){
 
 //Se encarga de procesar todos los mensajes que lleguen directamente de un gameboy
 void procesar_mensajes_directos(int* socket){
-	t_mensaje* mensaje = recibir_mensaje(socket);
+	t_mensaje* mensaje = recibir_mensaje(*socket);
 
 	switch(mensaje->codigo){
 		case APPEARED_POKEMON:
@@ -169,7 +169,10 @@ void procesar_mensajes_directos(int* socket){
 }
 
 void procesar_localized(t_localized_pokemon* localized_pokemon){
-
+	//Ya recibi appeared o localized de esta especie??
+		//Descarto
+	//Caso contrario
+		//proceso como appeared para cada posicion
 }
 
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon){

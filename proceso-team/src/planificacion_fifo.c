@@ -7,7 +7,7 @@ void comenzar_ciclo_fifo(t_entrenador* entrenador){
 
 void finalizar_ciclo_fifo(t_entrenador* entrenador){
 	//Termino de ejecutar?
-	if(entrenador->estado == BLOCKED){
+	if(entrenador->estado == BLOCKED_BY_CATCH){
 		//Si: Pasar a ejecucion el primero en la cola
 		ejecutar_proximo_fifo();
 	}else{

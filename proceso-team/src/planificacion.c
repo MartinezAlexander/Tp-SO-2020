@@ -18,9 +18,6 @@ void planificador_iniciar_hilo_entrenador(t_entrenador* entrenador){
 }
 
 
-
-//TODO t_pokemon en bibliotec + funciones necesarias para pasarlo de un mensaje
-
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Filtro entrenadores disponibles
