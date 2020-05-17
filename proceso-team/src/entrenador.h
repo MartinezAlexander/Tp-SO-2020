@@ -4,23 +4,22 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdint.h>
+#include<unistd.h>
 #include<commons/string.h>
 #include<commons/config.h>
 #include<commons/collections/list.h>
 #include<commons/collections/dictionary.h>
 #include<mensajes/posiciones.h>
 #include<mensajes/pokemon.h>
-#include<semaphore.h>
-#include<pthread.h>
-#include<unistd.h>
 #include<mensajes/mensajes.h>
 #include<mensajes/client.h>
 #include<mensajes/catch_pokemon.h>
 #include<mensajes/caught_pokemon.h>
+#include<semaphore.h>
+#include<pthread.h>
 
-#include "array_utils.h"
 #include "variables_globales.h"
-#include "objetivos.h"
+#include "utils/array_utils.h"
 
 
 uint32_t retardo_cpu;

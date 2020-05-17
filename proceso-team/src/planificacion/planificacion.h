@@ -4,8 +4,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdint.h>
-#include<commons/string.h>
-#include<commons/config.h>
 #include<commons/collections/list.h>
 #include<commons/collections/queue.h>
 #include<mensajes/pokemon.h>
@@ -14,8 +12,8 @@
 #include<semaphore.h>
 #include<unistd.h>
 
-#include "entrenador.h"
-#include "posicion_utils.h"
+#include "../entrenador.h"
+#include "../utils/posicion_utils.h"
 #include "planificacion_fifo.h"
 #include "planificador.h"
 
