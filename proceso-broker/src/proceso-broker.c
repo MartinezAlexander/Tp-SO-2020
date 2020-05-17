@@ -31,27 +31,17 @@ void inicializar_variables_globales(){
 
 void inicializar_colas_mensajeria(){
 	cola_mensajeria_new = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_new->hilo),NULL,(void*)procesar_new_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_new->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_new);
 	cola_mensajeria_appeared = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_appeared->hilo),NULL,(void*)procesar_appeared_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_appeared->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_appeared);
 	cola_mensajeria_get = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_get->hilo),NULL,(void*)procesar_get_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_get->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_get);
 	cola_mensajeria_localized = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_localized->hilo),NULL,(void*)procesar_localized_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_localized->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_localized);
 	cola_mensajeria_catch = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_catch->hilo),NULL,(void*)procesar_catch_pokemon,NULL);
+	pthread_create(&(cola_mensajeria_catch->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_catch);
 	cola_mensajeria_caught = cola_mensajeria_create();
-	pthread_create(&(cola_mensajeria_caught->hilo),NULL,(void*)procesar_caught_pokemon,NULL);
-}
-
-pthread_t prueba;
-
-void mostrar(){
-	 if(list_is_empty(cola_mensajeria_new->suscriptores)){
-		 puts("esta vacia");
-	 }else{
-		 puts("tiene algo");
-	 }
+	pthread_create(&(cola_mensajeria_caught->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_caught);
 }
 
 int main(void){
@@ -106,125 +96,8 @@ void administrar_mensajes(int* socket){
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
 	}
-	//pthread_create(&prueba,NULL,(void*)mostrar,NULL);
 }
 
-
-
-void procesar_suscripcion(t_mensaje* mensaje, int* socket){
-	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
-	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
-	switch(suscripcion->cola_suscripcion){
-		case NEW_POKEMON:
-			list_add(cola_mensajeria_new->suscriptores, suscriptor);
-			//mandar mensajes viejos de la cache
-			break;
-		case LOCALIZED_POKEMON:
-			list_add(cola_mensajeria_localized->suscriptores, suscriptor);
-			//mandar mensajes viejos de la cache
-			break;
-		case GET_POKEMON:
-			list_add(cola_mensajeria_get->suscriptores, suscriptor);
-			//mandar mensajes viejos de la cache
-			break;
-		case APPEARED_POKEMON:
-			list_add(cola_mensajeria_appeared->suscriptores, suscriptor);
-			//mandar mensajes viejos de la cache
-			break;
-		case CATCH_POKEMON:
-			list_add(cola_mensajeria_catch->suscriptores, suscriptor);
-			//mandar mensajes viejos de la cache
-			break;
-		case CAUGHT_POKEMON:
-			list_add(cola_mensajeria_caught->suscriptores, suscriptor);
-			//mandar mensajes viejos de la cache
-			break;
-		default:
-			printf("SUSCRIPTOR NO VALIDO \n\n");
-	}
-	puts("SUSCRIBI A: ");
-	suscripcion_proceso_mostrar(suscripcion);
-}
-
-void procesar_new_pokemon(){
-	while(1){
-		if(!queue_is_empty(cola_mensajeria_new->queue)){
-			if(!list_is_empty(cola_mensajeria_new->suscriptores)){
-				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_new->queue);
-				//guardar pokemon en la cache
-				printf("saco de la cola a: \n");
-				envio_a_suscriptores(cola_mensajeria_new->suscriptores,pokemon);
-				new_pokemon_mostrar((t_new_pokemon*)pokemon->mensaje);
-			}
-		}
-	}
-}
-
-void procesar_localized_pokemon(t_mensaje* mensaje){
-	while(1){
-		if(!queue_is_empty(cola_mensajeria_localized->queue)){
-			if(!list_is_empty(cola_mensajeria_localized->suscriptores)){
-				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_localized->queue);
-				//guardar pokemon en la cache
-				printf("saco de la cola a: \n");
-				envio_a_suscriptores(cola_mensajeria_localized->suscriptores,pokemon);
-				localized_pokemon_mostrar((t_localized_pokemon*)pokemon->mensaje);
-			}
-		}
-	}
-}
-void procesar_get_pokemon(t_mensaje* mensaje){
-	while(1){
-		if(!queue_is_empty(cola_mensajeria_get->queue)){
-			if(!list_is_empty(cola_mensajeria_get->suscriptores)){
-				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_get->queue);
-				//guardar pokemon en la cache
-				printf("saco de la cola a: \n");
-				envio_a_suscriptores(cola_mensajeria_get->suscriptores,pokemon);
-				get_pokemon_mostrar((t_get_pokemon*)pokemon->mensaje);
-			}
-		}
-	}
-}
-void procesar_appeared_pokemon(t_mensaje* mensaje){
-	while(1){
-		if(!queue_is_empty(cola_mensajeria_appeared->queue)){
-			if(!list_is_empty(cola_mensajeria_appeared->suscriptores)){
-				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_appeared->queue);
-				//guardar pokemon en la cache
-				printf("saco de la cola a: \n");
-				envio_a_suscriptores(cola_mensajeria_appeared->suscriptores,pokemon);
-				appeared_pokemon_mostrar((t_appeared_pokemon*)pokemon->mensaje);
-			}
-		}
-	}
-}
-void procesar_catch_pokemon(t_mensaje* mensaje){
-	while(1){
-		if(!queue_is_empty(cola_mensajeria_catch->queue)){
-			if(!list_is_empty(cola_mensajeria_catch->suscriptores)){
-				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_catch->queue);
-				//guardar pokemon en la cache
-				printf("saco de la cola a: \n");
-				envio_a_suscriptores(cola_mensajeria_catch->suscriptores,pokemon);
-				catch_pokemon_mostrar((t_catch_pokemon*)pokemon->mensaje);
-			}
-		}
-	}
-}
-void procesar_caught_pokemon(t_mensaje* mensaje){
-	while(1){
-		if(!queue_is_empty(cola_mensajeria_caught->queue)){
-			if(!list_is_empty(cola_mensajeria_caught->suscriptores)){
-				t_mensaje* pokemon = (t_mensaje*)queue_pop(cola_mensajeria_caught->queue);
-				//guardar pokemon en la cache
-				printf("saco de la cola a: \n");
-				envio_a_suscriptores(cola_mensajeria_caught->suscriptores,pokemon);
-				caught_pokemon_mostrar((t_caught_pokemon*)pokemon->mensaje);
-			}
-		}
-	}
-}
 
 void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 	for(int i = 0; i < list_size(suscriptores); i++){

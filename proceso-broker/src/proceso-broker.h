@@ -18,7 +18,8 @@
 #include<mensajes/catch_pokemon.h>
 #include<mensajes/caught_pokemon.h>
 #include<mensajes/new_pokemon.h>
-#include "cola.h"
+#include "procesar.h"
+
 
 t_config* config;
 
@@ -36,13 +37,6 @@ char* puerto_broker;
 
 t_log* logger;
 
-t_cola_mensajeria* cola_mensajeria_new;
-t_cola_mensajeria* cola_mensajeria_appeared;
-t_cola_mensajeria* cola_mensajeria_get;
-t_cola_mensajeria* cola_mensajeria_localized;
-t_cola_mensajeria* cola_mensajeria_catch;
-t_cola_mensajeria* cola_mensajeria_caught;
-
 int32_t ultimo_id;
 
 pthread_t hilo_suscripcion;
@@ -52,13 +46,6 @@ t_config* leer_config(void);
 void inicializar_colas_mensajeria();
 void inicializar_variables_globales();
 void administrar_mensajes(int* socket);
-void procesar_suscripcion(t_mensaje* mensaje, int* socket);
-void procesar_new_pokemon();
-void procesar_localized_pokemon();
-void procesar_get_pokemon();
-void procesar_appeared_pokemon();
-void procesar_catch_pokemon();
-void procesar_caught_pokemon();
 void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje);
 
 #endif /* PROCESO_BROKER_H_ */

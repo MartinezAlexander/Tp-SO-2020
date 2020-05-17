@@ -17,6 +17,8 @@
 #include<readline/readline.h>
 #include<commons/collections/list.h>
 #include<commons/collections/queue.h>
+#include <mensajes/mensajes.h>
+#include "suscriptor.h"
 
 //estructura de cola con sus respectivos suscriptores
 typedef struct{
@@ -26,13 +28,15 @@ typedef struct{
 	//semaforo
 }t_cola_mensajeria;
 
-typedef struct{
-	int socket;
-	int32_t pid;
-}t_suscriptor;
+t_cola_mensajeria* cola_mensajeria_new;
+t_cola_mensajeria* cola_mensajeria_appeared;
+t_cola_mensajeria* cola_mensajeria_get;
+t_cola_mensajeria* cola_mensajeria_localized;
+t_cola_mensajeria* cola_mensajeria_catch;
+t_cola_mensajeria* cola_mensajeria_caught;
 
-t_suscriptor* suscriptor_create(int socket, int32_t pid);
 t_cola_mensajeria* cola_mensajeria_create();
+t_cola_mensajeria* cola_mensajeria_obtener(op_code codigo);
 
 
 #endif /* COLA_H_ */
