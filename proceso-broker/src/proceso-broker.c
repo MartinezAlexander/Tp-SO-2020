@@ -99,12 +99,12 @@ void administrar_mensajes(int* socket){
 }
 
 
-void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
+/*void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 	for(int i = 0; i < list_size(suscriptores); i++){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
 		enviar_mensaje(mensaje,suscriptor->socket);
 	}
-}
+}*/
 
 t_log* iniciar_logger(char* path){
 	t_log* logger;

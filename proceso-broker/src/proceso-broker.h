@@ -46,6 +46,6 @@ t_config* leer_config(void);
 void inicializar_colas_mensajeria();
 void inicializar_variables_globales();
 void administrar_mensajes(int* socket);
-void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje);
+//void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje);
 
 #endif /* PROCESO_BROKER_H_ */
