@@ -1,8 +1,10 @@
 #ifndef LOCALIZED_POKEMON_H
 #define LOCALIZED_POKEMON_H
 
+#include <commons/collections/list.h>
 #include "mensajes.h"
 #include "posiciones.h"
+#include "pokemon.h"
 
 typedef struct{
 	uint32_t tamanio_nombre;
@@ -50,5 +52,10 @@ char* localized_pokemon_to_string(t_localized_pokemon* localized_pokemon);
 localized_pokemon_destroy libera la memoria utilizada para crear el mensaje localized pokemon
 */
 void localized_pokemon_destroy(t_localized_pokemon* localized_pokemon);
+
+/*
+ * localized_pokemon_get_list devuelve una lista de t_pokemon
+ */
+t_list* localized_pokemon_get_list(t_localized_pokemon* localized_pokemon);
 
 #endif

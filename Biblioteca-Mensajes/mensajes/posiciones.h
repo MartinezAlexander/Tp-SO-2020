@@ -8,13 +8,7 @@ typedef struct{
 	uint32_t posicionX;
 	uint32_t posicionY;
 }t_posicion;
-/*
-typedef struct{
-	t_posicion* posiciones;
-	int cantidad;
-	int indice;
-}t_posiciones;
-*/
+
 /*
 posicion_create es un metodo que crea una posicion sin necesidad
 de preocuparse como esta implementada dicha estructura solo indicando
