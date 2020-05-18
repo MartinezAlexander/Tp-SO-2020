@@ -80,8 +80,7 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		int32_t id_c = atoi(mensaje[6]);
 		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
 		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
-				codigo, -1, id_c);
-		/*Modificar mensaje_con_id_correlativo_create*/
+				codigo, id_c);
 	}
 
 	if (id == BROKER && codigo == CATCH_POKEMON) {
@@ -96,7 +95,7 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		uint32_t situacion = atrapo_pokemon(mensaje[4]);
 		mensaje_creado = (void*) caught_pokemon_create(situacion);
 		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
-				codigo, -1, id_c);
+				codigo, id_c);
 	}
 
 	if (id == BROKER && codigo == GET_POKEMON) {
