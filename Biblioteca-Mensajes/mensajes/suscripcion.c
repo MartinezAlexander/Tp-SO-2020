@@ -94,11 +94,11 @@ void suscripcion_proceso_mostrar(t_suscripcion* suscripcion){
 }
 
 char* proceso_to_string(t_proceso proceso){
-	char* team = "team";
-	char* gamecard = "gamecard";
-	char* gameboy = "gameboy";
-	char* suscriptor = "suscriptor";
-	char* broker = "broker";
+	char* team = "TEAM";
+	char* gamecard = "GAMECARD";
+	char* gameboy = "GAMEBOY";
+	char* suscriptor = "SUSCRIPTOR";
+	char* broker = "BROKER";
 	char* nombre_proceso;
 	switch(proceso){
 		case TEAM:
@@ -121,12 +121,12 @@ char* proceso_to_string(t_proceso proceso){
 }
 
 char* cola_to_string(op_code cola){
-	char* cola_new = "cola: new_pokemon";
-	char* cola_appeared = "cola: appeared_pokemon";
-	char* cola_get = "cola: get_pokemon";
-	char* cola_localized = "cola: localized_pokemon";
-	char* cola_catch = "cola: catch_pokemon";
-	char* cola_caught = "cola: caught_pokemon";
+	char* cola_new = "cola: NEW_POKEMON";
+	char* cola_appeared = "cola: APPEARED_POKEMON";
+	char* cola_get = "cola: GET_POKEMON";
+	char* cola_localized = "cola: LOCALIZED_POKEMON";
+	char* cola_catch = "cola: CATCH_POKEMON";
+	char* cola_caught = "cola: CAUGHT_POKEMON";
 	char* nombre_cola;
 
 	switch(cola){

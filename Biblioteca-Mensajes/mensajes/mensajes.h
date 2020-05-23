@@ -63,13 +63,14 @@ t_paquete* empaquetar_buffer(t_buffer* buffer, op_code codigo);
 /*
 enviar_mensaje es un metodo que envia todos los mensajes incluidos en el ENUM
 a traves de un socket que esta conectado a un server para lo cual necesita un
-t_mensaje* y el socket a traves del cual enviara el mensaje.
+t_mensaje* y el socket a traves del cual enviara el mensaje. Si lo pudo mandar
+retorna la cantidad de bytes que mando sino pudo enviar devuelve un -1;
 ej:
 t_new_pokemon* pokemon = new_pokemon_create("pikachu",2,3,4);
 t_mensaje* mensaje = mensaje_simple_create((void*)pokemon,NEW_POKEMON);
 enviar_mensaje(mensaje,socket);
 */
-void enviar_mensaje(t_mensaje* mensaje, int socket_cliente);
+int enviar_mensaje(t_mensaje* mensaje, int socket_cliente);
 
 /*
 recibir_mensaje es un metodo que se encarga de recibir los mensajes que lleguen
@@ -125,6 +126,16 @@ del mensaje el cual debera ser casteado en el exterior dependiendo el codigo que
 tenga asignado el mensaje
 */
 void* mensaje_obtener_contenido(t_mensaje* mensaje);
+
+/*
+mensaje_to_string crea un string con el contenido del mensaje para poder loguearlo
+*/
+char* mensaje_to_string(t_mensaje* mensaje);
+
+/*
+mensaje_mostrar muestra por pantalla el contenido del mensaje
+*/
+void mensaje_mostrar(t_mensaje* mensaje);
 
 /*
 mensaje_destroy libera la memoria del mensaje
