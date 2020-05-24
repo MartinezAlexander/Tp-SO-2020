@@ -26,6 +26,9 @@ uint32_t tiempo_de_reconexion;
 char* ip_broker;
 char* puerto_broker;
 
+char* ip_team;
+char* puerto_team;
+
 t_log* logger;
 
 #endif /* VARIABLES_GLOBALES_H_ */

@@ -18,6 +18,7 @@
 #include "../mensajes/procesamiento_caught.h"
 #include "../mensajes/procesamiento_appeared.h"
 #include "../mensajes/procesamiento_localized.h"
+#include "../variables_globales.h"
 
 void iniciar_puerto_de_escucha();
 void procesar_mensajes_directos(int* socket);

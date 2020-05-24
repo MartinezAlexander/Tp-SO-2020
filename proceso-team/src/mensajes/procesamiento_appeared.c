@@ -1,7 +1,7 @@
 #include "procesamiento_appeared.h"
 
 void descartar_appeared(t_appeared_pokemon* appeared_pokemon){
-	//TODO
+	appeared_pokemon_destroy(appeared_pokemon);
 }
 
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon){

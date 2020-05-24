@@ -17,60 +17,47 @@ void ejecutar_entrenador(t_entrenador* entrenador){
 void enviar_catch(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED_BY_CATCH;
 	printf("LLegue a destino, me bloqueo esperando rta \n\n");
-/*
 
 	//Conecto con broker
 	int socket = crear_conexion(ip_broker, puerto_broker);
+
+	//Envio mensaje
 	t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
 			entrenador->objetivo_actual->posicion.posicionX, entrenador->objetivo_actual->posicion.posicionY);
 	t_mensaje* mensaje = mensaje_simple_create(mensaje_catch, CATCH_POKEMON);
-	//Enviar mensaje
+
+	enviar_mensaje(mensaje, socket);
+
 	//Recibo id
 	//TODO se queda esperando a que le llegue mensaje recibir_mensaje()???
 	t_mensaje* respuesta = recibir_mensaje(socket);
+
 	//Agrego el id con mi entrenador al diccionario
 	char* key_id = string_itoa(respuesta->id);
 	dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
-*/
-}
 
-//TODO ver otra forma de hacer este asco
+}
 
 //Devuelve 0 si se movio, 1 si ya esta en la posicion del objetivo
 int mover_proxima_posicion(t_entrenador* entrenador){
 
-	//Obtengo direccion
-	int dirX = entrenador->objetivo_actual->posicion.posicionX - entrenador->posicion.posicionX;
+	int dirX = direccion_en_x(entrenador->posicion, entrenador->objetivo_actual->posicion);
 
+	if(dirX == 0){
+		int dirY = direccion_en_y(entrenador->posicion, entrenador->objetivo_actual->posicion);
 
-	if(dirX > 0){
-		entrenador->posicion.posicionX++;
-		//Retardo
-		sleep(retardo_cpu);
-	}else if(dirX < 0){
-		entrenador->posicion.posicionX--;
-		//Retardo
-		sleep(retardo_cpu);
-	}else{
-
-		int dirY = entrenador->objetivo_actual->posicion.posicionY - entrenador->posicion.posicionY;
-
-		if(dirY > 0){
-			entrenador->posicion.posicionY++;
-			//Retardo
-			sleep(retardo_cpu);
-		}else if(dirY < 0){
-			entrenador->posicion.posicionY--;
-			//Retardo
-			sleep(retardo_cpu);
-		}else{
-			printf("No me muevo\n");
+		if(dirY == 0){
 			return 1;
+		}else{
+			entrenador->posicion.posicionY += dirY;
+			sleep(retardo_cpu);
 		}
+	}else{
+		entrenador->posicion.posicionX += dirX;
+		sleep(retardo_cpu);
 	}
 
 	printf("Me movi a [%d , %d]\n", entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
-
 
 	return 0;
 }

@@ -1,7 +1,7 @@
 #include "procesamiento_caught.h"
 
 void descartar_caught(t_caught_pokemon* mensaje){
-	//TODO
+	caught_pokemon_destroy(mensaje);
 }
 
 void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo){

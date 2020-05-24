@@ -1,10 +1,7 @@
 #include "conexion_gameboy.h"
 
 void iniciar_puerto_de_escucha(){
-	//TODO definir ip y puerto del server por config por ahi??
-	char* ip = "127.0.0.2";
-	char* puerto = "5002";
-	iniciar_servidor(ip, puerto,(void*) procesar_mensajes_directos);
+	iniciar_servidor(ip_team, puerto_team,(void*) procesar_mensajes_directos);
 }
 
 void procesar_mensajes_directos(int* socket){

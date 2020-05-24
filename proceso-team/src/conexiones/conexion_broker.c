@@ -17,7 +17,7 @@ void iniciar_conexion_broker(){
 
 
 void enviarACK(int socket){
-	//TODO
+	//TODO envio de ACK luego de recibir mensaje
 }
 
 
@@ -28,9 +28,17 @@ void enviar_get_objetivo(t_list* objetivo_global){
 		char* pokemon = list_get(objetivo_global, i);
 
 		if(strcmp(pokemon, ultima_especie_enviada) != 0){
-			//TODO: Envio mensaje get al broker
+
+			//Envio mensaje GET al broker
+			t_get_pokemon* mensaje_get = get_pokemon_create(pokemon);
+			t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON);
+
+			int socket = crear_conexion(ip_broker, puerto_broker);
+			enviar_mensaje(mensaje, socket);
+			liberar_conexion(socket);
+
 			printf("Enviando especie GET al broker: %s\n", pokemon);
-			//
+
 			ultima_especie_enviada = pokemon;
 		}
 	}

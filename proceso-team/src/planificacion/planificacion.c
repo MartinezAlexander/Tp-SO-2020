@@ -11,7 +11,15 @@ void planificador_iniciar_hilo_entrenador(t_entrenador* entrenador){
 		case FIFO:
 			planificacion_correspondiente = ejecutar_hilo_fifo;
 			break;
-		//TODO atender demas casos
+		case RR:
+			planificacion_correspondiente = ejecutar_hilo_rr;
+			break;
+		case SJF_SD:
+			planificacion_correspondiente = ejecutar_hilo_sjf_sin_desalojo;
+			break;
+		case SJF_CD:
+			planificacion_correspondiente = ejecutar_hilo_sjf_con_desalojo;
+			break;
 	}
 
 	pthread_create(&(entrenador->hilo), NULL, planificacion_correspondiente, entrenador);
@@ -49,12 +57,50 @@ void ejecutar_hilo_fifo(t_entrenador* entrenador){
 	}
 }
 
+void ejecutar_hilo_rr(t_entrenador* entrenador){
+	while(1){
+		comenzar_ciclo_rr(entrenador);
+
+		ejecutar_entrenador(entrenador);
+
+		finalizar_ciclo_rr(entrenador);
+	}
+}
+
+void ejecutar_hilo_sjf_sin_desalojo(t_entrenador* entrenador){
+	while(1){
+		comenzar_ciclo_sjf_sin_desalojo(entrenador);
+
+		ejecutar_entrenador(entrenador);
+
+		finalizar_ciclo_sjf_sin_desalojo(entrenador);
+	}
+}
+
+void ejecutar_hilo_sjf_con_desalojo(t_entrenador* entrenador){
+	while(1){
+		comenzar_ciclo_sjf_con_desalojo(entrenador);
+
+		ejecutar_entrenador(entrenador);
+
+		finalizar_ciclo_sjf_con_desalojo(entrenador);
+	}
+}
+
 void ejecutar_proximo(){
 	switch(planificador->algoritmo_planificacion){
 		case FIFO:
 			ejecutar_proximo_fifo();
 			break;
-		//TODO demas casos
+		case RR:
+			ejecutar_proximo_rr();
+			break;
+		case SJF_SD:
+			ejecutar_proximo_sjf_sin_desalojo();
+			break;
+		case SJF_CD:
+			ejecutar_proximo_sjf_con_desalojo();
+			break;
 	}
 }
 

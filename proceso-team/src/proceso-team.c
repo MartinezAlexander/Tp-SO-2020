@@ -35,9 +35,14 @@ int main(void) {
 	char* path_logger = config_get_string_value(config, "LOG_FILE");
 	logger = iniciar_logger(path_logger);
 
+	ip_team = config_get_string_value(config, "IP_TEAM");
+	puerto_team = config_get_string_value(config, "PUERTO_TEAM");
 
+	//Inicializo los hilos de los entrenadores
+	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+		planificador_iniciar_hilo_entrenador(list_get(entrenadores, i));
+	}
 
-/*
 	//Conectarse a las colas del broker
 	iniciar_conexion_broker();
 
@@ -46,59 +51,11 @@ int main(void) {
 
 	//Abrir socket de escucha para el Gameboy
 	iniciar_puerto_de_escucha();
-*/
-
-	test();
 
 
 	terminar_programa(logger, config);
+	//TODO (mas adelante) joinear todos los hilos que tenga
 }
-
-
-void test(){
-	//Test de verdad
-	//Inicio los hilos de los entrenadores
-
-	//TODO funcion para esto y tambien para los join finales
-		for(int i = 0 ; i < list_size(entrenadores) ; i++){
-			planificador_iniciar_hilo_entrenador(list_get(entrenadores, i));
-		}
-
-	//nuevo APPEARED
-	t_appeared_pokemon* msj = appeared_pokemon_create("Pikachu", 5, 3);
-	//entrenador_entrar_a_planificacion(pokemon)
-	entrenador_entrar_a_planificacion(msj->pokemon);
-
-	//nuevo APPEARED
-	t_appeared_pokemon* nuevo_msj = appeared_pokemon_create("Charmander", 1, 3);
-	//entrenador_entrar_a_planificacion(pokemon)
-	entrenador_entrar_a_planificacion(nuevo_msj->pokemon);
-
-	//Deberia pasar:
-
-	//Encolado entrenador en [5,5]
-	//Entrenador en [5,5] pasa a ejecucion
-	//Encolado entrenador en [1,2]
-	// .. 2 seg ..
-	//Me movi a [5, 4]
-	// .. 2 seg ..
-	//Me movi a [5, 3]
-	//Llegue a destino, entrenador bloqueado
-	//Entrenador en [1,2] pasa a ejecucion
-	// .. 2 seg ..
-	//Me movi a [1, 3]
-	//Llegue a destino, entrenador bloqueado
-
-
-	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-		t_entrenador* ent = list_get(entrenadores, i);
-		pthread_join(ent->hilo, NULL);
-	}
-
-	printf("\n\n");
-}
-
-
 
 
 t_log* iniciar_logger(char* path)

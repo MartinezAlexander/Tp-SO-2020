@@ -1,6 +1,6 @@
 #include "procesamiento_localized.h"
 
-//TODO
+//TODO procesamiento mensaje localized
 void procesar_localized(t_localized_pokemon* localized_pokemon){
 	//Ya recibi appeared o localized de esta especie??
 		//Descarto

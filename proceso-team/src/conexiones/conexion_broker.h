@@ -15,9 +15,12 @@
 #include<commons/collections/list.h>
 #include<mensajes/mensajes.h>
 #include<mensajes/suscripcion.h>
+#include<mensajes/client.h>
 #include<mensajes/localized_pokemon.h>
 #include<mensajes/appeared_pokemon.h>
 #include<mensajes/caught_pokemon.h>
+#include<mensajes/get_pokemon.h>
+
 
 #include "../mensajes/procesamiento_caught.h"
 #include "../mensajes/procesamiento_appeared.h"
