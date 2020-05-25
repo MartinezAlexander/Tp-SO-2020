@@ -15,6 +15,7 @@
 #include<commons/string.h>
 #include<mensajes/posiciones.h>
 #include<mensajes/mensajes.h>
+#include<mensajes/pokemon.h>
 #include "../variables_globales.h"
 
 void loggear_planificacion();

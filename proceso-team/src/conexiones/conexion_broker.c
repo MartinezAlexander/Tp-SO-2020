@@ -1,6 +1,7 @@
 #include "conexion_broker.h"
 
 void iniciar_conexion_broker(){
+	//TODO por ahi habria que tener las suscripciones en 3 hilos. Por el tema del reintento
 	socket_appeared = iniciar_suscripcion_broker(APPEARED_POKEMON);
 	socket_caught = iniciar_suscripcion_broker(CAUGHT_POKEMON);
 	socket_localized = iniciar_suscripcion_broker(LOCALIZED_POKEMON);
@@ -17,7 +18,7 @@ void iniciar_conexion_broker(){
 
 
 void enviarACK(int socket){
-	//TODO envio de ACK luego de recibir mensaje
+	enviar_confirmacion(1, ACK, socket);
 }
 
 
@@ -35,6 +36,9 @@ void enviar_get_objetivo(t_list* objetivo_global){
 
 			int socket = crear_conexion(ip_broker, puerto_broker);
 			enviar_mensaje(mensaje, socket);
+
+			cod_confirmacion codigo;
+			int id = recibir_confirmacion(socket, &codigo);
 			liberar_conexion(socket);
 
 			printf("Enviando especie GET al broker: %s\n", pokemon);
@@ -50,10 +54,18 @@ int iniciar_suscripcion_broker(op_code cola){
 	t_mensaje* mensaje = mensaje_simple_create((void*) suscripcion, SUSCRIPCION);
 
 	int socket = crear_conexion(ip_broker, puerto_broker);
+
+	//Reintento conexion
+	while(socket < 0){
+		sleep(tiempo_de_reconexion);
+		socket = crear_conexion(ip_broker, puerto_broker);
+	}
+
 	enviar_mensaje(mensaje, socket);
 
 	return socket;
 }
+
 
 
 void recibir_mensaje_appeared(int socket_appeared){
