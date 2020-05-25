@@ -19,13 +19,15 @@
 #include<commons/collections/queue.h>
 #include <mensajes/mensajes.h>
 #include "suscriptor.h"
+#include <semaphore.h>
 
 //estructura de cola con sus respectivos suscriptores
 typedef struct{
 	t_queue* queue;
 	t_list* suscriptores;
 	pthread_t hilo;
-	//semaforo
+	sem_t semaforoMensajes;
+	sem_t semaforoSuscriptores;
 }t_cola_mensajeria;
 
 t_cola_mensajeria* cola_mensajeria_new;
@@ -37,6 +39,7 @@ t_cola_mensajeria* cola_mensajeria_caught;
 
 t_cola_mensajeria* cola_mensajeria_create();
 t_cola_mensajeria* cola_mensajeria_obtener(op_code codigo);
+void cola_mensajeria_recibir_mensaje(t_cola_mensajeria* cola, t_mensaje* mensaje, int* ultimo_id);
 
 
 #endif /* COLA_H_ */
