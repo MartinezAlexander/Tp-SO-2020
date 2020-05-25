@@ -6,6 +6,9 @@ void iniciarlizar_diccionario_catch(){
 }
 
 void ejecutar_entrenador(t_entrenador* entrenador){
+	//Actualizo estadistica
+	int ciclos = dictionary_get(diccionario_ciclos_entrenador, entrenador);
+	dictionary_put(diccionario_ciclos_entrenador, entrenador, ciclos+1);
 
 	int termine = mover_proxima_posicion(entrenador);
 	loggear_movimiento_entrenador(entrenador->identificador, entrenador->posicion);
@@ -72,6 +75,8 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 
 	entrenador->objetivo_actual = NULL;
 
+	dictionary_put(diccionario_ciclos_entrenador, entrenador, 0);
+
 	return entrenador;
 }
 
@@ -92,6 +97,8 @@ t_list* leer_entrenadores(t_config* config){
 	}
 
 	t_list* entrenadores = list_create();
+	diccionario_ciclos_entrenador = dictionary_create();
+
 	for(int i = 0 ; i < numero_posiciones ; i++){
 		list_add(entrenadores,entrenador_create(posiciones_entrenadores[i],
 				pokemones_entrenadores[i],

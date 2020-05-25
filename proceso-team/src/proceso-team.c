@@ -58,11 +58,9 @@ int main(void) {
 
 }
 
-//TODO estadisticas
-//Cantidad de ciclos de CPU totales
-//Cantidad de cambios de contexto realizados
-//Cantidad de ciclos de CPU realizados por entrenador
-//Deadlocks producidos y resueltos
+//TODO (estadisticas) ciclos de CPU totales (se calcula al final)
+//TODO (estadisticas) Cantidad de cambios de contexto realizados
+//TODO (estadisticas) Deadlocks producidos y resueltos
 
 t_log* iniciar_logger(char* path)
 {

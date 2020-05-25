@@ -34,4 +34,7 @@ t_log* logger;
 
 t_dictionary* diccionario_especies_recibidas;
 
+//Estadisticas
+t_dictionary* diccionario_ciclos_entrenador;
+
 #endif /* VARIABLES_GLOBALES_H_ */
