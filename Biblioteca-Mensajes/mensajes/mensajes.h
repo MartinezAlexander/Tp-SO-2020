@@ -43,6 +43,12 @@ typedef struct{
 	void* mensaje;
 }t_mensaje;
 
+typedef enum{
+	ACK = 1,
+	ID,
+	OK_SUSCRIPTO
+}cod_confirmacion;
+
 /*
 crea un void* de la siguiente forma
 [codigo_operacion][tamanio_de_buffer][buffer]
@@ -141,5 +147,8 @@ void mensaje_mostrar(t_mensaje* mensaje);
 mensaje_destroy libera la memoria del mensaje
 */
 void mensaje_destroy(t_mensaje* mensaje);
+
+int enviar_confirmacion(int32_t num, cod_confirmacion codigo, int socket);
+int32_t recibir_confirmacion(int socket, cod_confirmacion* codigo);
 
 #endif 

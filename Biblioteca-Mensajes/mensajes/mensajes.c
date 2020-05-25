@@ -166,6 +166,30 @@ int enviar_mensaje(t_mensaje* mensaje, int socket_cliente)
 	return se_envio;
 }
 
+int enviar_confirmacion(int32_t num, cod_confirmacion codigo, int socket){
+	int size = sizeof(int32_t) + sizeof(cod_confirmacion);
+	void* stream = malloc(size);
+	int offset = 0;
+	memcpy(stream + offset, &codigo, sizeof(cod_confirmacion));
+	offset += sizeof(cod_confirmacion);
+	memcpy(stream + offset, &num, sizeof(int32_t));
+
+	int cuanto_se_envio = send(socket,stream,size,0);
+
+	free(stream);
+
+	return cuanto_se_envio;
+}
+
+int32_t recibir_confirmacion(int socket, cod_confirmacion* codigo){
+	cod_confirmacion codigo_recibido;
+	recv(socket,&codigo_recibido,sizeof(cod_confirmacion),0);
+	int32_t num;
+	recv(socket,&num,sizeof(int32_t),0);
+	(*codigo) = codigo_recibido;
+	return num;
+}
+
 t_mensaje* recibir_mensaje(int socket_cliente)
 {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
