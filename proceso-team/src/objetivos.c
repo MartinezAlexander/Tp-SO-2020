@@ -1,5 +1,15 @@
 #include "objetivos.h"
 
+t_dictionary* inicializar_diccionario_especies(){
+	t_dictionary* diccionario = dictionary_create();
+
+	for(int i = 0 ; i < list_size(objetivo_global) ; i++){
+		dictionary_put(diccionario, list_get(objetivo_global, i), 0);
+	}
+
+	return diccionario;
+}
+
 t_list* obtener_objetivo_global(t_list* entrenadores){
 	t_list* objetivos_globales = list_create();
 

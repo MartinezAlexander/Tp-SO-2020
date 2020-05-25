@@ -25,6 +25,7 @@
 #include "../mensajes/procesamiento_caught.h"
 #include "../mensajes/procesamiento_appeared.h"
 #include "../mensajes/procesamiento_localized.h"
+#include "../utils/log_utils.h"
 
 int socket_appeared;
 int socket_caught;

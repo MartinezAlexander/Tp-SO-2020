@@ -14,6 +14,7 @@
 #include<stdint.h>
 #include<commons/config.h>
 #include<commons/collections/list.h>
+#include<commons/collections/dictionary.h>
 #include<commons/log.h>
 #include<commons/string.h>
 
@@ -30,5 +31,7 @@ char* ip_team;
 char* puerto_team;
 
 t_log* logger;
+
+t_dictionary* diccionario_especies_recibidas;
 
 #endif /* VARIABLES_GLOBALES_H_ */

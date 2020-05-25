@@ -19,6 +19,7 @@ int main(void) {
 
 	entrenadores = leer_entrenadores(config);
 	objetivo_global = obtener_objetivo_global(entrenadores);
+	diccionario_especies_recibidas = inicializar_diccionario_especies();
 
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");
@@ -52,11 +53,16 @@ int main(void) {
 	//Abrir socket de escucha para el Gameboy
 	iniciar_puerto_de_escucha();
 
-
-	terminar_programa(logger, config);
 	//TODO (mas adelante) joinear todos los hilos que tenga
+	terminar_programa(logger, config);
+
 }
 
+//TODO estadisticas
+//Cantidad de ciclos de CPU totales
+//Cantidad de cambios de contexto realizados
+//Cantidad de ciclos de CPU realizados por entrenador
+//Deadlocks producidos y resueltos
 
 t_log* iniciar_logger(char* path)
 {

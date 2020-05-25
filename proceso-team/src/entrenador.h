@@ -20,6 +20,8 @@
 
 #include "variables_globales.h"
 #include "utils/array_utils.h"
+#include "utils/direccion_utils.h"
+#include "utils/log_utils.h"
 
 
 uint32_t retardo_cpu;
@@ -33,15 +35,17 @@ typedef enum{
 } estado_planificacion;
 
 typedef struct{
+	int identificador;
 	t_posicion posicion;
-	estado_planificacion estado;
+
 	t_list* objetivos;
 	t_list* pokemones_adquiridos;
 
+	t_pokemon* objetivo_actual;
+
+	estado_planificacion estado;
 	pthread_t hilo;
 	sem_t semaforo;
-
-	t_pokemon* objetivo_actual;
 } t_entrenador;
 
 
@@ -54,7 +58,7 @@ void ejecutar_entrenador(t_entrenador* entrenador);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);
 
-t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos);
+t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador);
 t_list* leer_entrenadores(t_config* config);
 void entrenador_mostrar(t_entrenador *entrenador);
 

@@ -8,6 +8,7 @@ void iniciarlizar_diccionario_catch(){
 void ejecutar_entrenador(t_entrenador* entrenador){
 
 	int termine = mover_proxima_posicion(entrenador);
+	loggear_movimiento_entrenador(entrenador->identificador, entrenador->posicion);
 
 	if(termine){
 		enviar_catch(entrenador);
@@ -16,7 +17,7 @@ void ejecutar_entrenador(t_entrenador* entrenador){
 
 void enviar_catch(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED_BY_CATCH;
-	printf("LLegue a destino, me bloqueo esperando rta \n\n");
+	loggear_operacion_atrapar(entrenador->objetivo_actual);
 
 	//Conecto con broker
 	int socket = crear_conexion(ip_broker, puerto_broker);
@@ -29,13 +30,13 @@ void enviar_catch(t_entrenador* entrenador){
 	enviar_mensaje(mensaje, socket);
 
 	//Recibo id
-	//TODO se queda esperando a que le llegue mensaje recibir_mensaje()???
+	//TODO chequear si se queda esperando a que le llegue mensaje recibir_mensaje()???
 	t_mensaje* respuesta = recibir_mensaje(socket);
+	loggear_nuevo_mensaje(respuesta);
 
 	//Agrego el id con mi entrenador al diccionario
 	char* key_id = string_itoa(respuesta->id);
 	dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
-
 }
 
 //Devuelve 0 si se movio, 1 si ya esta en la posicion del objetivo
@@ -56,13 +57,10 @@ int mover_proxima_posicion(t_entrenador* entrenador){
 		entrenador->posicion.posicionX += dirX;
 		sleep(retardo_cpu);
 	}
-
-	printf("Me movi a [%d , %d]\n", entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
-
 	return 0;
 }
 
-t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos){
+t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador){
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	char** posiciones_separadas = string_split(posicion, "|");
@@ -97,7 +95,7 @@ t_list* leer_entrenadores(t_config* config){
 	for(int i = 0 ; i < numero_posiciones ; i++){
 		list_add(entrenadores,entrenador_create(posiciones_entrenadores[i],
 				pokemones_entrenadores[i],
-				objetivos_entrenadores[i]));
+				objetivos_entrenadores[i], (i+1)));
 	}
 
 	return entrenadores;
@@ -140,6 +138,8 @@ void entrenador_atrapar_objetivo(t_entrenador* entrenador){
 	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
 
 	entrenador_resetear_objetivo(entrenador);
+
+
 }
 
 void entrenador_resetear_objetivo(t_entrenador* entrenador){

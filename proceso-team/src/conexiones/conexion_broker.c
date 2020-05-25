@@ -59,6 +59,7 @@ int iniciar_suscripcion_broker(op_code cola){
 void recibir_mensaje_appeared(int socket_appeared){
 	while(1){
 		t_mensaje* mensaje_appeared = recibir_mensaje(socket_appeared);
+		loggear_nuevo_mensaje(mensaje_appeared);
 		enviarACK(socket_appeared);
 		procesar_appeared((t_appeared_pokemon*) mensaje_appeared->mensaje);
 	}
@@ -67,6 +68,7 @@ void recibir_mensaje_appeared(int socket_appeared){
 void recibir_mensaje_caught(int socket_caught){
 	while(1){
 		t_mensaje* mensaje_caught = recibir_mensaje(socket_caught);
+		loggear_nuevo_mensaje(mensaje_caught);
 		enviarACK(socket_caught);
 		procesar_caught((t_caught_pokemon*) mensaje_caught->mensaje, mensaje_caught->id_correlativo);
 	}
@@ -75,6 +77,7 @@ void recibir_mensaje_caught(int socket_caught){
 void recibir_mensaje_localized(int socket_localized){
 	while(1){
 		t_mensaje* mensaje_localized = recibir_mensaje(socket_localized);
+		loggear_nuevo_mensaje(mensaje_localized);
 		enviarACK(socket_localized);
 		procesar_localized((t_localized_pokemon*) mensaje_localized->mensaje);
 	}
