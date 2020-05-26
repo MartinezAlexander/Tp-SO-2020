@@ -15,8 +15,6 @@
 #include "../entrenador.h"
 #include "planificador.h"
 
-void comenzar_ciclo_rr(t_entrenador* entrenador);
-void finalizar_ciclo_rr(t_entrenador* entrenador);
-void ejecutar_proximo_rr();
+void planificar_rr();
 
 #endif /* PLANIFICACION_PLANIFICACION_RR_H_ */

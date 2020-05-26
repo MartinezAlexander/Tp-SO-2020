@@ -21,7 +21,7 @@ void ejecutar_entrenador(t_entrenador* entrenador){
 void enviar_catch(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED_BY_CATCH;
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
-
+/*
 	//Conecto con broker
 	int socket = crear_conexion(ip_broker, puerto_broker);
 
@@ -40,9 +40,10 @@ void enviar_catch(t_entrenador* entrenador){
 	//Agrego el id con mi entrenador al diccionario
 	char* key_id = string_itoa(respuesta->id);
 	dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
+	*/
 }
 
-//Devuelve 0 si se movio, 1 si ya esta en la posicion del objetivo
+//TODO Repensar; Devuelve 0 si se movio, 1 si ya esta en la posicion del objetivo
 int mover_proxima_posicion(t_entrenador* entrenador){
 
 	int dirX = direccion_en_x(entrenador->posicion, entrenador->objetivo_actual->posicion);
@@ -60,6 +61,9 @@ int mover_proxima_posicion(t_entrenador* entrenador){
 		entrenador->posicion.posicionX += dirX;
 		sleep(retardo_cpu);
 	}
+	if(movimientos_entre_posiciones(entrenador->posicion, entrenador->objetivo_actual->posicion) == 0){
+		return 1;
+	}
 	return 0;
 }
 
@@ -72,6 +76,7 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	entrenador->pokemones_adquiridos = array_to_list(string_split(pokemones, "|"));
 	entrenador->objetivos = array_to_list(string_split(objetivos, "|"));
 	entrenador->estado = NEW;
+	entrenador->identificador = identificador;
 
 	entrenador->objetivo_actual = NULL;
 

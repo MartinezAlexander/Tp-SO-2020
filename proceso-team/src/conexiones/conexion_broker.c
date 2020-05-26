@@ -18,7 +18,7 @@ void iniciar_conexion_broker(){
 
 
 void enviarACK(int socket){
-	enviar_confirmacion(1, ACK, socket);
+	//enviar_confirmacion(1, ACK, socket);
 }
 
 
@@ -37,8 +37,8 @@ void enviar_get_objetivo(t_list* objetivo_global){
 			int socket = crear_conexion(ip_broker, puerto_broker);
 			enviar_mensaje(mensaje, socket);
 
-			cod_confirmacion codigo;
-			int id = recibir_confirmacion(socket, &codigo);
+			//cod_confirmacion codigo;
+			//int id = recibir_confirmacion(socket, &codigo);
 			liberar_conexion(socket);
 
 			printf("Enviando especie GET al broker: %s\n", pokemon);

@@ -22,6 +22,7 @@
 #include<mensajes/appeared_pokemon.h>
 #include<mensajes/mensajes.h>
 #include<mensajes/pokemon.h>
+#include"test.h"
 
 void terminar_programa(t_log* logger, t_config* config);
 t_config* leer_config(void);

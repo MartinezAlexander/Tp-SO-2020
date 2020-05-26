@@ -15,8 +15,6 @@
 #include "../entrenador.h"
 #include "planificador.h"
 
-void comenzar_ciclo_fifo(t_entrenador* entrenador);
-void finalizar_ciclo_fifo(t_entrenador* entrenador);
-void ejecutar_proximo_fifo();
+void planificar_fifo();
 
 #endif /* PLANIFICACION_FIFO_H_ */

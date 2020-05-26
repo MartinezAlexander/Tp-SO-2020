@@ -15,12 +15,7 @@
 #include "../entrenador.h"
 #include "planificador.h"
 
-void comenzar_ciclo_sjf_sin_desalojo(t_entrenador* entrenador);
-void finalizar_ciclo_sjf_sin_desalojo(t_entrenador* entrenador);
-void ejecutar_proximo_sjf_sin_desalojo();
-
-void comenzar_ciclo_sjf_con_desalojo(t_entrenador* entrenador);
-void finalizar_ciclo_sjf_con_desalojo(t_entrenador* entrenador);
-void ejecutar_proximo_sjf_con_desalojo();
+void planificar_sjf_sd();
+void planificar_sjf_cd();
 
 #endif /* PLANIFICACION_PLANIFICACION_SJF_H_ */

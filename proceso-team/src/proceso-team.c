@@ -45,13 +45,18 @@ int main(void) {
 	}
 
 	//Conectarse a las colas del broker
-	iniciar_conexion_broker();
+	//iniciar_conexion_broker();
 
 	//Enviar mensaje GET al broker segun objetivos globales
-	enviar_get_objetivo(objetivo_global);
+	//enviar_get_objetivo(objetivo_global);
+	test();
+	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+			t_entrenador* entrenador = (list_get(entrenadores, i));
+			pthread_join(entrenador->hilo, NULL);
+		}
 
 	//Abrir socket de escucha para el Gameboy
-	iniciar_puerto_de_escucha();
+	//iniciar_puerto_de_escucha();
 
 	//TODO (mas adelante) joinear todos los hilos que tenga
 	terminar_programa(logger, config);
@@ -96,4 +101,3 @@ void terminar_programa(t_log* logger, t_config* config){
 		config_destroy(config);
 	}
 }
-

@@ -13,6 +13,10 @@
 #include<stdint.h>
 #include<commons/string.h>
 #include<commons/collections/queue.h>
+#include<semaphore.h>
+
+#include"../variables_globales.h"
+#include"../entrenador.h"
 
 typedef enum{
 	FIFO, RR, SJF_CD, SJF_SD
@@ -23,10 +27,14 @@ typedef struct{
 	uint32_t quantum;
 	uint32_t estimacion_inicial;
 	t_queue* cola;
+	t_entrenador* entrenadorEnExec;
+	sem_t semaforo;
 }t_planificador;
 
 
 t_planificador *planificador;
+
+int puedo_ejecutar();
 
 tipo_planificacion obtener_algoritmo(char* algoritmo);
 t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t estimacion_inicial);

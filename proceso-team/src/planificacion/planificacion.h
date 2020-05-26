@@ -22,15 +22,11 @@
 
 int entrenador_disponible(t_entrenador *entrenador);
 void encolar(t_entrenador* entrenador);
-int puedo_ejecutar();
 
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon);
 
-void ejecutar_hilo_fifo(t_entrenador* entrenador);
-void ejecutar_hilo_rr(t_entrenador* entrenador);
-void ejecutar_hilo_sjf_sin_desalojo(t_entrenador* entrenador);
-void ejecutar_hilo_sjf_con_desalojo(t_entrenador* entrenador);
-void ejecutar_proximo();
+void planificar();
+void ejecutar_hilo(t_entrenador* entrenador);
 
 void planificador_iniciar_hilo_entrenador(t_entrenador* entrenador);
 
