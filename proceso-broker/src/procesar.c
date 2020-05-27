@@ -23,10 +23,17 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 	suscripcion_proceso_mostrar(suscripcion);
 }
 
-void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
+void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje, t_estado_mensaje* estado){
+	int x;
 	for(int i = 0; i < list_size(suscriptores); i++){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
-		enviar_mensaje(mensaje,suscriptor->socket);
+		x = enviar_mensaje(mensaje,suscriptor->socket);
+		estado->id_mensaje = mensaje->id;
+		if(x>=0){
+			list_add(estado->enviados,suscriptor->pid);
+		}else{
+			list_add(estado->fallidos,suscriptor->pid);
+		}
 	}
 }
 
@@ -36,11 +43,35 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		sem_wait(&cola->semaforoMensajes);
 
 		t_mensaje* pokemon = (t_mensaje*) queue_pop(cola->queue);
+		t_estado_mensaje* estado = estado_mensaje_create(pokemon->id);
 		//guardar pokemon en la cache
 		printf("saco de la cola a: \n");
-		envio_a_suscriptores(cola->suscriptores, pokemon);
+		envio_a_suscriptores(cola->suscriptores, pokemon, estado);
+		printf("cantidad de enviados %d\n", list_size(estado->enviados));
+		printf("cantidad de fallidos %d\n", list_size(estado->fallidos));
+
+/*
+		while(!list_is_empty(estado->fallidos)){
+			reintentar_fallidos(estado->fallidos,);
+		}
+*/
 		//caught_pokemon_mostrar((t_caught_pokemon*)pokemon->mensaje);
 
 		sem_post(&cola->semaforoSuscriptores);
 	}
+}
+
+t_estado_mensaje* estado_mensaje_create(int32_t id){
+	t_estado_mensaje* estado = malloc(sizeof(t_estado_mensaje));
+	estado->id_mensaje = id;
+	estado->enviados = list_create();
+	estado->fallidos = list_create();
+	return estado;
+}
+
+void estado_mensaje_destroy(t_estado_mensaje* estado){
+	free(estado->id_mensaje);
+	list_destroy_and_destroy_elements(estado->enviados,free);
+	list_destroy_and_destroy_elements(estado->fallidos,free);
+	free(estado);
 }
