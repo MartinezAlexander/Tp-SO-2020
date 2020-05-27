@@ -25,6 +25,7 @@ typedef enum{
 typedef struct{
 	tipo_planificacion algoritmo_planificacion;
 	uint32_t quantum;
+	uint32_t quantum_actual;
 	uint32_t estimacion_inicial;
 	t_queue* cola;
 	t_entrenador* entrenadorEnExec;

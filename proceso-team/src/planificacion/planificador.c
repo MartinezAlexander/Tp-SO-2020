@@ -20,6 +20,7 @@ t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t 
 	planificador->cola = queue_create();
 	planificador->entrenadorEnExec = NULL;
 	sem_init(&(planificador->semaforo), 0, 1);
+	planificador->quantum_actual = 0;
     return planificador;
 }
 int puedo_ejecutar()
