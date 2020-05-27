@@ -27,12 +27,14 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje, t_estado_men
 	int x;
 	for(int i = 0; i < list_size(suscriptores); i++){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
+		printf("PID: %d\n",suscriptor->pid);
 		x = enviar_mensaje(mensaje,suscriptor->socket);
+		printf("envio de mensaje: %d\n\n",x);
 		estado->id_mensaje = mensaje->id;
-		if(x>=0){
-			list_add(estado->enviados,suscriptor->pid);
+		if(x>0){
+			list_add(estado->enviados,(void*)suscriptor->pid);
 		}else{
-			list_add(estado->fallidos,suscriptor->pid);
+			list_add(estado->fallidos,(void*)suscriptor->pid);
 		}
 	}
 }
@@ -70,7 +72,6 @@ t_estado_mensaje* estado_mensaje_create(int32_t id){
 }
 
 void estado_mensaje_destroy(t_estado_mensaje* estado){
-	free(estado->id_mensaje);
 	list_destroy_and_destroy_elements(estado->enviados,free);
 	list_destroy_and_destroy_elements(estado->fallidos,free);
 	free(estado);

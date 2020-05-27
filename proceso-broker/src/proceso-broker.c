@@ -65,27 +65,27 @@ void administrar_mensajes(int* socket){
 			break;
 		case NEW_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_new,mensaje,&ultimo_id);
-			enviar_confirmacion(ultimo_id, ID,*socket);
+			//enviar_confirmacion(ultimo_id, ID,*socket);
 			break;
 		case LOCALIZED_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized,mensaje,&ultimo_id);
-			enviar_confirmacion(ultimo_id, ID,*socket);
+			//enviar_confirmacion(ultimo_id, ID,*socket);
 			break;
 		case GET_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_get,mensaje,&ultimo_id);
-			enviar_confirmacion(ultimo_id, ID,*socket);
+			//enviar_confirmacion(ultimo_id, ID,*socket);
 			break;
 		case APPEARED_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared,mensaje,&ultimo_id);
-			enviar_confirmacion(ultimo_id, ID,*socket);
+			//enviar_confirmacion(ultimo_id, ID,*socket);
 			break;
 		case CATCH_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch,mensaje,&ultimo_id);
-			enviar_confirmacion(ultimo_id, ID,*socket);
+			//enviar_confirmacion(ultimo_id, ID,*socket);
 			break;
 		case CAUGHT_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught,mensaje,&ultimo_id);
-			enviar_confirmacion(ultimo_id, ID,*socket);
+			//enviar_confirmacion(ultimo_id, ID,*socket);
 			break;
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
