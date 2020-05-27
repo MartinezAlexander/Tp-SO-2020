@@ -157,7 +157,7 @@ int enviar_mensaje(t_mensaje* mensaje, int socket_cliente)
 	int size_serializado;
 	void* serializado = serializar_paquete(paquete, &size_serializado);
 
-	int se_envio = send(socket_cliente,serializado,size_serializado,0);
+	int se_envio = send(socket_cliente,serializado,size_serializado,MSG_NOSIGNAL);
 
 	free(serializado);
 	free(paquete->buffer);
@@ -174,7 +174,7 @@ int enviar_confirmacion(int32_t num, cod_confirmacion codigo, int socket){
 	offset += sizeof(cod_confirmacion);
 	memcpy(stream + offset, &num, sizeof(int32_t));
 
-	int cuanto_se_envio = send(socket,stream,size,0);
+	int cuanto_se_envio = send(socket,stream,size,MSG_NOSIGNAL);
 
 	free(stream);
 
