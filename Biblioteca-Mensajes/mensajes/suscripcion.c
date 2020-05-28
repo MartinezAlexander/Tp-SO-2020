@@ -157,7 +157,7 @@ char* cola_to_string(op_code cola){
 char* suscripcion_proceso_to_string(t_suscripcion* suscripcion){
 	char* nombre_proceso = proceso_to_string(suscripcion->id);
 	char* nombre_cola = cola_to_string(suscripcion->cola_suscripcion);
-	return string_from_format("Mensaje - Suscripcion Proceso\nProceso: %s\nMi pid es %d\nCola a suscribirme: %s\n------------",nombre_proceso,suscripcion->pid, nombre_cola);
+	return string_from_format("Mensaje - Suscripcion Proceso: Proceso: %s, Mi pid es %d, Cola a suscribirme: %s",nombre_proceso,suscripcion->pid, nombre_cola);
 }
 
 void suscripcion_proceso_destroy(t_suscripcion* suscripcion){
