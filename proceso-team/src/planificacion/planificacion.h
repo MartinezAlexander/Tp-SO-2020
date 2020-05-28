@@ -21,7 +21,6 @@
 
 
 int entrenador_disponible(t_entrenador *entrenador);
-void encolar(t_entrenador* entrenador);
 
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon);
 

@@ -16,5 +16,6 @@
 #include "planificador.h"
 
 void planificar_rr();
+void pasar_proximo_a_ejecucion();
 
 #endif /* PLANIFICACION_PLANIFICACION_RR_H_ */

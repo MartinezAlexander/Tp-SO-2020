@@ -48,6 +48,8 @@ void entrar_a_ejecucion(t_entrenador* entrenador);
  */
 void sacar_de_ejecucion();
 
+void encolar(t_entrenador* entrenador);
+
 tipo_planificacion obtener_algoritmo(char* algoritmo);
 t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t estimacion_inicial);
 

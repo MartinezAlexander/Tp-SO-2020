@@ -1,41 +1,52 @@
 #include "planificacion_rr.h"
 
-//TODO Re-hacer mas declarativo
 void planificar_rr(){
-	//Checkeo si termino el quantum
-	if(planificador->quantum_actual == planificador->quantum){
-		//Checkeo si termino su quantum pero sigue necesitando asi lo encolo
-		if(!puedo_ejecutar()){
-			encolar(planificador->entrenadorEnExec);
-		}
-		//Hago el paquete Pop, entrenadorEnExec, Estado a Exec, y signal del sem
-		t_entrenador* entrenador = queue_pop(planificador->cola);
-		planificador->entrenadorEnExec = entrenador;
-		entrenador->estado = EXEC;
-		planificador->quantum_actual = 1;
-		sem_post(&(entrenador->semaforo));
-	    //Checkeo si es la primera iteracion
-		}else if(planificador->quantum_actual == 0){
-			//Hago el paquete Pop, entrenadorEnExec, Estado a Exec, y signal del sem
-			t_entrenador* entrenador = queue_pop(planificador->cola);
-			planificador->entrenadorEnExec = entrenador;
-			entrenador->estado = EXEC;
-			planificador->quantum_actual++;
-			sem_post(&(entrenador->semaforo));
+	//En un planificador ruond robin, la planificacion se da
+	//en dos casos:
+	//1. Cuando el proceso actual termina de ejecutar
+	//2. Cuando se termina el quantum
+
+	if(hay_alguien_en_ejecucion()){
+		//Primero que nada aumento el quantum, ya que acabo de ejecutar
+		planificador->quantum_actual++;
+
+		//Ahora que se que estaba ejecutando alguien
+		//debo ver si se le termino su quantum o no,
+		//en ese caso, saco el actual (encolandolo de nuevo)
+		//y ejecuto el que sigue
+		if(planificador->quantum_actual == planificador->quantum){
+			encolar(planificador->entrenador_en_exec);
+			pasar_proximo_a_ejecucion();
 		}else{
-			//Checkeo si termino por blockeo y no por quantum
-			if(puedo_ejecutar()){
-				//Hago el paquete Pop, entrenadorEnExec, Estado a Exec, y signal del sem
-				planificador->quantum_actual = 0;
-				t_entrenador* entrenador = queue_pop(planificador->cola);
-				planificador->entrenadorEnExec = entrenador;
-				entrenador->estado = EXEC;
-				planificador->quantum_actual++;
-				sem_post(&(entrenador->semaforo));
-			//Caso normal de que le queda quantum y necesita ejecutar
-			}else{
-				planificador->quantum_actual++;
-				sem_post(&(planificador->entrenadorEnExec->semaforo));
-			}
+			//Puedo seguir ejecutando, que nosotros
+			//lo permitimos dando el signal de su
+			//semaforo para que el proximo ciclo no
+			//lo corte
+			sem_post(&(planificador->entrenador_en_exec->semaforo));
 		}
+	}else{
+		//No hay nadie ejecutando o
+		//termino de ejecutar el actual
+		pasar_proximo_a_ejecucion();
+	}
+}
+
+void pasar_proximo_a_ejecucion(){
+	//Aca entro de dos maneras posibles
+	//Si termino el que estaba ejecutando.
+	//en ese caso, solo lo saco del planificador
+	//(y al no hacer el signal, ya deja de ejecutar)
+	sacar_de_ejecucion();
+	//Luego tambien chequare si hay alguien
+	//disponible para ejecutar en cola
+
+	//O si no habia nadie ejecutando.
+	//en este caso chequeo que haya alguien en cola
+	//y lo ejecuto, setteando su quantum a cero.
+	if(!queue_is_empty(planificador->cola)){
+		t_entrenador* entrenador = queue_pop(planificador->cola);
+		entrar_a_ejecucion(entrenador);
+		planificador->quantum_actual = 0;
+		sem_post(&(entrenador->semaforo));
+	}
 }

@@ -41,3 +41,10 @@ void sacar_de_ejecucion(){
 	planificador->entrenador_en_exec_is_null = 1;
 }
 
+void encolar(t_entrenador* entrenador)
+{
+	printf("Encolado entrenador en [%d , %d]\n", entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
+    entrenador->estado = READY;
+	queue_push(planificador->cola, entrenador);
+}
+

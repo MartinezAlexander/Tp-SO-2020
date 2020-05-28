@@ -65,10 +65,3 @@ int entrenador_disponible(t_entrenador *entrenador)
 {
 	return entrenador->estado == NEW || entrenador->estado == BLOCKED;
 }
-
-void encolar(t_entrenador* entrenador)
-{
-	printf("Encolado entrenador en [%d , %d]\n", entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
-    entrenador->estado = READY;
-	queue_push(planificador->cola, entrenador);
-}
