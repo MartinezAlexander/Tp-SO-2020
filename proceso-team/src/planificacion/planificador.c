@@ -18,13 +18,26 @@ t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t 
 	planificador->quantum = quantum;
 	planificador->estimacion_inicial = estimacion_inicial;
 	planificador->cola = queue_create();
-	planificador->entrenadorEnExec = NULL;
+	planificador->entrenador_en_exec = NULL;
+	planificador->entrenador_en_exec_is_null = 1;
 	sem_init(&(planificador->semaforo), 0, 1);
 	planificador->quantum_actual = 0;
     return planificador;
 }
-int puedo_ejecutar()
-{
-    return !list_any_satisfy(entrenadores, (void*)entrenador_en_ejecucion);
+
+int hay_alguien_en_ejecucion(){
+	if(planificador->entrenador_en_exec_is_null) return 0;
+	else return entrenador_en_ejecucion(planificador->entrenador_en_exec);
+}
+
+void entrar_a_ejecucion(t_entrenador* entrenador){
+	planificador->entrenador_en_exec = entrenador;
+	planificador->entrenador_en_exec_is_null = 0;
+	entrenador->estado = EXEC;
+}
+
+void sacar_de_ejecucion(){
+	planificador->entrenador_en_exec = NULL;
+	planificador->entrenador_en_exec_is_null = 1;
 }
 

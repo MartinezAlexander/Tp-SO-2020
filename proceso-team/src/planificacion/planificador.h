@@ -24,18 +24,29 @@ typedef enum{
 
 typedef struct{
 	tipo_planificacion algoritmo_planificacion;
+	t_queue* cola;
+
 	uint32_t quantum;
 	uint32_t quantum_actual;
+
 	uint32_t estimacion_inicial;
-	t_queue* cola;
-	t_entrenador* entrenadorEnExec;
+
+	t_entrenador* entrenador_en_exec;
+	int entrenador_en_exec_is_null;
+
 	sem_t semaforo;
 }t_planificador;
 
 
 t_planificador *planificador;
 
-int puedo_ejecutar();
+int hay_alguien_en_ejecucion();
+void entrar_a_ejecucion(t_entrenador* entrenador);
+
+/**
+ * Saca el entrenador actual de ejecucion (osea, limpia la variable entrenador en exec)
+ */
+void sacar_de_ejecucion();
 
 tipo_planificacion obtener_algoritmo(char* algoritmo);
 t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t estimacion_inicial);
