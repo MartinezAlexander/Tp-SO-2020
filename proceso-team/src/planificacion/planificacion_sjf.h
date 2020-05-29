@@ -18,4 +18,7 @@
 void planificar_sjf_sd();
 void planificar_sjf_cd();
 
+t_entrenador* shortest_job();
+double calcular_estimacion(t_entrenador* entrenador);
+
 #endif /* PLANIFICACION_PLANIFICACION_SJF_H_ */

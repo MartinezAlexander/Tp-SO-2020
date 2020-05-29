@@ -35,6 +35,11 @@ typedef enum{
 } estado_planificacion;
 
 typedef struct{
+	uint32_t ultima_rafaga;
+	double ultima_estimacion;
+} estado_sjf;
+
+typedef struct{
 	int identificador;
 	t_posicion posicion;
 
@@ -44,6 +49,8 @@ typedef struct{
 	t_pokemon* objetivo_actual;
 
 	estado_planificacion estado;
+	estado_sjf* estado_sjf;
+
 	pthread_t hilo;
 	sem_t semaforo;
 } t_entrenador;
@@ -58,8 +65,8 @@ void ejecutar_entrenador(t_entrenador* entrenador);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);
 
-t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador);
-t_list* leer_entrenadores(t_config* config);
+t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador, double estimacion_inicial);
+t_list* leer_entrenadores(t_config* config, double estimacion_inicial);
 
 void entrenador_resetear_objetivo(t_entrenador* entrenador);
 void entrenador_atrapar_objetivo(t_entrenador* entrenador);

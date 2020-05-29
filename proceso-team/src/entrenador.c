@@ -74,7 +74,7 @@ int mover_proxima_posicion(t_entrenador* entrenador){
 	return 0;
 }
 
-t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador){
+t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador, double estimacion_inicial ){
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	char** posiciones_separadas = string_split(posicion, "|");
@@ -87,13 +87,17 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 
 	entrenador->objetivo_actual = NULL;
 
+	entrenador->estado_sjf = malloc(sizeof(estado_sjf));
+	entrenador->estado_sjf->ultima_rafaga = 0;
+	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
+
 	dictionary_put(diccionario_ciclos_entrenador, entrenador, 0);
 
 	return entrenador;
 }
 
 
-t_list* leer_entrenadores(t_config* config){
+t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
 	char** pokemones_entrenadores = config_get_array_value(config, "POKEMON_ENTRENADORES");
 	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
@@ -114,7 +118,7 @@ t_list* leer_entrenadores(t_config* config){
 	for(int i = 0 ; i < numero_posiciones ; i++){
 		list_add(entrenadores,entrenador_create(posiciones_entrenadores[i],
 				pokemones_entrenadores[i],
-				objetivos_entrenadores[i], (i+1)));
+				objetivos_entrenadores[i], (i+1), estimacion_inicial));
 	}
 
 	return entrenadores;

@@ -46,18 +46,19 @@ int main(void) {
 void inicializar_variables(){
 	config = leer_config();
 
-	entrenadores = leer_entrenadores(config);
+	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
+	uint32_t quantum = config_get_int_value(config, "QUANTUM");
+	uint32_t estimacion_inicial = config_get_int_value(config, "ESTIMACION_INICIAL");
+	double alpha = config_get_double_value(config, "ALPHA");
+
+	planificador = planificador_create(algoritmo_planificacion, quantum, estimacion_inicial, alpha);
+
+	entrenadores = leer_entrenadores(config, estimacion_inicial);
 	objetivo_global = obtener_objetivo_global(entrenadores);
 	diccionario_especies_recibidas = inicializar_diccionario_especies();
 
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");
-
-	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
-	uint32_t quantum = config_get_int_value(config, "QUANTUM");
-	uint32_t estimacion_inicial = config_get_int_value(config, "ESTIMACION_INICIAL");
-
-	planificador = planificador_create(algoritmo_planificacion, quantum, estimacion_inicial);
 
 	ip_broker = config_get_string_value(config, "IP_BROKER");
 	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
