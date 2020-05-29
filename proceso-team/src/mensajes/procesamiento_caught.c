@@ -31,7 +31,11 @@ void resolver_caught_positivo(t_entrenador* entrenador){
 		if(entrenador_estado_deadlock(entrenador))
 			entrenador->estado = BLOCKED_DEADLOCK;
 		else
-			encolar(entrenador);//Caso si puedo seguir atrapando
+			entrenador->estado = BLOCKED;
+			//Si puedo seguir atrapando, el entrenador
+			//queda en estado bloqueado, asi la proxima
+			//vez que aparezca un pokemon, este entrenador
+			//este en los candidatos a ir a buscarlo
 	}
 }
 
