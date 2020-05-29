@@ -1,26 +1,19 @@
 #include "conexion_broker.h"
 
 void iniciar_conexion_broker(){
-	//TODO por ahi habria que tener las suscripciones en 3 hilos. Por el tema del reintento
-	socket_appeared = iniciar_suscripcion_broker(APPEARED_POKEMON);
-	socket_caught = iniciar_suscripcion_broker(CAUGHT_POKEMON);
-	socket_localized = iniciar_suscripcion_broker(LOCALIZED_POKEMON);
+	pthread_t hilo_suscripcion_appeared;
+	pthread_create(&hilo_suscripcion_appeared, NULL, (void*) iniciar_suscripcion_broker, APPEARED_POKEMON);
 
-	pthread_t hilo_cola_appeared;
-	pthread_t hilo_cola_caught;
-	pthread_t hilo_cola_localized;
+	pthread_t hilo_suscripcion_caught;
+	pthread_create(&hilo_suscripcion_caught, NULL, (void*) iniciar_suscripcion_broker, CAUGHT_POKEMON);
 
-	pthread_create(&hilo_cola_appeared, NULL, (void*)recibir_mensaje_appeared, &socket_appeared);
-	pthread_create(&hilo_cola_caught, NULL, (void*)recibir_mensaje_caught, &socket_caught);
-	pthread_create(&hilo_cola_localized, NULL, (void*)recibir_mensaje_localized, &socket_localized);
+	pthread_t hilo_suscripcion_localized;
+	pthread_create(&hilo_suscripcion_localized, NULL, (void*) iniciar_suscripcion_broker, LOCALIZED_POKEMON);
 }
-
-
 
 void enviarACK(int socket){
-	//enviar_confirmacion(1, ACK, socket);
+	enviar_confirmacion(1, ACK, socket);
 }
-
 
 void enviar_get_objetivo(t_list* objetivo_global){
 
@@ -49,7 +42,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 }
 
 
-int iniciar_suscripcion_broker(op_code cola){
+void iniciar_suscripcion_broker(op_code cola){
 	t_suscripcion* suscripcion = suscripcion_proceso_create(TEAM, getpid(), cola);
 	t_mensaje* mensaje = mensaje_simple_create((void*) suscripcion, SUSCRIPCION);
 
@@ -63,10 +56,23 @@ int iniciar_suscripcion_broker(op_code cola){
 
 	enviar_mensaje(mensaje, socket);
 
-	return socket;
+	void* funcion_de_escucha;
+
+	switch(cola){
+		case APPEARED_POKEMON:
+			funcion_de_escucha = recibir_mensaje_appeared;
+			break;
+		case CAUGHT_POKEMON:
+			funcion_de_escucha = recibir_mensaje_caught;
+			break;
+		case LOCALIZED_POKEMON:
+			funcion_de_escucha = recibir_mensaje_localized;
+			break;
+	}
+
+	pthread_t hilo_escucha;
+	pthread_create(&hilo_escucha, NULL, funcion_de_escucha, &socket);
 }
-
-
 
 void recibir_mensaje_appeared(int socket_appeared){
 	while(1){

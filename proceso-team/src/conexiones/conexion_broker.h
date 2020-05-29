@@ -27,12 +27,9 @@
 #include "../mensajes/procesamiento_localized.h"
 #include "../utils/log_utils.h"
 
-int socket_appeared;
-int socket_caught;
-int socket_localized;
 
 void iniciar_conexion_broker();
-int iniciar_suscripcion_broker(op_code cola);
+void iniciar_suscripcion_broker(op_code cola);
 void recibir_mensaje_appeared(int socket_appeared);
 void recibir_mensaje_caught(int socket_caught);
 void recibir_mensaje_localized(int socket_localized);

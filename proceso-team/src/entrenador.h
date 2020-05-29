@@ -60,7 +60,6 @@ int entrenador_en_ejecucion(t_entrenador *entrenador);
 
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador);
 t_list* leer_entrenadores(t_config* config);
-void entrenador_mostrar(t_entrenador *entrenador);
 
 void entrenador_resetear_objetivo(t_entrenador* entrenador);
 void entrenador_atrapar_objetivo(t_entrenador* entrenador);

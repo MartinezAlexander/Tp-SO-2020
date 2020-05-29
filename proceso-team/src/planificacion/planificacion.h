@@ -27,7 +27,8 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon);
 void planificar();
 void ejecutar_hilo(t_entrenador* entrenador);
 
-void planificador_iniciar_hilo_entrenador(t_entrenador* entrenador);
+void iniciar_hilos_entrenadores();
+void esperar_hilos_entrenadores();
 
 
 #endif /* PLANIFICACION_H_ */

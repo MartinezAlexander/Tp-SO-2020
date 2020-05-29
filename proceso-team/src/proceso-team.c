@@ -13,8 +13,37 @@
 
 
 int main(void) {
+	inicializar_variables();
 
-	//Leer archivo config y settear variables
+	iniciar_hilos_entrenadores();
+
+	//Me suscribo a las colas y abro hilos para recibir mensajes
+	//iniciar_conexion_broker();
+	//Envio mensaje GET al broker segun objetivos globales
+	//enviar_get_objetivo(objetivo_global);
+	//Abro socket de escucha para el Gameboy
+	//iniciar_puerto_de_escucha();
+
+	test();
+
+	//Antes de terminar el programa, debo esperar a que
+	//terminen de ejecutar todos los entrenadores (hilos)
+	//Cuando esto ocurra, tambien significara que el
+	//proceso team termino.
+	esperar_hilos_entrenadores();
+
+	//TODO hay que ver como apagar los hilos de escucha
+	//del broker, una vez que termino el team
+	//
+	terminar_programa(logger, config);
+
+}
+
+//TODO (estadisticas) ciclos de CPU totales (se calcula al final)
+//TODO (estadisticas) Cantidad de cambios de contexto realizados
+//TODO (estadisticas) Deadlocks producidos y resueltos
+
+void inicializar_variables(){
 	config = leer_config();
 
 	entrenadores = leer_entrenadores(config);
@@ -38,34 +67,7 @@ int main(void) {
 
 	ip_team = config_get_string_value(config, "IP_TEAM");
 	puerto_team = config_get_string_value(config, "PUERTO_TEAM");
-
-	//Inicializo los hilos de los entrenadores
-	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-		planificador_iniciar_hilo_entrenador(list_get(entrenadores, i));
-	}
-
-	//Conectarse a las colas del broker
-	//iniciar_conexion_broker();
-
-	//Enviar mensaje GET al broker segun objetivos globales
-	//enviar_get_objetivo(objetivo_global);
-	test();
-	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-			t_entrenador* entrenador = (list_get(entrenadores, i));
-			pthread_join(entrenador->hilo, NULL);
-		}
-
-	//Abrir socket de escucha para el Gameboy
-	//iniciar_puerto_de_escucha();
-
-	//TODO (mas adelante) joinear todos los hilos que tenga
-	terminar_programa(logger, config);
-
 }
-
-//TODO (estadisticas) ciclos de CPU totales (se calcula al final)
-//TODO (estadisticas) Cantidad de cambios de contexto realizados
-//TODO (estadisticas) Deadlocks producidos y resueltos
 
 t_log* iniciar_logger(char* path)
 {

@@ -21,6 +21,13 @@ void ejecutar_entrenador(t_entrenador* entrenador){
 void enviar_catch(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED_BY_CATCH;
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
+
+	//El entrenador que le sigue, va a tener que esperar a que el actual
+	//termine de mandar el catch y etc. ya que planificar() se ejcuta
+	//despues de esta funcion. Queremos que eso sea asi???
+	//TODO pensar forma de que se ejecute la planificacion del prox sin tener
+	//que esperar a que termine de hacer el catch
+	//Con un hilo podria ser????
 /*
 	//Conecto con broker
 	int socket = crear_conexion(ip_broker, puerto_broker);
@@ -114,32 +121,6 @@ t_list* leer_entrenadores(t_config* config){
 }
 
 
-void entrenador_mostrar(t_entrenador* entrenador){
-	printf("Mostrando entrenador: \n");
-	printf("Posicion: %d,%d \n", *posicion_get_X(&entrenador->posicion), *posicion_get_Y(&entrenador->posicion));
-	printf("Objetivos: [");
-
-
-	for(int i=0; i<list_size(entrenador->objetivos); i++){
-		char* objetivos = (char*)list_get(entrenador->objetivos,i);
-		printf(" %s ", objetivos);
-	}
-
-	printf("] \n");
-
-	printf("Pokemones: [");
-
-	for(int i=0; i<list_size(entrenador->pokemones_adquiridos); i++){
-		char* pokemones = (char*)list_get(entrenador->pokemones_adquiridos,i);
-		printf(" %s ", pokemones);
-	}
-
-	printf("] \n");
-
-	printf("Estado: %d \n\n", entrenador->estado);
-
-}
-
 int entrenador_en_ejecucion(t_entrenador *entrenador)
 {
 	return(entrenador->estado == EXEC);
@@ -150,8 +131,6 @@ void entrenador_atrapar_objetivo(t_entrenador* entrenador){
 	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
 
 	entrenador_resetear_objetivo(entrenador);
-
-
 }
 
 void entrenador_resetear_objetivo(t_entrenador* entrenador){

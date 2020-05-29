@@ -27,6 +27,7 @@
 void terminar_programa(t_log* logger, t_config* config);
 t_config* leer_config(void);
 t_log* iniciar_logger(char*);
+void inicializar_variables();
 
 void test();
 

@@ -1,11 +1,19 @@
 #include "planificacion.h"
 
-
-void planificador_iniciar_hilo_entrenador(t_entrenador* entrenador){
-	sem_init(&(entrenador->semaforo), 0, 0);
-	pthread_create(&(entrenador->hilo), NULL, ejecutar_hilo, entrenador);
+void iniciar_hilos_entrenadores(){
+	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+		t_entrenador* entrenador = list_get(entrenadores, i);
+		sem_init(&(entrenador->semaforo), 0, 0);
+		pthread_create(&(entrenador->hilo), NULL, ejecutar_hilo, entrenador);
+	}
 }
 
+void esperar_hilos_entrenadores(){
+	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+		t_entrenador* entrenador = list_get(entrenadores, i);
+		pthread_join(entrenador->hilo, NULL);
+	}
+}
 
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
@@ -30,7 +38,12 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 }
 
 void ejecutar_hilo(t_entrenador* entrenador){
-	while(1){
+	//El entrenador debe ejecutar constantemente
+	//y tomamos un ciclo como una pasada del while.
+	//Decimos que el entrenador ya termino de ejcutar
+	//cuando cumplio sus objetivos (y el del team)
+	//esto lo verificamos a traves de su estado
+	while(entrenador->estado != EXIT){
 		sem_wait(&(entrenador->semaforo));
 
 		ejecutar_entrenador(entrenador);
