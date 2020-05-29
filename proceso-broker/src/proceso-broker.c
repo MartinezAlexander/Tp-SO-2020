@@ -27,6 +27,10 @@ void inicializar_variables_globales(){
 	logger = iniciar_logger(path_logger);
 
 	ultimo_id = 0;
+
+	memoria_cache = memoria_cache_create();
+	//TODO esto no va - solo se creo para probar
+	obtener_cache(memoria_cache);
 }
 
 void inicializar_colas_mensajeria(){
@@ -61,31 +65,31 @@ void administrar_mensajes(int* socket){
 	mensaje = recibir_mensaje(*socket);
 	switch(mensaje->codigo){
 		case SUSCRIPCION:
-			procesar_suscripcion(mensaje, socket);
+			procesar_suscripcion(mensaje, socket, memoria_cache);
 			break;
 		case NEW_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_new,mensaje,&ultimo_id);
-			//enviar_confirmacion(ultimo_id, ID,*socket);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case LOCALIZED_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized,mensaje,&ultimo_id);
-			//enviar_confirmacion(ultimo_id, ID,*socket);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case GET_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_get,mensaje,&ultimo_id);
-			//enviar_confirmacion(ultimo_id, ID,*socket);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case APPEARED_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared,mensaje,&ultimo_id);
-			//enviar_confirmacion(ultimo_id, ID,*socket);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case CATCH_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch,mensaje,&ultimo_id);
-			//enviar_confirmacion(ultimo_id, ID,*socket);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case CAUGHT_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught,mensaje,&ultimo_id);
-			//enviar_confirmacion(ultimo_id, ID,*socket);
+			enviar_id(*socket,ultimo_id);
 			break;
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");

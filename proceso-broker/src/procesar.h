@@ -5,6 +5,12 @@
 #include <mensajes/mensajes.h>
 #include <mensajes/suscripcion.h>
 #include "cola.h"
+#include "memoria_cache.h"
+#include <pthread.h>
+
+//TODO resolucion turbia para evitar hacer una struct en el hilo de procesar pokemon
+t_memoria_cache* memoria;
+void obtener_cache(t_memoria_cache* memoria);
 
 typedef struct{
 	int32_t id_mensaje;
@@ -13,8 +19,8 @@ typedef struct{
 }t_estado_mensaje;
 
 t_estado_mensaje* estado_mensaje_create(int32_t id);
-void procesar_suscripcion(t_mensaje* mensaje, int* socket);
+void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memoria);
 void procesar_pokemon(t_cola_mensajeria* cola);
-void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje, t_estado_mensaje* estado);
+void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje);
 
 #endif /* PROCESAR_H_ */

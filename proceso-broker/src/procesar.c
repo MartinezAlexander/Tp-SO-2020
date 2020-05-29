@@ -1,17 +1,23 @@
 #include "procesar.h"
 
-void procesar_suscripcion(t_mensaje* mensaje, int* socket){
+void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memoria){
 	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
 	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
+
+	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria);
+	pthread_t envio_mensajes_cacheados;
+	pthread_create(&envio_mensajes_cacheados,NULL,(void*)memoria_cache_enviar_mensajes_cacheados,parametros);
 
 	t_cola_mensajeria* cola = cola_mensajeria_obtener(suscripcion->cola_suscripcion);
 
 	int posicion_suscriptor = suscriptor_esta_suscripto(cola->suscriptores,suscriptor);
 
 	if(posicion_suscriptor < 0){
+		//TODO asegurar mutua exclusion
 		suscriptor_suscribirse_a(cola->suscriptores,suscriptor);
 		puts("SUSCRIBI A: ");
 	}else{
+		//TODO asegurar mutua exclusion
 		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
 		puts("ACTUALICE EL SOCKET DE:");
 	}
@@ -20,22 +26,24 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 		sem_post(&cola->semaforoSuscriptores);
 	}
 
+	//TODO enviar todos los mensajes correspondientes a la cola que esten en cache hilo
+
 	suscripcion_proceso_mostrar(suscripcion);
 }
 
-void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje, t_estado_mensaje* estado){
+void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 	int x;
 	for(int i = 0; i < list_size(suscriptores); i++){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
-		printf("PID: %d\n",suscriptor->pid);
 		x = enviar_mensaje(mensaje,suscriptor->socket);
-		printf("envio de mensaje: %d\n\n",x);
-		estado->id_mensaje = mensaje->id;
-		if(x>0){
-			list_add(estado->enviados,(void*)suscriptor->pid);
+		if(x > 0){
+			printf("Enviado:\n");
+			mensaje_mostrar(mensaje);
 		}else{
-			list_add(estado->fallidos,(void*)suscriptor->pid);
+			printf("No pudo enviarse\n");
+			mensaje_mostrar(mensaje);
 		}
+		recibir_ACK(suscriptor->socket);
 	}
 }
 
@@ -44,20 +52,13 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		sem_wait(&cola->semaforoSuscriptores);
 		sem_wait(&cola->semaforoMensajes);
 
-		t_mensaje* pokemon = (t_mensaje*) queue_pop(cola->queue);
-		t_estado_mensaje* estado = estado_mensaje_create(pokemon->id);
-		//guardar pokemon en la cache
-		printf("saco de la cola a: \n");
-		envio_a_suscriptores(cola->suscriptores, pokemon, estado);
-		printf("cantidad de enviados %d\n", list_size(estado->enviados));
-		printf("cantidad de fallidos %d\n", list_size(estado->fallidos));
+		//TODO hacer un queue_peek
+		t_mensaje* mensaje = (t_mensaje*) queue_pop(cola->queue);
 
-/*
-		while(!list_is_empty(estado->fallidos)){
-			reintentar_fallidos(estado->fallidos,);
-		}
-*/
-		//caught_pokemon_mostrar((t_caught_pokemon*)pokemon->mensaje);
+		printf("saco de la cola a: \n");
+		envio_a_suscriptores(cola->suscriptores, mensaje);
+
+		memoria_cache_agregar_mensaje(memoria,mensaje);
 
 		sem_post(&cola->semaforoSuscriptores);
 	}
@@ -75,4 +76,8 @@ void estado_mensaje_destroy(t_estado_mensaje* estado){
 	list_destroy_and_destroy_elements(estado->enviados,free);
 	list_destroy_and_destroy_elements(estado->fallidos,free);
 	free(estado);
+}
+
+void obtener_cache(t_memoria_cache* memoria_cache){
+	memoria = memoria_cache;
 }

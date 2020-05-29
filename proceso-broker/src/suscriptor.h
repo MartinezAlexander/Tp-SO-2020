@@ -3,7 +3,6 @@
 
 #include <commons/collections/list.h>
 #include <stdlib.h>
-
 typedef struct{
 	int socket;
 	int32_t pid;

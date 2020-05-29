@@ -41,6 +41,8 @@ int32_t ultimo_id;
 
 pthread_t hilo_suscripcion;
 
+t_memoria_cache* memoria_cache;
+
 t_log* iniciar_logger(char* path);
 t_config* leer_config(void);
 void inicializar_colas_mensajeria();
