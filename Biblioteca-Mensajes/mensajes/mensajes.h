@@ -150,6 +150,7 @@ void mensaje_destroy(t_mensaje* mensaje);
 
 int enviar_confirmacion(int32_t num, cod_confirmacion codigo, int socket);
 int32_t recibir_confirmacion(int socket, cod_confirmacion* codigo);
+char* op_code_to_string(op_code codigo);
 
 /*
 enviar_id envia el valor de un id a traves del socket

@@ -32,7 +32,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	//En caso de que no haya nadie ejecutando en este instante, nadie me va a poder mandar
 	// a ejecutar a mi que estoy en la cola, por eso es que tengo que comprobar esto.
 	//Entonces si no hay nadie en ejecucion, planifico al proximo en la cola
-	if(!hay_alguien_en_ejecucion()){
+	if(!hay_alguien_en_ejecucion() || planificador->algoritmo_planificacion == SJF_CD){
     	planificar();
     }
 }

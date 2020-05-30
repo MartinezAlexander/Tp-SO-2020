@@ -37,4 +37,6 @@ t_dictionary* diccionario_especies_recibidas;
 //Estadisticas
 t_dictionary* diccionario_ciclos_entrenador;
 
+int finalizo_team;
+
 #endif /* VARIABLES_GLOBALES_H_ */

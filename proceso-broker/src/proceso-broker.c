@@ -118,7 +118,7 @@ t_log* iniciar_logger(char* path){
 
 t_config* leer_config(void){
 	t_config *config;//Puede que este mal el path
-	if((config = config_create("/home/utnso/workspace/tp-2020-1c-Grupo-7-SO/proceso-broker/src/broker.config")) == NULL)
+	if((config = config_create("/home/utnso/tp-2020-1c-Grupo-7-SO/proceso-broker/src/broker.config")) == NULL)
 	{
 		printf("No pude leer la config\n");
 		exit(2);

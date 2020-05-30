@@ -28,39 +28,45 @@ void planificar_sjf_sd(){
 
 //TODO planificacion sjf con desalojo
 void planificar_sjf_cd(){
+	//Replanifica cuando:
+	//Termina proceso
+	//Llega uno NUEVO a la cola
+
 
 }
-
-//TODO consulta:
-//Actualizo las ultimas estimaciones siempre o solo cuando lo elijo???
 
 //Estimacion proxima: Rafaga anterior * alpha + Est anterior * (1 - alpha)
 t_entrenador* shortest_job(){
 
 	t_list* entrenadores_en_ready = planificador->cola->elements;
-	t_entrenador* entrenador_mas_corto = list_get(entrenadores_en_ready, 0);
+
 	int index_mas_corto = 0;
+	double estimacion_mas_corta = 100;
 
 	for(int i = 0 ; i < list_size(entrenadores_en_ready) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores_en_ready, i);
-		entrenador->estado_sjf->ultima_estimacion = calcular_estimacion(entrenador);
+		double estimacion = calcular_estimacion(entrenador);
 
-		if(entrenador->estado_sjf->ultima_estimacion < entrenador_mas_corto->estado_sjf->ultima_estimacion){
-			entrenador_mas_corto = entrenador;
+		if(estimacion < estimacion_mas_corta){
 			index_mas_corto = i;
+			estimacion_mas_corta = estimacion;
 		}
 	}
 
-	return list_remove(planificador->cola->elements, index_mas_corto);
+	t_entrenador* entrenador_mas_corto = list_remove(planificador->cola->elements, index_mas_corto);
+	//Solo actualizamos la estimacion al que sabemos que va a ejecutar,
+	//los demas quedan con la estimacion anterior
+	entrenador_mas_corto->estado_sjf->ultima_estimacion = estimacion_mas_corta;
+	return entrenador_mas_corto;
 }
 
 double calcular_estimacion(t_entrenador* entrenador){
 	double raf = entrenador->estado_sjf->ultima_rafaga * planificador->alpha;
 	double est = entrenador->estado_sjf->ultima_estimacion * (1 - planificador->alpha);
-
+/*
 	printf("Estimando entrenador %d: ult raf = %d, ult est = %f, nueva est = %f\n",
 			entrenador->identificador, entrenador->estado_sjf->ultima_rafaga,
 			entrenador->estado_sjf->ultima_estimacion, raf + est);
-
+*/
 	return raf + est;
 }

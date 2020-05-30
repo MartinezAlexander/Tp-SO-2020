@@ -209,7 +209,7 @@ t_config* leer_config(void) {
 
 	t_config* config =
 			config_create(
-					"/home/utnso/workspace/tp-2020-1c-Grupo-7-SO/proceso-game-boy/gameboy.config");
+					"/home/utnso/tp-2020-1c-Grupo-7-SO/proceso-game-boy/gameboy.config");
 
 	if (config == NULL) {
 		printf("No puede leer la config\n");

@@ -1,6 +1,5 @@
 #include "entrenador.h"
 
-
 void iniciarlizar_diccionario_catch(){
 	mensajes_catch_pendientes = dictionary_create();
 }
@@ -22,9 +21,6 @@ void enviar_catch(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED_BY_CATCH;
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
 
-	//El entrenador que le sigue, va a tener que esperar a que el actual
-	//termine de mandar el catch y etc. ya que planificar() se ejcuta
-	//despues de esta funcion. Queremos que eso sea asi???
 	//TODO pensar forma de que se ejecute la planificacion del prox sin tener
 	//que esperar a que termine de hacer el catch
 	//Con un hilo podria ser????
@@ -38,6 +34,11 @@ void enviar_catch(t_entrenador* entrenador){
 	t_mensaje* mensaje = mensaje_simple_create(mensaje_catch, CATCH_POKEMON);
 
 	enviar_mensaje(mensaje, socket);
+
+	//TODO comportamiento default
+	//si falla el envio, debo tomar como respuesta positiva
+	//en ese caso, el codigo de abajo no lo hago
+	//y llamo a resolver caught positivo()
 
 	//Recibo id
 	t_mensaje* respuesta = recibir_mensaje(socket);

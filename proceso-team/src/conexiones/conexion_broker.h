@@ -26,9 +26,14 @@
 #include "../mensajes/procesamiento_appeared.h"
 #include "../mensajes/procesamiento_localized.h"
 #include "../utils/log_utils.h"
+#include "../variables_globales.h"
 
+pthread_t hilo_appeared;
+pthread_t hilo_caught;
+pthread_t hilo_localized;
 
 void iniciar_conexion_broker();
+void cerrar_conexion_broker();
 void iniciar_suscripcion_broker(op_code cola);
 void recibir_mensaje_appeared(int socket_appeared);
 void recibir_mensaje_caught(int socket_caught);
