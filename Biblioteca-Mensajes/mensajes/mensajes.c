@@ -428,3 +428,37 @@ void mensaje_mostrar(t_mensaje* mensaje){
 				break;
 		}
 }
+
+char* op_code_to_string(op_code codigo){
+	char* get = "GET_POKEMON";
+	char* new = "NEW_POKEMON";
+	char* appeared = "APPEARED_POKEMON";
+	char* localized = "LOCALIZED_POKEMON";
+	char* catch = "CATCH_POKEMON";
+	char* caught = "CAUGHT_POKEMON";
+	char* op_code_string;
+
+	switch(codigo){
+	case NEW_POKEMON:
+		op_code_string = new;
+		break;
+	case GET_POKEMON:
+		op_code_string = get;
+		break;
+	case APPEARED_POKEMON:
+		op_code_string = appeared;
+		break;
+	case LOCALIZED_POKEMON:
+		op_code_string = localized;
+		break;
+	case CATCH_POKEMON:
+		op_code_string = catch;
+		break;
+	case CAUGHT_POKEMON:
+		op_code_string = caught;
+		break;
+	default:
+		break;
+	}
+	return op_code_string;
+}
