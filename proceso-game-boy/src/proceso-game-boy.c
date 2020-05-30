@@ -61,20 +61,20 @@ uint32_t atrapo_pokemon(char* confirmacion) {
 	}
 	return atrapado;
 }
-/*
+
 void desconectar_suscriptor(int socket, int32_t tiempo_desconexion) {
 	sleep(tiempo_desconexion);
 	liberar_conexion(socket);
 }
 
-void recepcion_mensajes(int socket){
-	while(1){
+void recepcion_mensajes(int socket) {
+	while (1) {
 		t_mensaje* mensaje = recibir_mensaje(socket);
-		//TODO enviar_ACK(socket);
-		mensaje_mostrar(mensaje);
+		//TODO ACTUALIZAR BIBLIOTECA enviar_ACK(socket);
+		//TODO ACTUALIZAR BIBLIOTECA mensaje_mostrar(mensaje);
 	}
 }
-*/
+
 t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 	void* mensaje_creado = NULL;
 	t_mensaje* mensaje_procesado = NULL;
@@ -94,7 +94,7 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
 		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
 				codigo, -1, id_c);
-		/*Modificar mensaje_con_id_correlativo_create*/
+		//TODO Modificar mensaje_con_id_correlativo_create CON ACTUALIZACION DE BIBLIOTECA
 	}
 
 	if (id == BROKER && codigo == CATCH_POKEMON) {
@@ -161,23 +161,21 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	case BROKER:
 		socket = crear_conexion(ip_broker, puerto_broker);
 		enviar_mensaje(mensaje, socket);
-		//TODO: FALTA ACTUALIZAR BIBLIOTECA enviar_ACK(socket);
+		//TODO: ACTUALIZAR BIBLIOTECA enviar_ACK(socket);
 		liberar_conexion(socket);
 		break;
 	case TEAM:
 		socket = crear_conexion(ip_team, puerto_team);
 		enviar_mensaje(mensaje, socket);
-		//TODO: FALTA ACTUALIZAR BIBLIOTECA recibir_ACK(socket);
+		//TODO: ACTUALIZAR BIBLIOTECA recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
 	case GAMECARD:
 		socket = crear_conexion(ip_gamecard, puerto_gamecard);
 		enviar_mensaje(mensaje, socket);
-		//TODO: FALTA ACTUALIZAR BIBLIOTECA recibir_ACK(socket);
+		//TODO: ACTUALIZAR BIBLIOTECA recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
-		//case SUSCRIPTOR:
-		//break;
 	default:
 		break;
 	}
@@ -211,12 +209,18 @@ int main(int arg, char** args) {
 		tiempo_conexion = atoi(args[3]);
 		int socket = crear_conexion(ip_broker, puerto_broker);
 		enviar_mensaje(mensaje_procesado, socket);
+		int estoy_suscripto = recibir_confirmacion_suscripcion(socket);
+		if (estoy_suscripto) {
+			printf("Estoy suscripto\n");
+			pthread_t receptor_mensajes;
+			pthread_t suscriptor_desconexion;
 
-		pthread_t receptor_mensaje;
-		pthread_t suscriptor_desconexion;
-
-		//pthread_create(&receptor_mensaje,NULL,(void*)recepcion_mensaje,&socket);
-		//pthread_create(&suscriptor_desconexion, NULL,(void*) desconectar_suscriptor, &socket);
+			pthread_create(&receptor_mensajes, NULL, (void*) recepcion_mensajes,&socket);
+			pthread_create(&suscriptor_desconexion, NULL,(void*) desconectar_suscriptor, &socket);
+		}
+		else{
+			printf("No pude suscribirme\n");
+		}
 
 	} else {
 		enviar_a(id_proceso, mensaje_procesado);

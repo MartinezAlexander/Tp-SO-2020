@@ -42,23 +42,15 @@ int32_t tiempo_conexion;
  */
 
 t_proceso obtener_id_proceso(char* id);
-
 op_code obtener_tipo_mensaje(char* tipo);
-
 uint32_t atrapo_pokemon(char* confirmacion);
-
 t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id);
-
-void enviar_a(t_proceso id, t_mensaje* mensaje);
-
-void inicializar_variables();
-
-void desconectar_suscriptor(int socket);
-
 t_log* iniciar_logger(char* path);
-
 t_config* leer_config(void);
-
+void enviar_a(t_proceso id, t_mensaje* mensaje);
+void inicializar_variables();
+void desconectar_suscriptor(int socket,int32_t tiempo_desconexion);
+void recepcion_mensajes(int socket);
 void terminar_programa(t_log* logger, t_config* config);
 
 #endif /* PROCESO_GAME_BOY_H_ */
