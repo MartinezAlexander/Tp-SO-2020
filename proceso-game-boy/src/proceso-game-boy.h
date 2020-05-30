@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <mensajes/client.h>
 #include <mensajes/mensajes.h>
 #include <mensajes/appeared_pokemon.h>
@@ -33,6 +34,7 @@ char* puerto_broker;
 char* puerto_team;
 char* puerto_gamecard;
 
+int32_t tiempo_conexion;
 /*
  uint32_t puerto_broker;
  uint32_t puerto_team;
@@ -50,6 +52,8 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id);
 void enviar_a(t_proceso id, t_mensaje* mensaje);
 
 void inicializar_variables();
+
+void desconectar_suscriptor(int socket);
 
 t_log* iniciar_logger(char* path);
 
