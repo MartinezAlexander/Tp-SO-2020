@@ -6,6 +6,7 @@
 #include "localized_pokemon.h"
 #include "new_pokemon.h"
 #include <sys/socket.h>
+#include <commons/string.h>
 
 #include "suscripcion.h"
 
@@ -157,7 +158,7 @@ int enviar_mensaje(t_mensaje* mensaje, int socket_cliente)
 	int size_serializado;
 	void* serializado = serializar_paquete(paquete, &size_serializado);
 
-	int se_envio = send(socket_cliente,serializado,size_serializado,0);
+	int se_envio = send(socket_cliente,serializado,size_serializado,MSG_NOSIGNAL);
 
 	free(serializado);
 	free(paquete->buffer);
@@ -174,7 +175,7 @@ int enviar_confirmacion(int32_t num, cod_confirmacion codigo, int socket){
 	offset += sizeof(cod_confirmacion);
 	memcpy(stream + offset, &num, sizeof(int32_t));
 
-	int cuanto_se_envio = send(socket,stream,size,0);
+	int cuanto_se_envio = send(socket,stream,size,MSG_NOSIGNAL);
 
 	free(stream);
 
@@ -188,6 +189,50 @@ int32_t recibir_confirmacion(int socket, cod_confirmacion* codigo){
 	recv(socket,&num,sizeof(int32_t),0);
 	(*codigo) = codigo_recibido;
 	return num;
+}
+
+int enviar_id(int socket,int32_t id){
+	int resultado = enviar_confirmacion(id,ID,socket);
+	return resultado;
+}
+
+int32_t recibir_id(int socket){
+	cod_confirmacion codigo;
+	int32_t id =  recibir_confirmacion(socket,&codigo);
+	if(codigo != ID){
+		id = (-1);
+	}
+	return id;
+}
+
+int enviar_ACK(int socket){
+	int resultado = enviar_confirmacion(1,ACK,socket);
+	return resultado;
+}
+
+int recibir_ACK(int socket){
+	cod_confirmacion codigo;
+	recibir_confirmacion(socket,&codigo);
+	int correcto = 0;
+	if(codigo == ACK){
+		correcto = 1;
+	}
+	return correcto;
+}
+
+int confirmar_suscripcion(int socket){
+	int resultado = enviar_confirmacion(3,OK_SUSCRIPTO,socket);
+	return resultado;
+}
+
+int recibir_confirmacion_suscripcion(int socket){
+	cod_confirmacion codigo;
+	recibir_confirmacion(socket,&codigo);
+	int correcto = 0;
+	if (codigo == OK_SUSCRIPTO) {
+		correcto = 1;
+	}
+	return correcto;
 }
 
 t_mensaje* recibir_mensaje(int socket_cliente)
@@ -295,8 +340,35 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 	return mensaje;
 }*/
 
-char* mensaje_to_string(t_mensaje* mensaje){
+char* id_to_string(int32_t id){
+	char* sin_id = "No tiene id, ";
+	char* con_id = string_from_format("Su id es: %d, ",id);
 	char* string;
+	if(id > 0){
+		string = con_id;
+	}else{
+		string = sin_id;
+	}
+	return string;
+}
+
+char* id_c_to_string(int32_t id_c){
+	char* sin_id = "No tiene id correlativo.";
+	char* con_id = string_from_format("Su id correlativo es: %d.",id_c);
+	char* string;
+	if(id_c > 0){
+		string = con_id;
+	}else{
+		string = sin_id;
+	}
+	return string;
+}
+
+char* mensaje_to_string(t_mensaje* mensaje){
+	char* string_mensaje = string_new();
+
+	char* string;
+
 	switch(mensaje->codigo){
 	case NEW_POKEMON:
 		string = new_pokemon_to_string((t_new_pokemon*)mensaje->mensaje);
@@ -320,7 +392,15 @@ char* mensaje_to_string(t_mensaje* mensaje){
 		string = suscripcion_proceso_to_string((t_suscripcion*)mensaje->mensaje);
 			break;
 	}
-	return string;
+
+	string_append(&string_mensaje,string);
+
+	char* id = id_to_string(mensaje->id);
+	char* id_c = id_c_to_string(mensaje->id_correlativo);
+	string_append(&string_mensaje, id);
+	string_append(&string_mensaje, id_c);
+
+	return string_mensaje;
 }
 
 void mensaje_mostrar(t_mensaje* mensaje){

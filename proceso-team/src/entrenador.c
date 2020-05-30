@@ -40,7 +40,6 @@ void enviar_catch(t_entrenador* entrenador){
 	enviar_mensaje(mensaje, socket);
 
 	//Recibo id
-	//TODO (prueba)chequear si se queda esperando a que le llegue mensaje recibir_mensaje()???
 	t_mensaje* respuesta = recibir_mensaje(socket);
 	loggear_nuevo_mensaje(respuesta);
 

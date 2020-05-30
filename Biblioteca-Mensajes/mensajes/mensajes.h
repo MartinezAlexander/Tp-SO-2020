@@ -53,7 +53,7 @@ typedef enum{
 crea un void* de la siguiente forma
 [codigo_operacion][tamanio_de_buffer][buffer]
 y lo retorna, ademas indica la cantidad de bytes
-que ocupa todo el stream anteriormente nombrado
+que ocupa el stream anteriormente nombrado
 */
 void* serializar_paquete(t_paquete* paquete, int *bytes);
 
@@ -150,5 +150,44 @@ void mensaje_destroy(t_mensaje* mensaje);
 
 int enviar_confirmacion(int32_t num, cod_confirmacion codigo, int socket);
 int32_t recibir_confirmacion(int socket, cod_confirmacion* codigo);
+
+/*
+enviar_id envia el valor de un id a traves del socket
+devueve -1 o 0 ante un error y cualquier otro valor si pudo ser enviado
+*/
+int enviar_id(int socket,int32_t id);
+
+/*
+recibir_id recibe un id del socket indicado
+devuelve -1 si lo que recibio no es un ID sino devuelve el valor del ID
+*/
+int32_t recibir_id(int socket);
+
+/*
+enviar_ACK sirve para confirmar que llego un mensaje a traves de un socket
+devuelve -1 o 0 si no pudo enviar la confirmacion de recepcion y cualquier
+valor mayor a 0 si pudo enviarlo
+*/
+int enviar_ACK(int socket);
+
+/*
+recibir_ACK recibe un confirmacion de recepcion de mensaje de un proceso
+devuelve 0 si lo que recibio no es un ACK o 1 si es un ACK
+*/
+int recibir_ACK(int socket);
+
+/*
+confirmar_suscripcion le aviso a un proceso a traves del socket que su solicitud
+de suscripcion ha sido aceptada. SI no se puede enviar devuelve -1 o 0, si se envio
+devuelve un valor mayor a 0
+*/
+int confirmar_suscripcion(int socket);
+
+/*
+recibir_confirmacion_suscripcion recibe la confirmacion de suscripcion por parte
+de un proceso. En caso de que no sea una confirmacion de suscripcion devuelve un 0
+si lo es devuelve un 1
+*/
+int recibir_confirmacion_suscripcion(int socket);
 
 #endif 

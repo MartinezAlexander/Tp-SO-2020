@@ -68,7 +68,7 @@ void new_pokemon_mostrar(t_new_pokemon* new_pokemon){
 }
 
 char* new_pokemon_to_string(t_new_pokemon* new_pokemon){
-	return string_from_format("Mensaje - New Pokemon:\nNombre: %s\nTamanio del nombre: %d\nPosicion x: %d\nPosicion y: %d\nCantidad: %d\n------------",new_pokemon->pokemon->especie,new_pokemon->tamanio_nombre,new_pokemon->pokemon->posicion.posicionX,new_pokemon->pokemon->posicion.posicionY,new_pokemon->cantidad);
+	return string_from_format("Mensaje - New Pokemon: Nombre: %s, Posicion x: %d, Posicion y: %d, Cantidad: %d, ",new_pokemon->pokemon->especie,new_pokemon->pokemon->posicion.posicionX,new_pokemon->pokemon->posicion.posicionY,new_pokemon->cantidad);
 }
 
 void new_pokemon_destroy(t_new_pokemon* new_pokemon){

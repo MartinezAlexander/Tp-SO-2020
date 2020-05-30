@@ -60,7 +60,7 @@ void catch_pokemon_mostrar(t_catch_pokemon* catch_pokemon){
 }
 
 char* catch_pokemon_to_string(t_catch_pokemon*catch_pokemon){
-	return string_from_format("Mensaje - Catch Pokemon:\nNombre: %s\nTamanio del nombre: %d\nPosicion x: %d\nPosicion y: %d\n------------",catch_pokemon->pokemon->especie,catch_pokemon->tamanio_nombre,catch_pokemon->pokemon->posicion.posicionX,catch_pokemon->pokemon->posicion.posicionY);
+	return string_from_format("Mensaje - Catch Pokemon: Nombre: %s, Posicion x: %d, Posicion y: %d, ",catch_pokemon->pokemon->especie,catch_pokemon->pokemon->posicion.posicionX,catch_pokemon->pokemon->posicion.posicionY);
 }
 
 void catch_pokemon_destroy(t_catch_pokemon* catch_pokemon){

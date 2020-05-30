@@ -18,9 +18,9 @@ int main(void) {
 	iniciar_hilos_entrenadores();
 
 	//Me suscribo a las colas y abro hilos para recibir mensajes
-	//iniciar_conexion_broker();
+	iniciar_conexion_broker();
 	//Envio mensaje GET al broker segun objetivos globales
-	//enviar_get_objetivo(objetivo_global);
+	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
 	//iniciar_puerto_de_escucha();
 

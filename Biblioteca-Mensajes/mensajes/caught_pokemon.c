@@ -42,7 +42,7 @@ void caught_pokemon_mostrar(t_caught_pokemon* caught_pokemon){
 }
 
 char* caught_pokemon_to_string(t_caught_pokemon* caught_pokemon){
-	return string_from_format("Mensaje - Caught Pokemon:\nFue atrapado: %d\n------------",caught_pokemon->atrapado);
+	return string_from_format("Mensaje - Caught Pokemon: Fue atrapado: %d, ",caught_pokemon->atrapado);
 }
 
 void caught_pokemon_destroy(t_caught_pokemon* caught_pokemon){

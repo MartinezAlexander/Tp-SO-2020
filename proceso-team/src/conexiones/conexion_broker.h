@@ -33,7 +33,6 @@ void iniciar_suscripcion_broker(op_code cola);
 void recibir_mensaje_appeared(int socket_appeared);
 void recibir_mensaje_caught(int socket_caught);
 void recibir_mensaje_localized(int socket_localized);
-void enviarACK(int socket);
 
 void enviar_get_objetivo(t_list* objetivo_global);
 
