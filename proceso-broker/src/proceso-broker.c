@@ -27,6 +27,12 @@ void inicializar_variables_globales(){
 	logger = iniciar_logger(path_logger);
 
 	ultimo_id = 0;
+
+	memoria_cache = memoria_cache_create();
+	//TODO esto no va - solo se creo para probar
+	obtener_cache(memoria_cache);
+	obtener_logger(logger);
+	obtener_logger2(logger);
 }
 
 void inicializar_colas_mensajeria(){
@@ -61,50 +67,44 @@ void administrar_mensajes(int* socket){
 	mensaje = recibir_mensaje(*socket);
 	switch(mensaje->codigo){
 		case SUSCRIPCION:
-			procesar_suscripcion(mensaje, socket);
+			log_info(logger,mensaje_to_string(mensaje));
+			procesar_suscripcion(mensaje, socket, memoria_cache);
 			break;
 		case NEW_POKEMON:
-			ultimo_id++;
-			mensaje->id = ultimo_id;//validar id = -1
-			queue_push(cola_mensajeria_new->queue,mensaje);
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_new,mensaje,&ultimo_id);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case LOCALIZED_POKEMON:
-			ultimo_id++;
-			mensaje->id = ultimo_id;//validar id = -1
-			queue_push(cola_mensajeria_localized->queue,mensaje);
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized,mensaje,&ultimo_id);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case GET_POKEMON:
-			ultimo_id++;
-			mensaje->id = ultimo_id;//validar id = -1
-			queue_push(cola_mensajeria_get->queue,mensaje);
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_get,mensaje,&ultimo_id);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case APPEARED_POKEMON:
-			ultimo_id++;
-			mensaje->id = ultimo_id;//validar id = -1
-			queue_push(cola_mensajeria_appeared->queue,mensaje);
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared,mensaje,&ultimo_id);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case CATCH_POKEMON:
-			ultimo_id++;
-			mensaje->id = ultimo_id;//validar id = -1
-			queue_push(cola_mensajeria_catch->queue,mensaje);
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch,mensaje,&ultimo_id);
+			enviar_id(*socket,ultimo_id);
 			break;
 		case CAUGHT_POKEMON:
-			ultimo_id++;
-			mensaje->id = ultimo_id; //validar id = -1
-			queue_push(cola_mensajeria_caught->queue,mensaje);
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught,mensaje,&ultimo_id);
+			enviar_id(*socket,ultimo_id);
 			break;
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
 	}
 }
 
-
-/*void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
-	for(int i = 0; i < list_size(suscriptores); i++){
-		t_suscriptor* suscriptor = list_get(suscriptores,i);
-		enviar_mensaje(mensaje,suscriptor->socket);
-	}
-}*/
 
 t_log* iniciar_logger(char* path){
 	t_log* logger;

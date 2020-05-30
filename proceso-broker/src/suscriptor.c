@@ -27,13 +27,6 @@ void suscriptor_reconectar(t_list* lista_suscriptores, t_suscriptor* suscriptor,
 	list_replace_and_destroy_element(lista_suscriptores, posicion, suscriptor, suscriptor_destroy);
 }
 
-void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
-	for(int i = 0; i < list_size(suscriptores); i++){
-		t_suscriptor* suscriptor = list_get(suscriptores,i);
-		enviar_mensaje(mensaje,suscriptor->socket);
-	}
-}
-
 void suscriptor_destroy(void* suscriptor){
 	free((t_suscriptor*)suscriptor);
 }

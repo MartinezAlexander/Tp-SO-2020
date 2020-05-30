@@ -41,11 +41,13 @@ int32_t ultimo_id;
 
 pthread_t hilo_suscripcion;
 
+t_memoria_cache* memoria_cache;
+
 t_log* iniciar_logger(char* path);
 t_config* leer_config(void);
 void inicializar_colas_mensajeria();
 void inicializar_variables_globales();
 void administrar_mensajes(int* socket);
-//void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje);
+
 
 #endif /* PROCESO_BROKER_H_ */

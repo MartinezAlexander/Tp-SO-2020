@@ -81,6 +81,7 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
 		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
 				codigo, id_c);
+		/*Modificar mensaje_con_id_correlativo_create*/
 	}
 
 	if (id == BROKER && codigo == CATCH_POKEMON) {
@@ -142,16 +143,19 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	case BROKER:
 		socket = crear_conexion(ip_broker, puerto_broker);
 		enviar_mensaje(mensaje, socket);
+		recibir_id(socket);
 		liberar_conexion(socket);
 		break;
 	case TEAM:
 		socket = crear_conexion(ip_team, puerto_team);
 		enviar_mensaje(mensaje, socket);
+		recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
 	case GAMECARD:
 		socket = crear_conexion(ip_gamecard, puerto_gamecard);
 		enviar_mensaje(mensaje, socket);
+		recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
 	case SUSCRIPTOR:
