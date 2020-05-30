@@ -8,6 +8,13 @@
 #include "suscriptor.h"
 #include <stdlib.h>
 
+//TODO borrar si se ocurre una mejor manera de conseguir el logger
+//TODO como llamar al logger en el interior de estas funciones
+#include<commons/log.h>
+#include<commons/string.h>
+t_log* loger2;
+void obtener_logger2(t_log* logger);
+
 typedef struct{
 	t_dictionary* memoria_cache;
 }t_memoria_cache;

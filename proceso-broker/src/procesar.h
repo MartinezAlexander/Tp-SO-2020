@@ -8,6 +8,11 @@
 #include "memoria_cache.h"
 #include <pthread.h>
 
+//TODO como llamar al logger en el interior de estas funciones
+#include<commons/log.h>
+t_log* loger;
+void obtener_logger(t_log* logger);
+
 //TODO resolucion turbia para evitar hacer una struct en el hilo de procesar pokemon
 t_memoria_cache* memoria;
 void obtener_cache(t_memoria_cache* memoria);

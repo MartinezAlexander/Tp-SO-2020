@@ -31,6 +31,8 @@ void inicializar_variables_globales(){
 	memoria_cache = memoria_cache_create();
 	//TODO esto no va - solo se creo para probar
 	obtener_cache(memoria_cache);
+	obtener_logger(logger);
+	obtener_logger2(logger);
 }
 
 void inicializar_colas_mensajeria(){
@@ -65,29 +67,36 @@ void administrar_mensajes(int* socket){
 	mensaje = recibir_mensaje(*socket);
 	switch(mensaje->codigo){
 		case SUSCRIPCION:
+			log_info(logger,mensaje_to_string(mensaje));
 			procesar_suscripcion(mensaje, socket, memoria_cache);
 			break;
 		case NEW_POKEMON:
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_new,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case LOCALIZED_POKEMON:
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case GET_POKEMON:
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_get,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case APPEARED_POKEMON:
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case CATCH_POKEMON:
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case CAUGHT_POKEMON:
+			log_info(logger,string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;

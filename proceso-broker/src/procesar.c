@@ -15,11 +15,11 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memor
 	if(posicion_suscriptor < 0){
 		//TODO asegurar mutua exclusion
 		suscriptor_suscribirse_a(cola->suscriptores,suscriptor);
-		puts("SUSCRIBI A: ");
+		//puts("SUSCRIBI A: ");
 	}else{
 		//TODO asegurar mutua exclusion
 		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
-		puts("ACTUALICE EL SOCKET DE:");
+		//puts("ACTUALICE EL SOCKET DE:");
 	}
 
 	if (list_size(cola->suscriptores) == 1) {
@@ -28,7 +28,7 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memor
 
 	//TODO enviar todos los mensajes correspondientes a la cola que esten en cache hilo
 
-	suscripcion_proceso_mostrar(suscripcion);
+	//suscripcion_proceso_mostrar(suscripcion);
 }
 
 void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
@@ -37,11 +37,17 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
 		x = enviar_mensaje(mensaje,suscriptor->socket);
 		if(x > 0){
-			printf("Enviado:\n");
-			mensaje_mostrar(mensaje);
+			/*printf("Enviado:\n");
+			mensaje_mostrar(mensaje);*/
+			char* mensaje_a_loggear = string_from_format("Enviado a %d a traves del socket %d ",suscriptor->pid,suscriptor->socket);
+			string_append(&mensaje_a_loggear,mensaje_to_string(mensaje));
+			log_info(loger,mensaje_a_loggear);
 		}else{
-			printf("No pudo enviarse\n");
-			mensaje_mostrar(mensaje);
+			/*printf("No pudo enviarse\n");
+			mensaje_mostrar(mensaje);*/
+			char* mensaje_a_loggear = string_from_format("No enviado a %d a traves del socket %d ",suscriptor->pid,suscriptor->socket);
+			string_append(&mensaje_a_loggear,mensaje_to_string(mensaje));
+			log_info(loger,mensaje_a_loggear);
 		}
 		recibir_ACK(suscriptor->socket);
 	}
@@ -55,7 +61,7 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		//TODO hacer un queue_peek
 		t_mensaje* mensaje = (t_mensaje*) queue_pop(cola->queue);
 
-		printf("saco de la cola a: \n");
+		//printf("saco de la cola a: \n");
 		envio_a_suscriptores(cola->suscriptores, mensaje);
 
 		memoria_cache_agregar_mensaje(memoria,mensaje);
@@ -78,6 +84,11 @@ void estado_mensaje_destroy(t_estado_mensaje* estado){
 	free(estado);
 }
 
+//TODO borrar al encontrar una mejor manera
 void obtener_cache(t_memoria_cache* memoria_cache){
 	memoria = memoria_cache;
+}
+
+void obtener_logger(t_log* logger){
+	loger = logger;
 }
