@@ -39,8 +39,6 @@ t_list* memoria_cache_obtener_mensajes_por_cola(t_memoria_cache* memoria, op_cod
 void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros){
 	t_list* mensajes = memoria_cache_obtener_mensajes_por_cola(parametros->memoria,parametros->cola);
 
-	confirmar_suscripcion(parametros->suscriptor->socket);
-
 	if(mensajes != NULL){
 		int i;
 		for (i = 0; i < list_size(mensajes); i++) {

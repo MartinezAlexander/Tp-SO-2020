@@ -4,6 +4,8 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memor
 	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
 	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
 
+	confirmar_suscripcion(*socket);
+
 	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria);
 	pthread_t envio_mensajes_cacheados;
 	pthread_create(&envio_mensajes_cacheados,NULL,(void*)memoria_cache_enviar_mensajes_cacheados,parametros);
@@ -42,6 +44,7 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 			char* mensaje_a_loggear = string_from_format("Enviado a %d a traves del socket %d ",suscriptor->pid,suscriptor->socket);
 			string_append(&mensaje_a_loggear,mensaje_to_string(mensaje));
 			log_info(loger,mensaje_a_loggear);
+			recibir_ACK(suscriptor->socket);
 		}else{
 			/*printf("No pudo enviarse\n");
 			mensaje_mostrar(mensaje);*/
@@ -49,7 +52,6 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 			string_append(&mensaje_a_loggear,mensaje_to_string(mensaje));
 			log_info(loger,mensaje_a_loggear);
 		}
-		recibir_ACK(suscriptor->socket);
 	}
 }
 
