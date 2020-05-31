@@ -66,6 +66,8 @@ void inicializar_variables(){
 	ip_broker = config_get_string_value(config, "IP_BROKER");
 	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
 
+	team_id = config_get_int_value(config, "TEAM_ID");
+
 	char* path_logger = config_get_string_value(config, "LOG_FILE");
 	logger = iniciar_logger(path_logger);
 

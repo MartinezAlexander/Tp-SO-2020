@@ -30,6 +30,8 @@ char* puerto_broker;
 char* ip_team;
 char* puerto_team;
 
+int32_t team_id;
+
 t_log* logger;
 
 t_dictionary* diccionario_especies_recibidas;

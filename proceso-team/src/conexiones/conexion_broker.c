@@ -42,8 +42,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 }
 
 void iniciar_suscripcion_broker(op_code cola){
-	//TODO mandar team_id en vez de pid()
-	t_suscripcion* suscripcion = suscripcion_proceso_create(TEAM, getpid(), cola);
+	t_suscripcion* suscripcion = suscripcion_proceso_create(TEAM, team_id, cola);
 	t_mensaje* mensaje = mensaje_simple_create((void*) suscripcion, SUSCRIPCION);
 
 	int socket = crear_conexion(ip_broker, puerto_broker);
