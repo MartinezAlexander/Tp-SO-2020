@@ -35,11 +35,9 @@ char* puerto_team;
 char* puerto_gamecard;
 
 int32_t tiempo_conexion;
-/*
- uint32_t puerto_broker;
- uint32_t puerto_team;
- uint32_t puerto_gamecard;
- */
+int32_t hay_tiempo = 1;
+
+pthread_mutex_t mutex;
 
 t_proceso obtener_id_proceso(char* id);
 op_code obtener_tipo_mensaje(char* tipo);
