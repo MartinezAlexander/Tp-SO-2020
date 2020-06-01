@@ -20,7 +20,6 @@
 
 #include "variables_globales.h"
 #include "utils/array_utils.h"
-#include "utils/direccion_utils.h"
 #include "utils/posicion_utils.h"
 #include "utils/log_utils.h"
 
@@ -74,6 +73,8 @@ void entrenador_atrapar_objetivo(t_entrenador* entrenador);
 
 int entrenador_estado_deadlock(t_entrenador* entrenador);
 int cumplio_objetivo_entrenador(t_entrenador* entrenador);
+
+t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion posicion);
 
 
 #endif
