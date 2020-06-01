@@ -50,28 +50,23 @@ void enviar_catch(t_entrenador* entrenador){
 	*/
 }
 
-//TODO Repensar; Devuelve 0 si se movio, 1 si ya esta en la posicion del objetivo
+/**
+ * Lleva a cabo el proximo movimiento del entrenador para llegar a su objetivo
+ * (primero mueve en x, luego en y), devolviendo 1 en caso de que haya alcanzado
+ * el mismo, y 0 si debe seguir moviendose
+ */
 int mover_proxima_posicion(t_entrenador* entrenador){
-
 	int dirX = direccion_en_x(entrenador->posicion, entrenador->objetivo_actual->posicion);
 
 	if(dirX == 0){
 		int dirY = direccion_en_y(entrenador->posicion, entrenador->objetivo_actual->posicion);
-
-		if(dirY == 0){
-			return 1;
-		}else{
-			entrenador->posicion.posicionY += dirY;
-			sleep(retardo_cpu);
-		}
+		entrenador->posicion.posicionY += dirY;
 	}else{
 		entrenador->posicion.posicionX += dirX;
-		sleep(retardo_cpu);
 	}
-	if(movimientos_entre_posiciones(entrenador->posicion, entrenador->objetivo_actual->posicion) == 0){
-		return 1;
-	}
-	return 0;
+	sleep(retardo_cpu);
+
+	return movimientos_entre_posiciones(entrenador->posicion, entrenador->objetivo_actual->posicion) == 0;
 }
 
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador, double estimacion_inicial ){

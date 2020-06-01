@@ -21,6 +21,7 @@
 #include "variables_globales.h"
 #include "utils/array_utils.h"
 #include "utils/direccion_utils.h"
+#include "utils/posicion_utils.h"
 #include "utils/log_utils.h"
 
 
