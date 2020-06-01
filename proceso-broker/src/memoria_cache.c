@@ -1,9 +1,8 @@
 #include "memoria_cache.h"
 
-t_memoria_cache* memoria_cache_create(){
-	t_memoria_cache* memoria = malloc(sizeof(t_memoria_cache));
-	memoria->memoria_cache = dictionary_create();
-	return memoria;
+void memoria_cache_create(){
+	memoria_cache = malloc(sizeof(t_memoria_cache));
+	memoria_cache->memoria_cache = dictionary_create();
 }
 
 //TODO crear un semaforo mutex
@@ -47,7 +46,7 @@ void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* param
 
 			char* mensaje_a_loggear = string_from_format("Enviado a %d a traves del socket %d ", parametros->suscriptor->pid,parametros->suscriptor->socket);
 			string_append(&mensaje_a_loggear, mensaje_to_string(mensaje));
-			log_info(loger2, mensaje_a_loggear);
+			loggear_info(mensaje_a_loggear);
 
 			if (resultado_envio > 0) {
 				recibir_ACK(parametros->suscriptor->socket);
@@ -70,8 +69,4 @@ para_envio_mensaje_cacheados* parametros_create(t_suscriptor* suscriptor, op_cod
 
 void parametros_destroy(para_envio_mensaje_cacheados* parametros){
 	free(parametros);
-}
-
-void obtener_logger2(t_log* logger){
-	loger2 = logger;
 }

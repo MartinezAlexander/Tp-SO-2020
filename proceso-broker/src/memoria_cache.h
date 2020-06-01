@@ -7,17 +7,14 @@
 #include <mensajes/mensajes.h>
 #include "suscriptor.h"
 #include <stdlib.h>
-
-//TODO borrar si se ocurre una mejor manera de conseguir el logger
-//TODO como llamar al logger en el interior de estas funciones
-#include<commons/log.h>
-#include<commons/string.h>
-t_log* loger2;
-void obtener_logger2(t_log* logger);
+#include "logger.h"
+#include <commons/string.h>
 
 typedef struct{
 	t_dictionary* memoria_cache;
 }t_memoria_cache;
+
+t_memoria_cache* memoria_cache;
 
 typedef struct{
 	t_suscriptor* suscriptor;
@@ -25,7 +22,7 @@ typedef struct{
 	t_memoria_cache* memoria;
 }para_envio_mensaje_cacheados;
 
-t_memoria_cache* memoria_cache_create();
+void memoria_cache_create();
 
 void memoria_cache_agregar_mensaje(t_memoria_cache* memoria,t_mensaje* mensaje);
 
