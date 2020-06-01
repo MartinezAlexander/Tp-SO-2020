@@ -44,12 +44,15 @@ void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* param
 			t_mensaje* mensaje = (t_mensaje*) list_get(mensajes, i);
 			int resultado_envio = enviar_mensaje(mensaje,parametros->suscriptor->socket);
 
-			char* mensaje_a_loggear = string_from_format("Enviado a %d a traves del socket %d ", parametros->suscriptor->pid,parametros->suscriptor->socket);
-			string_append(&mensaje_a_loggear, mensaje_to_string(mensaje));
-			loggear_info(mensaje_a_loggear);
-
 			if (resultado_envio > 0) {
+				//TODO pasar a log personal
+				char* log = string_from_format("[Enviado CACHE] %s", mensaje_to_string(mensaje));
+				loggear_info(log);
+
+				//TODO verificar retorno de ack
 				recibir_ACK(parametros->suscriptor->socket);
+				char* log2 = string_from_format("[ACK CACHE] Recibi confirmacion de: %d", parametros->suscriptor->pid);
+				loggear_info(log2);
 			} else {
 				i = list_size(mensajes);
 			}

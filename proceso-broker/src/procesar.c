@@ -1,28 +1,35 @@
 #include "procesar.h"
+#include <unistd.h>
 
 void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memoria){
 	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
 	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
+
+	char* log = string_from_format("[Recibido] %s",mensaje_to_string(mensaje));
+	loggear_info(log);
 
 	confirmar_suscripcion(*socket);
 
 	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria);
 	pthread_t envio_mensajes_cacheados;
 	pthread_create(&envio_mensajes_cacheados,NULL,(void*)memoria_cache_enviar_mensajes_cacheados,parametros);
-
 	t_cola_mensajeria* cola = cola_mensajeria_obtener(suscripcion->cola_suscripcion);
 
 	int posicion_suscriptor = suscriptor_esta_suscripto(cola->suscriptores,suscriptor);
 
 	if(posicion_suscriptor < 0){
-		//TODO asegurar mutua exclusion
 		suscriptor_suscribirse_a(cola->suscriptores,suscriptor);
-		//puts("SUSCRIBI A: ");
+		char* log = string_from_format("[Sucripcion] %s",suscripcion_proceso_to_string(suscripcion));
+		loggear_info(log);
 	}else{
-		//TODO asegurar mutua exclusion
 		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
-		//puts("ACTUALICE EL SOCKET DE:");
+		//TODO pasar a log personal
+		char* log = string_from_format("[Reconexion] %s",suscripcion_proceso_to_string(suscripcion));
+		loggear_info(log);
 	}
+
+	//TODO dudoso, turbio, probar en maquina de ale
+	pthread_join(envio_mensajes_cacheados,NULL);
 
 	if (list_size(cola->suscriptores) == 1) {
 		sem_post(&cola->semaforoSuscriptores);
@@ -35,14 +42,16 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
 		x = enviar_mensaje(mensaje,suscriptor->socket);
 		if(x > 0){
-			char* mensaje_a_loggear = string_from_format("Enviado a %d a traves del socket %d ",suscriptor->pid,suscriptor->socket);
-			string_append(&mensaje_a_loggear,mensaje_to_string(mensaje));
-			loggear_info(mensaje_a_loggear);
+			char* log = string_from_format("[Enviado] %s", mensaje_to_string(mensaje));
+			loggear_info(log);
+			//TODO verificar el retorno del ACK
 			recibir_ACK(suscriptor->socket);
+			char* log2 = string_from_format("[ACK] Recibi confirmacion de: %d", suscriptor->pid);
+			loggear_info(log2);
 		}else{
-			char* mensaje_a_loggear = string_from_format("No enviado a %d a traves del socket %d ",suscriptor->pid,suscriptor->socket);
-			string_append(&mensaje_a_loggear,mensaje_to_string(mensaje));
-			loggear_info(mensaje_a_loggear);
+			//TODO pasar a log personal
+			char* log = string_from_format("[Envio fallido] %s", mensaje_to_string(mensaje));
+			loggear_info(log);
 		}
 	}
 }

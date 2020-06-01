@@ -1,4 +1,5 @@
 #include "administrador_mensajes.h"
+#include <commons/string.h>
 
 void iniciar_servidor(char* ip, char* puerto,void (*serve_client)(int *socket))
 {
@@ -43,6 +44,8 @@ void esperar_cliente(int socket_servidor,void (*serve_client)(int *socket))
 	int tam_direccion = sizeof(struct sockaddr_in);
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
+	char* mensaje = string_from_format("Nueva conexion al broker: %d", socket_cliente);
+	loggear_info(mensaje);
 
 	pthread_create(&thread,NULL,(void*)serve_client,&socket_cliente);
 	pthread_detach(thread);
@@ -53,40 +56,34 @@ void administrar_mensajes(int* socket){
 	t_mensaje* mensaje = recibir_mensaje(*socket);
 	switch(mensaje->codigo){
 		case SUSCRIPCION:
-			loggear_info(mensaje_to_string(mensaje));
 			procesar_suscripcion(mensaje, socket, memoria_cache);
 			break;
 		case NEW_POKEMON:
-			loggear_info(string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_new,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case LOCALIZED_POKEMON:
-			loggear_info(string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case GET_POKEMON:
-			loggear_info(string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_get,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case APPEARED_POKEMON:
-			loggear_info(string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case CATCH_POKEMON:
-			loggear_info(string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		case CAUGHT_POKEMON:
-			loggear_info(string_from_format("Recibido = %s ",mensaje_to_string(mensaje)));
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught,mensaje,&ultimo_id);
 			enviar_id(*socket,ultimo_id);
 			break;
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
 	}
+	//TODO liberar memoria de suscripcion
 }

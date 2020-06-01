@@ -3,7 +3,6 @@
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<commons/log.h>
 #include<commons/string.h>
 #include<commons/config.h>
 #include<readline/readline.h>
@@ -11,6 +10,7 @@
 #include<commons/collections/queue.h>
 #include <mensajes/mensajes.h>
 #include "suscriptor.h"
+#include "logger.h"
 #include <semaphore.h>
 #include <pthread.h>
 
