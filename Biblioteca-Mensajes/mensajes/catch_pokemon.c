@@ -60,7 +60,11 @@ void catch_pokemon_mostrar(t_catch_pokemon* catch_pokemon){
 }
 
 char* catch_pokemon_to_string(t_catch_pokemon*catch_pokemon){
-	return string_from_format("Mensaje - Catch Pokemon: Nombre: %s, Posicion x: %d, Posicion y: %d, ",catch_pokemon->pokemon->especie,catch_pokemon->pokemon->posicion.posicionX,catch_pokemon->pokemon->posicion.posicionY);
+	return string_from_format("Tipo = CATCH_POKEMON | Contenido = Pokemon: %s | Posicion (x,y): (%d,%d) ",catch_pokemon->pokemon->especie,catch_pokemon->pokemon->posicion.posicionX,catch_pokemon->pokemon->posicion.posicionY);
+}
+
+int catch_pokemon_size(t_catch_pokemon* pokemon){
+	return sizeof(pokemon->tamanio_nombre) + pokemon_size(pokemon->pokemon);
 }
 
 void catch_pokemon_destroy(t_catch_pokemon* catch_pokemon){

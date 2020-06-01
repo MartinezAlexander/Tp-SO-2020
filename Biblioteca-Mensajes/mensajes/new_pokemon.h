@@ -45,6 +45,11 @@ new_pokemon_to_string convierte el mensaje new_pokemon en un string
 char* new_pokemon_to_string(t_new_pokemon* new_pokemon);
 
 /*
+new_pokemon_size devuelve la cantidad de bytes que ocupa un mensaje new_pokemon especifico
+*/
+int new_pokemon_size(t_new_pokemon* new);
+
+/*
 new_pokemon_destroy libera la memoria utilizada para crear el mensaje new pokemon
 */
 void new_pokemon_destroy(t_new_pokemon* new_pokemon);

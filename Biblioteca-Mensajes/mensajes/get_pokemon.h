@@ -41,6 +41,11 @@ get_pokemon_to_string convierte en un string al mensaje get_pokemon
 char* get_pokemon_to_string(t_get_pokemon* get_pokemon);
 
 /*
+get_pokemon_size devuelve la cantidad de bytes que ocupa un mensaje get_pokemon especifico
+*/
+int get_pokemon_size(t_get_pokemon* get);
+
+/*
 get_pokemon_destroy libera la memoria utilizada para crear el mensaje get pokemon
 */
 void get_pokemon_destroy(t_get_pokemon* get_pokemon);

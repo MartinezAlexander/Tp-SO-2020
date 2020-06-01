@@ -85,7 +85,7 @@ void localized_pokemon_mostrar(t_localized_pokemon* localized_pokemon){
 }
 
 char* localized_pokemon_to_string(t_localized_pokemon* localized_pokemon){
-	char* mensaje = string_from_format("Mensaje - Localized Pokemon: Nombre: %s, Cantidad de posiciones: %d, Posiciones (x,y): ",localized_pokemon->nombre,localized_pokemon->cantidadPos);
+	char* mensaje = string_from_format("Tipo = LOCALIZED_POKEMON | Contenido = Pokemon: %s | Cantidad de posiciones: %d | Posiciones (x,y): ",localized_pokemon->nombre,localized_pokemon->cantidadPos);
 	for(int i=0; i<localized_pokemon->cantidadPos; i++){
 		uint32_t x = *posiciones_get_X(localized_pokemon->posiciones,i);
 		uint32_t y = *posiciones_get_Y(localized_pokemon->posiciones,i);
@@ -98,6 +98,10 @@ char* localized_pokemon_to_string(t_localized_pokemon* localized_pokemon){
 void localized_pokemon_destroy(t_localized_pokemon* localized_pokemon){
 	posiciones_destroy(localized_pokemon->posiciones);
 	free(localized_pokemon);
+}
+
+int localized_pokemon_size(t_localized_pokemon* localized){
+	return sizeof(localized->tamanio_nombre) + localized->tamanio_nombre + sizeof(localized->cantidadPos) + (sizeof(uint32_t)*2)*localized->cantidadPos;
 }
 
 t_list* localized_pokemon_get_list(t_localized_pokemon* localized_pokemon){

@@ -121,12 +121,12 @@ char* proceso_to_string(t_proceso proceso){
 }
 
 char* cola_to_string(op_code cola){
-	char* cola_new = "cola: NEW_POKEMON";
-	char* cola_appeared = "cola: APPEARED_POKEMON";
-	char* cola_get = "cola: GET_POKEMON";
-	char* cola_localized = "cola: LOCALIZED_POKEMON";
-	char* cola_catch = "cola: CATCH_POKEMON";
-	char* cola_caught = "cola: CAUGHT_POKEMON";
+	char* cola_new = "NEW_POKEMON";
+	char* cola_appeared = "APPEARED_POKEMON";
+	char* cola_get = "GET_POKEMON";
+	char* cola_localized = "LOCALIZED_POKEMON";
+	char* cola_catch = "CATCH_POKEMON";
+	char* cola_caught = "CAUGHT_POKEMON";
 	char* nombre_cola;
 
 	switch(cola){
@@ -157,7 +157,11 @@ char* cola_to_string(op_code cola){
 char* suscripcion_proceso_to_string(t_suscripcion* suscripcion){
 	char* nombre_proceso = proceso_to_string(suscripcion->id);
 	char* nombre_cola = cola_to_string(suscripcion->cola_suscripcion);
-	return string_from_format("Mensaje - Suscripcion Proceso: Proceso: %s, Mi pid es %d, Cola a suscribirme: %s",nombre_proceso,suscripcion->pid, nombre_cola);
+	return string_from_format("Proceso: %s | Id: %d | Cola: %s ",nombre_proceso,suscripcion->pid, nombre_cola);
+}
+
+int suscripcion_proceso_size(t_suscripcion* suscripcion){
+	return sizeof(suscripcion->pid) + sizeof(suscripcion->id) + sizeof(suscripcion->cola_suscripcion);
 }
 
 void suscripcion_proceso_destroy(t_suscripcion* suscripcion){
