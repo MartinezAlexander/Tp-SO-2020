@@ -43,6 +43,11 @@ suscripcion_proceso_to_string convierte una suscripcion en un string para loguea
 char* suscripcion_proceso_to_string(t_suscripcion* suscripcion);
 
 /*
+suscripcion_proceso_size devuelve la cantidad de bytes que ocupa un mensaje de suscripcion especifico
+*/
+int suscripcion_proceso_size(t_suscripcion* suscripcion);
+
+/*
 suscripcion_proceso_destroy libera la memoria utilizada para crear el mensaje de tipo proceso
 */
 void suscripcion_proceso_destroy(t_suscripcion* id_proceso);

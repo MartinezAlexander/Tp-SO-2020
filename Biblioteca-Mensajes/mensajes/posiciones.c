@@ -33,6 +33,10 @@ uint32_t* posiciones_get_Y(t_list* posiciones, int indice){
 	return posicion_get_Y(posicion);
 }
 
+int posicion_size(t_posicion posicion){
+	return sizeof(posicion.posicionX) + sizeof(posicion.posicionY);
+}
+
 void posiciones_destroy(t_list* posiciones){
 	list_destroy_and_destroy_elements(posiciones,free);
 }

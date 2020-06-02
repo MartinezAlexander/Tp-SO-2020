@@ -7,7 +7,16 @@
 #include<sys/socket.h>
 #include<netdb.h>
 
+/*
+crear_conexion crea un socket cliente a un servidor que se encuentra en
+el ip y puerto indicado por parametro, si logra conectarse devuelve el
+valor del socket, sino devuelve -1
+*/
 int crear_conexion(char* ip, char* puerto);
+
+/*
+liberar_conexion destruye el socket creado
+*/
 void liberar_conexion(int socket_cliente);
 
 #endif

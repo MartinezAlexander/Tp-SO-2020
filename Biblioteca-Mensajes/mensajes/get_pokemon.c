@@ -50,7 +50,11 @@ void get_pokemon_mostrar(t_get_pokemon* get_pokemon){
 }
 
 char* get_pokemon_to_string(t_get_pokemon* get_pokemon){
-	return string_from_format("Mensaje - Get Pokemon:\nNombre: %s\nTamanio de nombre: %d\n------------",get_pokemon->nombre,get_pokemon->tamanio_nombre);
+	return string_from_format("Tipo = GET_POKEMON | Contenido = Pokemon: %s ",get_pokemon->nombre);
+}
+
+int get_pokemon_size(t_get_pokemon* get){
+	return sizeof(get->tamanio_nombre) + get->tamanio_nombre;
 }
 
 void get_pokemon_destroy(t_get_pokemon* get_pokemon){

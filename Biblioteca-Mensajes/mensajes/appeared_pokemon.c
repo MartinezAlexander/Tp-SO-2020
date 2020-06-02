@@ -62,7 +62,11 @@ void appeared_pokemon_mostrar(t_appeared_pokemon* appeared_pokemon){
 }
 
 char* appeared_pokemon_to_string(t_appeared_pokemon* appeared_pokemon){
-	return string_from_format("Mensaje - Appeared Pokemon:\nNombre: %s\nTamanio del nombre: %d\nPosicion x: %d\nPosicion y: %d\n------------",appeared_pokemon->pokemon->especie,appeared_pokemon->tamanio_nombre,appeared_pokemon->pokemon->posicion.posicionX,appeared_pokemon->pokemon->posicion.posicionY);
+	return string_from_format("Tipo = APPEARED_POKEMON | Contenido = Pokemon: %s | Posicion (x,y): (%d,%d) ",appeared_pokemon->pokemon->especie,appeared_pokemon->pokemon->posicion.posicionX,appeared_pokemon->pokemon->posicion.posicionY);
+}
+
+int appeared_pokemon_size(t_appeared_pokemon* appeared){
+	return sizeof(appeared->tamanio_nombre) + pokemon_size(appeared->pokemon);
 }
 
 void appeared_pokemon_destroy(t_appeared_pokemon* appeared_pokemon){

@@ -2,6 +2,7 @@
 #define SUSCRIPTOR_H_
 
 #include <commons/collections/list.h>
+#include <mensajes/mensajes.h>
 #include <stdlib.h>
 typedef struct{
 	int socket;

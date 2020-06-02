@@ -81,7 +81,6 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
 		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
 				codigo, id_c);
-		/*Modificar mensaje_con_id_correlativo_create*/
 	}
 
 	if (id == BROKER && codigo == CATCH_POKEMON) {

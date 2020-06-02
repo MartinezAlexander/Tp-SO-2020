@@ -42,7 +42,19 @@ void caught_pokemon_mostrar(t_caught_pokemon* caught_pokemon){
 }
 
 char* caught_pokemon_to_string(t_caught_pokemon* caught_pokemon){
-	return string_from_format("Mensaje - Caught Pokemon:\nFue atrapado: %d\n------------",caught_pokemon->atrapado);
+	char* atrapado = "Atrapado";
+	char* no_atrapado = "No atrapado";
+	char* resultado;
+	if(caught_pokemon->atrapado == 0){
+		resultado = no_atrapado;
+	}else{
+		resultado = atrapado;
+	}
+	return string_from_format("Tipo = CAUGHT_POKEMON | Contenido = %s ",resultado);
+}
+
+int caught_pokemon_size(t_caught_pokemon* caught){
+	return sizeof(caught->atrapado);
 }
 
 void caught_pokemon_destroy(t_caught_pokemon* caught_pokemon){
