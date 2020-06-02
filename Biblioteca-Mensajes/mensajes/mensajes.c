@@ -152,7 +152,6 @@ int enviar_mensaje(t_mensaje* mensaje, int socket_cliente)
 	buffer->size = nuevo_tamanio;
 	buffer->stream = nuevo_stream;
 
-
 	t_paquete* paquete = empaquetar_buffer(buffer,mensaje->codigo);
 
 	int size_serializado;
