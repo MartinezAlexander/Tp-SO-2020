@@ -2,9 +2,6 @@
 #ifndef MEMORIA_PARTICIONES_DINAMICAS_H_
 #define MEMORIA_PARTICIONES_DINAMICAS_H_
 
-#include "config.h"
-
-
 
 
 

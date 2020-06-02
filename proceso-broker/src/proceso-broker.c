@@ -17,6 +17,8 @@ int main(void){
 
 	iniciar_logger(path_logger);
 
+	iniciar_log_personal("src/broker_personal.log");
+
 	inicializar_ids_mensajes();
 
 	memoria_cache_create();

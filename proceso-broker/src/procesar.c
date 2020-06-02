@@ -5,8 +5,7 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memor
 	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
 	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
 
-	char* log = string_from_format("[Recibido] %s",mensaje_to_string(mensaje));
-	loggear_info(log);
+	loggear_recepcion_mensaje(mensaje_to_string(mensaje));
 
 	confirmar_suscripcion(*socket);
 
@@ -19,13 +18,11 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memor
 
 	if(posicion_suscriptor < 0){
 		suscriptor_suscribirse_a(cola->suscriptores,suscriptor);
-		char* log = string_from_format("[Sucripcion] %s",suscripcion_proceso_to_string(suscripcion));
-		loggear_info(log);
+		loggear_suscripcion_proceso(suscripcion_proceso_to_string(suscripcion));
 	}else{
 		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
 		//TODO pasar a log personal
-		char* log = string_from_format("[Reconexion] %s",suscripcion_proceso_to_string(suscripcion));
-		loggear_info(log);
+		loggear_reconexion_proceso(suscripcion_proceso_to_string(suscripcion));
 	}
 
 	//TODO dudoso, turbio, probar en maquina de ale
@@ -42,16 +39,13 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
 		x = enviar_mensaje(mensaje,suscriptor->socket);
 		if(x > 0){
-			char* log = string_from_format("[Enviado] %s", mensaje_to_string(mensaje));
-			loggear_info(log);
+			loggear_envio_mensaje(mensaje_to_string(mensaje));
 			//TODO verificar el retorno del ACK
 			recibir_ACK(suscriptor->socket);
-			char* log2 = string_from_format("[ACK] Recibi confirmacion de: %d", suscriptor->pid);
-			loggear_info(log2);
+			loggear_recepcion_ACK(suscriptor_to_string(suscriptor));
 		}else{
 			//TODO pasar a log personal
-			char* log = string_from_format("[Envio fallido] %s", mensaje_to_string(mensaje));
-			loggear_info(log);
+			log_personal_error_envio_a_suscriptor(suscriptor_to_string(suscriptor));
 		}
 	}
 }
@@ -64,7 +58,6 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		//TODO hacer un queue_peek
 		t_mensaje* mensaje = (t_mensaje*) queue_pop(cola->queue);
 
-		//printf("saco de la cola a: \n");
 		envio_a_suscriptores(cola->suscriptores, mensaje);
 
 		memoria_cache_agregar_mensaje(memoria_cache,mensaje);

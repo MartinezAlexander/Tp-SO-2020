@@ -46,14 +46,13 @@ void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* param
 
 			if (resultado_envio > 0) {
 				//TODO pasar a log personal
-				char* log = string_from_format("[Enviado CACHE] %s", mensaje_to_string(mensaje));
-				loggear_info(log);
+				loggear_envio_mensaje(mensaje_to_string(mensaje));
 
 				//TODO verificar retorno de ack
 				recibir_ACK(parametros->suscriptor->socket);
-				char* log2 = string_from_format("[ACK CACHE] Recibi confirmacion de: %d", parametros->suscriptor->pid);
-				loggear_info(log2);
+				loggear_recepcion_ACK(suscriptor_to_string(parametros->suscriptor));
 			} else {
+				log_personal_error_envio_a_suscriptor(suscriptor_to_string(parametros->suscriptor));
 				i = list_size(mensajes);
 			}
 		}

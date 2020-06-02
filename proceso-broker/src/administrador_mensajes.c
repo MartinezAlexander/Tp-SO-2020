@@ -44,8 +44,7 @@ void esperar_cliente(int socket_servidor,void (*serve_client)(int *socket))
 	int tam_direccion = sizeof(struct sockaddr_in);
 
 	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
-	char* mensaje = string_from_format("Nueva conexion al broker: %d", socket_cliente);
-	loggear_info(mensaje);
+	loggear_conexion_al_broker(socket_cliente);
 
 	pthread_create(&thread,NULL,(void*)serve_client,&socket_cliente);
 	pthread_detach(thread);
