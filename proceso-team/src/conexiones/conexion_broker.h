@@ -11,6 +11,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<pthread.h>
+#include<semaphore.h>
 #include<commons/string.h>
 #include<commons/collections/list.h>
 #include<mensajes/mensajes.h>
@@ -31,13 +32,29 @@
 pthread_t hilo_appeared;
 pthread_t hilo_caught;
 pthread_t hilo_localized;
+pthread_t hilo_reconexion;
+sem_t semaforo_reconexion;
+pthread_mutex_t mutex_reconexion;
+int estoy_reconectando;
+
+int socket_appeared;
+int socket_caught;
+int socket_localized;
+sem_t semaforo_procesamiento_appeared;
+sem_t semaforo_procesamiento_caught;
+sem_t semaforo_procesamiento_localized;
 
 void iniciar_conexion_broker();
 void cerrar_conexion_broker();
 void iniciar_suscripcion_broker(op_code cola);
-void recibir_mensaje_appeared(int socket_appeared);
-void recibir_mensaje_caught(int socket_caught);
-void recibir_mensaje_localized(int socket_localized);
+
+void reconectar_al_broker();
+void iniciar_reconexion();
+
+void suscribirse_a_cola(int* socket, op_code cola);
+void recibir_appeared();
+void recibir_caught();
+void recibir_localized();
 
 void enviar_get_objetivo(t_list* objetivo_global);
 

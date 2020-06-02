@@ -38,6 +38,7 @@ t_dictionary* diccionario_especies_recibidas;
 
 //Estadisticas
 t_dictionary* diccionario_ciclos_entrenador;
+int cambios_de_contexto;
 
 int finalizo_team;
 

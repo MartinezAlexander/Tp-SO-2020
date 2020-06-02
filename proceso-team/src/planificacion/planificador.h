@@ -33,7 +33,6 @@ typedef struct{
 	double alpha;
 
 	t_entrenador* entrenador_en_exec;
-	int entrenador_en_exec_is_null;
 
 	sem_t semaforo;
 }t_planificador;

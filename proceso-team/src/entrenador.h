@@ -63,6 +63,9 @@ int mover_proxima_posicion(t_entrenador* entrenador);
 void enviar_catch(t_entrenador* entrenador);
 void ejecutar_entrenador(t_entrenador* entrenador);
 
+void resolver_caught_positivo(t_entrenador* entrenador);
+void resolver_caught_negativo(t_entrenador* entrenador);
+
 int entrenador_en_ejecucion(t_entrenador *entrenador);
 
 t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador, double estimacion_inicial);

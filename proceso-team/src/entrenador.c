@@ -21,33 +21,54 @@ void enviar_catch(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED_BY_CATCH;
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
 
-	//TODO pensar forma de que se ejecute la planificacion del prox sin tener
-	//que esperar a que termine de hacer el catch
-	//Con un hilo podria ser????
-/*
 	//Conecto con broker
 	int socket = crear_conexion(ip_broker, puerto_broker);
+	if(socket < 0){
+		loggear_error_broker("envio de mensaje catch");
+		//Comportamiento default: CATCH positivo
+		resolver_caught_positivo(entrenador);
+	}else{
+		//Envio mensaje
+		t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
+				entrenador->objetivo_actual->posicion.posicionX, entrenador->objetivo_actual->posicion.posicionY);
+		t_mensaje* mensaje = mensaje_simple_create(mensaje_catch, CATCH_POKEMON);
 
-	//Envio mensaje
-	t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
-			entrenador->objetivo_actual->posicion.posicionX, entrenador->objetivo_actual->posicion.posicionY);
-	t_mensaje* mensaje = mensaje_simple_create(mensaje_catch, CATCH_POKEMON);
+		int envio = enviar_mensaje(mensaje, socket);
+		if(envio < 0){
+			loggear_error_broker("envio de mensaje catch");
+			//Comportamiento default: CATCH positivo
+			resolver_caught_positivo(entrenador);
+		}else{
+			int id = recibir_id(socket);
+			printf("-Enviado el catch, y recibido id de mensaje: %d -\n", id);
+			//Agrego el id con mi entrenador al diccionario
+			char* key_id = string_itoa(id);
+			dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
+		}
+	}
+}
 
-	enviar_mensaje(mensaje, socket);
+void resolver_caught_positivo(t_entrenador* entrenador){
+	entrenador_atrapar_objetivo(entrenador);
 
-	//TODO comportamiento default
-	//si falla el envio, debo tomar como respuesta positiva
-	//en ese caso, el codigo de abajo no lo hago
-	//y llamo a resolver caught positivo()
+	//Actualizo el estado del entrenador
+	if(cumplio_objetivo_entrenador(entrenador)){
+		entrenador->estado = EXIT;
+	}else{
+		if(entrenador_estado_deadlock(entrenador))
+			entrenador->estado = BLOCKED_DEADLOCK;
+		else
+			entrenador->estado = BLOCKED;
+			//Si puedo seguir atrapando, el entrenador
+			//queda en estado bloqueado, asi la proxima
+			//vez que aparezca un pokemon, este entrenador
+			//este en los candidatos a ir a buscarlo
+	}
+}
 
-	//Recibo id
-	t_mensaje* respuesta = recibir_mensaje(socket);
-	loggear_nuevo_mensaje(respuesta);
-
-	//Agrego el id con mi entrenador al diccionario
-	char* key_id = string_itoa(respuesta->id);
-	dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
-	*/
+void resolver_caught_negativo(t_entrenador* entrenador){
+	entrenador_resetear_objetivo(entrenador);
+	entrenador->estado = BLOCKED;
 }
 
 /**

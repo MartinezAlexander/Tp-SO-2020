@@ -33,19 +33,25 @@ void loggear_resultado_deteccion_deadlock(){
 void loggear_nuevo_mensaje(t_mensaje* mensaje){
 	log_info(logger, mensaje_to_string(mensaje));
 }
+
 //TODO log: 8. Resultado del Team (especificado anteriormente)
 void loggear_resultado_team(){
 
 }
-//TODO log: 9. Errores de comunicacion con el Broker (indicando que se realizara la operacion por default)
-void loggear_error_broker(){
 
+void loggear_error_broker(char* tipo_operacion){
+	log_info(logger, "Error de comunicacion con el proceso Broker en %s: se realizara el comportamiento default", tipo_operacion);
 }
-//TODO log: 10. Inicio de proceso de reintento de comunicacion con el Broker
+
 void loggear_inicio_reintento_broker(){
-
+	log_info(logger, "Iniciando reintento de conexion con el proceso Broker");
 }
-//TODO log: 11. Resultado de proceso de reintento de comunicacion con el Broker.
-void loggear_resultado_reintento_broker(){
+
+void loggear_resultado_reintento_broker(int resultado){
+	if(resultado){
+		log_info(logger, "Finalizo el reintento de conexion con el proceso Broker: conexion exitosa");
+	}else{
+		log_info(logger, "Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar");
+	}
 
 }

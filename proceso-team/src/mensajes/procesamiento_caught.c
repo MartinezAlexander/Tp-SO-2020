@@ -21,25 +21,3 @@ void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo){
 	}
 }
 
-void resolver_caught_positivo(t_entrenador* entrenador){
-	entrenador_atrapar_objetivo(entrenador);
-
-	//Actualizo el estado del entrenador
-	if(cumplio_objetivo_entrenador(entrenador)){
-		entrenador->estado = EXIT;
-	}else{
-		if(entrenador_estado_deadlock(entrenador))
-			entrenador->estado = BLOCKED_DEADLOCK;
-		else
-			entrenador->estado = BLOCKED;
-			//Si puedo seguir atrapando, el entrenador
-			//queda en estado bloqueado, asi la proxima
-			//vez que aparezca un pokemon, este entrenador
-			//este en los candidatos a ir a buscarlo
-	}
-}
-
-void resolver_caught_negativo(t_entrenador* entrenador){
-	entrenador_resetear_objetivo(entrenador);
-	entrenador->estado = BLOCKED;
-}

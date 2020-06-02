@@ -37,6 +37,20 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
     }
 }
 
+//TODO solucionar el tema del catch asincronico
+//Entonces. Hay que tener otro hilo para el planificador
+//este hilo solo ejecuta la funcion planificar();
+//y esta sincronizado en orden con el entrenador
+//de manera que no ejecuta hasta que el entrenador
+//no ejecuta antes.
+//Entonces el entrenador a fin de ciclo manda un post
+//para el planificador.
+//En el catch, entonces podemos mandar ese post antes de
+//hacer el envio y recibimiento, y hacerlo asincronicamente
+//porque libero el planificador para que mande al proximo
+//Ojo: cuando salgo de ejecutar el entrenador tengo que
+//chequear si ya mande el post antes de mandarlo de nuevo.
+
 void ejecutar_hilo(t_entrenador* entrenador){
 	//El entrenador debe ejecutar constantemente
 	//y tomamos un ciclo como una pasada del while.

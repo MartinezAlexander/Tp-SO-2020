@@ -37,17 +37,24 @@ int main(void) {
 	//la escucha y el procesamiento de mensajes
 	cerrar_conexion_broker();
 
+	int ciclos_cpu_totales = 0;
+	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+		int ciclos = dictionary_get(diccionario_ciclos_entrenador, list_get(entrenadores, i));
+		ciclos_cpu_totales += ciclos;
+	}
+
+	//Loggear estadisticas
+
 	terminar_programa(logger, config);
 }
 
-//TODO (estadisticas) ciclos de CPU totales (se calcula al final)
-//TODO (estadisticas) Cantidad de cambios de contexto realizados
 //TODO (estadisticas) Deadlocks producidos y resueltos
 
 void inicializar_variables(){
 	config = leer_config();
 
 	finalizo_team = 0;
+	cambios_de_contexto = 0;
 
 	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
 	uint32_t quantum = config_get_int_value(config, "QUANTUM");

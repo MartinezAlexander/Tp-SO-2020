@@ -235,6 +235,7 @@ int recibir_confirmacion_suscripcion(int socket){
 	return correcto;
 }
 
+/*
 t_mensaje* recibir_mensaje(int socket_cliente)
 {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
@@ -282,10 +283,9 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 
 
 	return mensaje;
-}
+}*/
 
-/*
- * version sin probar, controla errores en el socket que envia mensajes
+
 t_mensaje* recibir_mensaje(int socket_cliente)
 {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
@@ -338,7 +338,7 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 	}
 
 	return mensaje;
-}*/
+}
 
 char* id_to_string(int32_t id){
 	char* sin_id = "No tiene id, ";

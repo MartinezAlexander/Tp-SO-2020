@@ -20,7 +20,4 @@
 void descartar_caught(t_caught_pokemon* mensaje);
 void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo);
 
-void resolver_caught_positivo(t_entrenador* entrenador);
-void resolver_caught_negativo(t_entrenador* entrenador);
-
 #endif /* PROCESAMIENTO_CAUGHT_H_ */
