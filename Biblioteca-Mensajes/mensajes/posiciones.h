@@ -57,4 +57,9 @@ posiciones_destroy libera la memoria que se utilizo para crear la lista de posic
 */
 void posiciones_destroy(t_list* posiciones);
 
+/*
+Dada una posicion te devuelve cuantos bytes ocupa
+*/
+int posicion_size(t_posicion posicion);
+
 #endif

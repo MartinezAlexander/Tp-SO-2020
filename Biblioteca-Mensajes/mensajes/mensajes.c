@@ -196,6 +196,11 @@ int enviar_id(int socket,int32_t id){
 	return resultado;
 }
 
+int enviar_ACK(int socket){
+	int resultado = enviar_confirmacion(1,ACK,socket);
+	return resultado;
+}
+
 int32_t recibir_id(int socket){
 	cod_confirmacion codigo;
 	int32_t id =  recibir_confirmacion(socket,&codigo);
@@ -203,11 +208,6 @@ int32_t recibir_id(int socket){
 		id = (-1);
 	}
 	return id;
-}
-
-int enviar_ACK(int socket){
-	int resultado = enviar_confirmacion(1,ACK,socket);
-	return resultado;
 }
 
 int recibir_ACK(int socket){
@@ -340,9 +340,10 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 	return mensaje;
 }
 
+
 char* id_to_string(int32_t id){
-	char* sin_id = "No tiene id, ";
-	char* con_id = string_from_format("Su id es: %d, ",id);
+	char* sin_id = "| No tiene id ";
+	char* con_id = string_from_format("| Su id es: %d ",id);
 	char* string;
 	if(id > 0){
 		string = con_id;
@@ -353,8 +354,8 @@ char* id_to_string(int32_t id){
 }
 
 char* id_c_to_string(int32_t id_c){
-	char* sin_id = "No tiene id correlativo.";
-	char* con_id = string_from_format("Su id correlativo es: %d.",id_c);
+	char* sin_id = "| No tiene id correlativo.";
+	char* con_id = string_from_format("| Su id correlativo es: %d.",id_c);
 	char* string;
 	if(id_c > 0){
 		string = con_id;
@@ -389,7 +390,7 @@ char* mensaje_to_string(t_mensaje* mensaje){
 		string = localized_pokemon_to_string((t_localized_pokemon*)mensaje->mensaje);
 			break;
 	case SUSCRIPCION:
-		string = suscripcion_proceso_to_string((t_suscripcion*)mensaje->mensaje);
+		string = string_from_format("Tipo = Suscripcion | Contenido = %s",suscripcion_proceso_to_string((t_suscripcion*)mensaje->mensaje));
 			break;
 	}
 
@@ -461,4 +462,33 @@ char* op_code_to_string(op_code codigo){
 		break;
 	}
 	return op_code_string;
+}
+
+int mensaje_size(t_mensaje* mensaje){
+	int size;
+	switch(mensaje->codigo){
+	case NEW_POKEMON:
+		size = new_pokemon_size((t_new_pokemon*)mensaje->mensaje);
+		break;
+	case GET_POKEMON:
+		size = get_pokemon_size((t_get_pokemon*)mensaje->mensaje);
+			break;
+	case CATCH_POKEMON:
+		size = catch_pokemon_size((t_catch_pokemon*)mensaje->mensaje);
+			break;
+	case CAUGHT_POKEMON:
+		size = caught_pokemon_size((t_caught_pokemon*)mensaje->mensaje);
+			break;
+	case APPEARED_POKEMON:
+		size = appeared_pokemon_size((t_appeared_pokemon*)mensaje->mensaje);
+			break;
+	case LOCALIZED_POKEMON:
+		size = localized_pokemon_size((t_localized_pokemon*)mensaje->mensaje);
+			break;
+	case SUSCRIPCION:
+		size = suscripcion_proceso_size((t_suscripcion*)mensaje->mensaje);
+			break;
+	}
+	size += sizeof(int32_t)*2;
+	return size;
 }

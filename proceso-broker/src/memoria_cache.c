@@ -1,9 +1,9 @@
 #include "memoria_cache.h"
 
-t_memoria_cache* memoria_cache_create(){
-	t_memoria_cache* memoria = malloc(sizeof(t_memoria_cache));
-	memoria->memoria_cache = dictionary_create();
-	return memoria;
+
+void memoria_cache_create(){
+	memoria_cache = malloc(sizeof(t_memoria_cache));
+	memoria_cache->memoria_cache = dictionary_create();
 }
 
 //TODO crear un semaforo mutex
@@ -39,21 +39,21 @@ t_list* memoria_cache_obtener_mensajes_por_cola(t_memoria_cache* memoria, op_cod
 void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros){
 	t_list* mensajes = memoria_cache_obtener_mensajes_por_cola(parametros->memoria,parametros->cola);
 
-	confirmar_suscripcion(parametros->suscriptor->socket);
-
 	if(mensajes != NULL){
 		int i;
 		for (i = 0; i < list_size(mensajes); i++) {
 			t_mensaje* mensaje = (t_mensaje*) list_get(mensajes, i);
 			int resultado_envio = enviar_mensaje(mensaje,parametros->suscriptor->socket);
 
-			char* mensaje_a_loggear = string_from_format("Enviado a %d a traves del socket %d ", parametros->suscriptor->pid,parametros->suscriptor->socket);
-			string_append(&mensaje_a_loggear, mensaje_to_string(mensaje));
-			log_info(loger2, mensaje_a_loggear);
-
 			if (resultado_envio > 0) {
+				//TODO pasar a log personal
+				loggear_envio_mensaje(mensaje_to_string(mensaje));
+
+				//TODO verificar retorno de ack
 				recibir_ACK(parametros->suscriptor->socket);
+				loggear_recepcion_ACK(suscriptor_to_string(parametros->suscriptor));
 			} else {
+				log_personal_error_envio_a_suscriptor(suscriptor_to_string(parametros->suscriptor));
 				i = list_size(mensajes);
 			}
 		}
@@ -74,6 +74,3 @@ void parametros_destroy(para_envio_mensaje_cacheados* parametros){
 	free(parametros);
 }
 
-void obtener_logger2(t_log* logger){
-	loger2 = logger;
-}

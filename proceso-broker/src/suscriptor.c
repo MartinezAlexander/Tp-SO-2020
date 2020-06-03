@@ -1,5 +1,5 @@
-
 #include "suscriptor.h"
+#include <commons/string.h>
 
 t_suscriptor* suscriptor_create(int socket, int32_t pid){
 	t_suscriptor* suscriptor = malloc(sizeof(t_suscriptor));
@@ -17,6 +17,10 @@ int suscriptor_esta_suscripto(t_list* lista_suscriptores, t_suscriptor* suscript
 		}
 	}
 	return pos;
+}
+
+char* suscriptor_to_string(t_suscriptor* suscriptor){
+	return string_from_format("ID suscriptor: %d conectado a traves del socket %d ",suscriptor->pid,suscriptor->socket);
 }
 
 void suscriptor_suscribirse_a(t_list* lista_suscriptores, t_suscriptor* suscriptor){

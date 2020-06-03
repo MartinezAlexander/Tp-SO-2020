@@ -13,5 +13,6 @@ void suscriptor_destroy(void*);
 int suscriptor_esta_suscripto(t_list* lista_suscriptores, t_suscriptor* suscriptor);
 void suscriptor_suscribirse_a(t_list* lista_suscriptores, t_suscriptor* suscriptor);
 void suscriptor_reconectar(t_list* lista_suscriptores, t_suscriptor* suscriptor, int posicion);
+char* suscriptor_to_string(t_suscriptor* suscriptor);
 
 #endif /* SUSCRIPTOR_H_ */

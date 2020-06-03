@@ -1,8 +1,13 @@
 #include "procesar.h"
+#include <unistd.h>
 
 void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memoria){
 	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
 	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
+
+	loggear_recepcion_mensaje(mensaje_to_string(mensaje));
+
+	confirmar_suscripcion(*socket);
 
 	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria);
 	pthread_t envio_mensajes_cacheados;
@@ -15,20 +20,23 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memor
 	if(posicion_suscriptor < 0){
 		//TODO asegurar mutua exclusion
 		suscriptor_suscribirse_a(cola->suscriptores,suscriptor);
-		//puts("SUSCRIBI A: ");
+
+		loggear_suscripcion_proceso(suscripcion_proceso_to_string(suscripcion));
+
 	}else{
 		//TODO asegurar mutua exclusion
 		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
-		//puts("ACTUALICE EL SOCKET DE:");
+
+		//TODO pasar a log personal
+		loggear_reconexion_proceso(suscripcion_proceso_to_string(suscripcion));
 	}
+
+	//TODO dudoso, turbio, probar en maquina de ale
+	pthread_join(envio_mensajes_cacheados,NULL);
 
 	if (list_size(cola->suscriptores) == 1) {
 		sem_post(&cola->semaforoSuscriptores);
 	}
-
-	//TODO enviar todos los mensajes correspondientes a la cola que esten en cache hilo
-
-	//suscripcion_proceso_mostrar(suscripcion);
 }
 
 void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
@@ -37,19 +45,14 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
 		x = enviar_mensaje(mensaje,suscriptor->socket);
 		if(x > 0){
-			/*printf("Enviado:\n");
-			mensaje_mostrar(mensaje);*/
-			char* mensaje_a_loggear = string_from_format("Enviado a %d a traves del socket %d ",suscriptor->pid,suscriptor->socket);
-			string_append(&mensaje_a_loggear,mensaje_to_string(mensaje));
-			log_info(loger,mensaje_a_loggear);
+			loggear_envio_mensaje(mensaje_to_string(mensaje));
+			//TODO verificar el retorno del ACK
+			recibir_ACK(suscriptor->socket);
+			loggear_recepcion_ACK(suscriptor_to_string(suscriptor));
 		}else{
-			/*printf("No pudo enviarse\n");
-			mensaje_mostrar(mensaje);*/
-			char* mensaje_a_loggear = string_from_format("No enviado a %d a traves del socket %d ",suscriptor->pid,suscriptor->socket);
-			string_append(&mensaje_a_loggear,mensaje_to_string(mensaje));
-			log_info(loger,mensaje_a_loggear);
+			//TODO pasar a log personal
+			log_personal_error_envio_a_suscriptor(suscriptor_to_string(suscriptor));
 		}
-		recibir_ACK(suscriptor->socket);
 	}
 }
 
@@ -61,10 +64,9 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		//TODO hacer un queue_peek
 		t_mensaje* mensaje = (t_mensaje*) queue_pop(cola->queue);
 
-		//printf("saco de la cola a: \n");
 		envio_a_suscriptores(cola->suscriptores, mensaje);
 
-		memoria_cache_agregar_mensaje(memoria,mensaje);
+		memoria_cache_agregar_mensaje(memoria_cache,mensaje);
 
 		sem_post(&cola->semaforoSuscriptores);
 	}
@@ -82,13 +84,4 @@ void estado_mensaje_destroy(t_estado_mensaje* estado){
 	list_destroy_and_destroy_elements(estado->enviados,free);
 	list_destroy_and_destroy_elements(estado->fallidos,free);
 	free(estado);
-}
-
-//TODO borrar al encontrar una mejor manera
-void obtener_cache(t_memoria_cache* memoria_cache){
-	memoria = memoria_cache;
-}
-
-void obtener_logger(t_log* logger){
-	loger = logger;
 }

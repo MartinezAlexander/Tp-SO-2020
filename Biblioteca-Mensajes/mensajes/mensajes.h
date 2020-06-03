@@ -191,4 +191,6 @@ si lo es devuelve un 1
 */
 int recibir_confirmacion_suscripcion(int socket);
 
+int mensaje_size(t_mensaje* mensaje);
+
 #endif 
