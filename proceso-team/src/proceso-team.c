@@ -39,7 +39,8 @@ int main(void) {
 
 	int ciclos_cpu_totales = 0;
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-		int ciclos = dictionary_get(diccionario_ciclos_entrenador, list_get(entrenadores, i));
+		t_entrenador* entrenador = list_get(entrenadores, i);
+		int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, (char*)entrenador->identificador);
 		ciclos_cpu_totales += ciclos;
 	}
 

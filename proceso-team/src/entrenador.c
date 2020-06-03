@@ -4,10 +4,13 @@ void iniciarlizar_diccionario_catch(){
 	mensajes_catch_pendientes = dictionary_create();
 }
 
+void actualizar_estadistica_entrenador(int id_entrenador){
+	int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, (char*)id_entrenador);
+	dictionary_put(diccionario_ciclos_entrenador, (char*)id_entrenador, (void*)ciclos+1);
+}
+
 void ejecutar_entrenador(t_entrenador* entrenador){
-	//Actualizo estadistica
-	int ciclos = dictionary_get(diccionario_ciclos_entrenador, entrenador);
-	dictionary_put(diccionario_ciclos_entrenador, entrenador, ciclos+1);
+	actualizar_estadistica_entrenador(entrenador->identificador);
 
 	int termine = mover_proxima_posicion(entrenador);
 	loggear_movimiento_entrenador(entrenador->identificador, entrenador->posicion);
@@ -107,7 +110,7 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	entrenador->estado_sjf->ultima_rafaga = 0;
 	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
 
-	dictionary_put(diccionario_ciclos_entrenador, entrenador, 0);
+	dictionary_put(diccionario_ciclos_entrenador, (char*)entrenador->identificador, 0);
 
 	return entrenador;
 }
