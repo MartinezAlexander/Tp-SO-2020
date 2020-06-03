@@ -5,8 +5,8 @@ void iniciarlizar_diccionario_catch(){
 }
 
 void actualizar_estadistica_entrenador(int id_entrenador){
-	int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, (char*)id_entrenador);
-	dictionary_put(diccionario_ciclos_entrenador, (char*)id_entrenador, (void*)ciclos+1);
+	int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, string_itoa(id_entrenador));
+	dictionary_put(diccionario_ciclos_entrenador, string_itoa(id_entrenador), (void*)ciclos+1);
 }
 
 int ejecutar_entrenador(t_entrenador* entrenador){
@@ -54,11 +54,17 @@ void enviar_catch(t_entrenador* entrenador){
 			//Agrego el id con mi entrenador al diccionario
 			char* key_id = string_itoa(id);
 			dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
+			printf("TODO OK\n");
 		}
 	}
 }
 
 void resolver_caught_positivo(t_entrenador* entrenador){
+
+	printf("Entrenador %d atrapo exitosamente al %s en [%d,%d]\n", entrenador->identificador,
+			entrenador->objetivo_actual->especie, entrenador->objetivo_actual->posicion.posicionX,
+			entrenador->objetivo_actual->posicion.posicionY);
+
 	entrenador_atrapar_objetivo(entrenador);
 
 	//Actualizo el estado del entrenador
@@ -77,6 +83,7 @@ void resolver_caught_positivo(t_entrenador* entrenador){
 }
 
 void resolver_caught_negativo(t_entrenador* entrenador){
+	printf("Entrenador %d no pudo atrapar su pokemon\n", entrenador->identificador);
 	entrenador_resetear_objetivo(entrenador);
 	entrenador->estado = BLOCKED;
 }
@@ -117,7 +124,7 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	entrenador->estado_sjf->ultima_rafaga = 0;
 	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
 
-	dictionary_put(diccionario_ciclos_entrenador, (char*)entrenador->identificador, 0);
+	dictionary_put(diccionario_ciclos_entrenador, string_itoa(entrenador->identificador), 0);
 
 	return entrenador;
 }
@@ -140,6 +147,7 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 
 	t_list* entrenadores = list_create();
 	diccionario_ciclos_entrenador = dictionary_create();
+	iniciarlizar_diccionario_catch();
 
 	for(int i = 0 ; i < numero_posiciones ; i++){
 		list_add(entrenadores,entrenador_create(posiciones_entrenadores[i],
