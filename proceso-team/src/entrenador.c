@@ -9,7 +9,7 @@ void actualizar_estadistica_entrenador(int id_entrenador){
 	dictionary_put(diccionario_ciclos_entrenador, (char*)id_entrenador, (void*)ciclos+1);
 }
 
-void ejecutar_entrenador(t_entrenador* entrenador){
+int ejecutar_entrenador(t_entrenador* entrenador){
 	actualizar_estadistica_entrenador(entrenador->identificador);
 
 	int termine = mover_proxima_posicion(entrenador);
@@ -18,10 +18,17 @@ void ejecutar_entrenador(t_entrenador* entrenador){
 	if(termine){
 		enviar_catch(entrenador);
 	}
+
+	return termine;
 }
 
 void enviar_catch(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED_BY_CATCH;
+	//Cambie de estado, entonces habilito el semaforo
+	//del planificador para que pueda mandar a ejecutar
+	//a alguien mas, ya que yo me quedo esperando nada mas
+	habilitar_hilo_planificacion();
+
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
 
 	//Conecto con broker

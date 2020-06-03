@@ -24,11 +24,14 @@ int entrenador_disponible(t_entrenador *entrenador);
 
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon);
 
+void ejecutar_hilo_planificador();
+void habilitar_hilo_planificacion();
+
 void planificar();
 void ejecutar_hilo(t_entrenador* entrenador);
 
-void iniciar_hilos_entrenadores();
-void esperar_hilos_entrenadores();
+void iniciar_hilos_planificacion();
+void esperar_hilos_planificacion();
 
 
 #endif /* PLANIFICACION_H_ */

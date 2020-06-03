@@ -61,7 +61,12 @@ void iniciarlizar_diccionario_catch();
 
 int mover_proxima_posicion(t_entrenador* entrenador);
 void enviar_catch(t_entrenador* entrenador);
-void ejecutar_entrenador(t_entrenador* entrenador);
+/*
+ * Realiza el proximo ciclo de ejecucion del entrenador,
+ * en caso de que haya finalizado su ejecucion devuelve 1,
+ * de lo contrario retorna 0
+ */
+int ejecutar_entrenador(t_entrenador* entrenador);
 
 void resolver_caught_positivo(t_entrenador* entrenador);
 void resolver_caught_negativo(t_entrenador* entrenador);

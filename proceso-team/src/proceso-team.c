@@ -15,7 +15,7 @@
 int main(void) {
 	inicializar_variables();
 
-	iniciar_hilos_entrenadores();
+	iniciar_hilos_planificacion();
 
 	//Me suscribo a las colas y abro hilos para recibir mensajes
 	iniciar_conexion_broker();
@@ -30,7 +30,7 @@ int main(void) {
 	//terminen de ejecutar todos los entrenadores (hilos)
 	//Cuando esto ocurra, tambien significara que el
 	//proceso team termino.
-	esperar_hilos_entrenadores();
+	esperar_hilos_planificacion();
 	//Una vez que llego a esta zona se que ya todos los entrenadores
 	//estan en estado exit, por lo que puedo liberar las conexiones
 	//con el broker y joinear los hilos que llevaban a cabo

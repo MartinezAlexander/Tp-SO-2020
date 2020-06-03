@@ -1,18 +1,20 @@
 #include "planificacion.h"
 
-void iniciar_hilos_entrenadores(){
+void iniciar_hilos_planificacion(){
+	pthread_create(&(planificador->hilo_planificacion), NULL, (void*)ejecutar_hilo_planificador, NULL);
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores, i);
 		sem_init(&(entrenador->semaforo), 0, 0);
-		pthread_create(&(entrenador->hilo), NULL, ejecutar_hilo, entrenador);
+		pthread_create(&(entrenador->hilo), NULL, (void*)ejecutar_hilo, entrenador);
 	}
 }
 
-void esperar_hilos_entrenadores(){
+void esperar_hilos_planificacion(){
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores, i);
 		pthread_join(entrenador->hilo, NULL);
 	}
+	pthread_join(planificador->hilo_planificacion, NULL);
 }
 
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
@@ -37,19 +39,47 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
     }
 }
 
-//TODO solucionar el tema del catch asincronico
-//Entonces. Hay que tener otro hilo para el planificador
-//este hilo solo ejecuta la funcion planificar();
-//y esta sincronizado en orden con el entrenador
-//de manera que no ejecuta hasta que el entrenador
-//no ejecuta antes.
-//Entonces el entrenador a fin de ciclo manda un post
-//para el planificador.
-//En el catch, entonces podemos mandar ese post antes de
-//hacer el envio y recibimiento, y hacerlo asincronicamente
-//porque libero el planificador para que mande al proximo
-//Ojo: cuando salgo de ejecutar el entrenador tengo que
-//chequear si ya mande el post antes de mandarlo de nuevo.
+//En un principio pensabamos en tener tantos hilos como entrenadores
+//para la ejecucion de los mismos, empezando todos bloqueados
+//y desbloqueandose a medida que debemos ejecutarlos (por decision del
+//planificador). Cada entrenador ejecutaba un ciclo, y al final del mismo
+//chequeaba si debia re-planificar.
+//El problema de este modelo es que debido a la secuencialidad del codigo,
+//cuando un entrenador llegaba al objetivo y debia hacer el CATCH,
+//no podria volver a re-planificar (que en ese caso siempre seria
+//mandar al proximo entrenador) hasta que se envie el mensaje al broker
+//y le devuelva la respuesta, etc.
+
+//Nosotros pensamos que el siguiente entrenador no deberia tener que esperar
+//a que el otro haga todas estas cosas para poder entrar en ejecucion,
+//por lo que buscamos una alternativa en la que ni bien llega a su
+//objetivo, mientras manda el catch el siguiente ya empieza a ejecutar.
+
+//Como dijimos antes, por la secuencialidad del codigo, la solucion
+//a la que llegamos es la de tener un hilo aparte que se encargue de planificar
+//sacandole esa responsabilidad al entrenador (esto ademas tiene sentido ya que
+//el entrenador no tiene porque saber como se planifica).
+//De todas formas decidimos mantener el mismo formato de ejecucion-chequeo planif.
+//por lo que estos dos hilos se ejecutaran en orden: entrenador-planificador
+//(lo cual logramos con dos semaforos). De esta manera, el entrenador puede
+//habilitar el semaforo del planificador una vez que llego al objetivo, antes de
+//mandar el catch, por lo que solucionariamos el problema que describimos
+//ya que el hilo este podra decidir quien planificar y no perdemos tiempo
+//innecesariamente.
+void ejecutar_hilo_planificador(){
+	while(!finalizo_team){
+		sem_wait(&(planificador->semaforo));
+
+		planificar();
+		//Aca tendria que habilitar el semaforo
+		//del entrenador, pero eso se hace dentro
+		//de planificar()
+	}
+}
+
+void habilitar_hilo_planificacion(){
+	sem_post(&(planificador->semaforo));
+}
 
 void ejecutar_hilo(t_entrenador* entrenador){
 	//El entrenador debe ejecutar constantemente
@@ -60,15 +90,22 @@ void ejecutar_hilo(t_entrenador* entrenador){
 	while(entrenador->estado != EXIT){
 		sem_wait(&(entrenador->semaforo));
 
-		ejecutar_entrenador(entrenador);
+		int termino_ejecucion = ejecutar_entrenador(entrenador);
 
-		planificar();
+		//Ahora tengo que habilitar el semaforo del
+		//planificador para que vea que hacer,
+		//pero solo lo voy a habilitar si sigo en EXEC,
+		//ya que si cambie de estado a BLOCKED_BY_CATCH
+		//asumo que ya mande este post
+		if(!termino_ejecucion){
+			habilitar_hilo_planificacion();
+		}
 	}
 }
 
 void planificar(){
 	//Para evitar problemas de sincronizacion agregamos un mutex
-	sem_wait(&planificador->semaforo);
+	pthread_mutex_lock(&(planificador->mutex_planificacion));
 	//Dependiendo del tipo de algoritmo el planificador funcionara
 	//de distintas maneras
 	switch(planificador->algoritmo_planificacion){
@@ -85,7 +122,7 @@ void planificar(){
 			planificar_sjf_cd();
 			break;
 	}
-	sem_post(&planificador->semaforo);
+	pthread_mutex_unlock(&(planificador->mutex_planificacion));
 }
 
 int entrenador_disponible(t_entrenador *entrenador)

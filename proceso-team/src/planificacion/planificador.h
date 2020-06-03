@@ -11,6 +11,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdint.h>
+#include<pthread.h>
 #include<commons/string.h>
 #include<commons/collections/queue.h>
 #include<semaphore.h>
@@ -35,6 +36,9 @@ typedef struct{
 	t_entrenador* entrenador_en_exec;
 
 	sem_t semaforo;
+	pthread_t hilo_planificacion;
+
+	pthread_mutex_t mutex_planificacion;
 }t_planificador;
 
 
