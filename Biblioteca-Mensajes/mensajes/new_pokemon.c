@@ -76,5 +76,6 @@ int new_pokemon_size(t_new_pokemon* new){
 }
 
 void new_pokemon_destroy(t_new_pokemon* new_pokemon){
+	pokemon_destroy(new_pokemon->pokemon);
 	free(new_pokemon);
 }

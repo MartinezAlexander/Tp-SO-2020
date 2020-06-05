@@ -96,6 +96,7 @@ char* localized_pokemon_to_string(t_localized_pokemon* localized_pokemon){
 }
 
 void localized_pokemon_destroy(t_localized_pokemon* localized_pokemon){
+	//TODO se libera la memoria del char* nombre ?
 	posiciones_destroy(localized_pokemon->posiciones);
 	free(localized_pokemon);
 }

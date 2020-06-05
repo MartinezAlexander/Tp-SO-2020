@@ -70,5 +70,6 @@ int appeared_pokemon_size(t_appeared_pokemon* appeared){
 }
 
 void appeared_pokemon_destroy(t_appeared_pokemon* appeared_pokemon){
+	pokemon_destroy(appeared_pokemon->pokemon);
 	free(appeared_pokemon);
 }

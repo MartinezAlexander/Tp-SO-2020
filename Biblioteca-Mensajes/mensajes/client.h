@@ -6,6 +6,7 @@
 #include<unistd.h>
 #include<sys/socket.h>
 #include<netdb.h>
+#include <string.h>
 
 /*
 crear_conexion crea un socket cliente a un servidor que se encuentra en

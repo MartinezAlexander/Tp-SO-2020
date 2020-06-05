@@ -152,6 +152,7 @@ int enviar_mensaje(t_mensaje* mensaje, int socket_cliente)
 	buffer->size = nuevo_tamanio;
 	buffer->stream = nuevo_stream;
 
+
 	t_paquete* paquete = empaquetar_buffer(buffer,mensaje->codigo);
 
 	int size_serializado;
@@ -234,6 +235,7 @@ int recibir_confirmacion_suscripcion(int socket){
 	return correcto;
 }
 
+/*
 t_mensaje* recibir_mensaje(int socket_cliente)
 {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
@@ -281,10 +283,8 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 
 
 	return mensaje;
-}
+}*/
 
-/*
- * version sin probar, controla errores en el socket que envia mensajes
 t_mensaje* recibir_mensaje(int socket_cliente)
 {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
@@ -337,7 +337,7 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 	}
 
 	return mensaje;
-}*/
+}
 
 char* id_to_string(int32_t id){
 	char* sin_id = "| No tiene id ";
@@ -487,6 +487,149 @@ int mensaje_size(t_mensaje* mensaje){
 		size = suscripcion_proceso_size((t_suscripcion*)mensaje->mensaje);
 			break;
 	}
-	size += sizeof(int32_t)*2;
+	size += sizeof(int32_t)*2 + sizeof(op_code);
 	return size;
+}
+
+int mensaje_size_contenido(t_mensaje* mensaje){
+	int size;
+	switch(mensaje->codigo){
+	case NEW_POKEMON:
+		size = new_pokemon_size((t_new_pokemon*)mensaje->mensaje);
+		break;
+	case GET_POKEMON:
+		size = get_pokemon_size((t_get_pokemon*)mensaje->mensaje);
+			break;
+	case CATCH_POKEMON:
+		size = catch_pokemon_size((t_catch_pokemon*)mensaje->mensaje);
+			break;
+	case CAUGHT_POKEMON:
+		size = caught_pokemon_size((t_caught_pokemon*)mensaje->mensaje);
+			break;
+	case APPEARED_POKEMON:
+		size = appeared_pokemon_size((t_appeared_pokemon*)mensaje->mensaje);
+			break;
+	case LOCALIZED_POKEMON:
+		size = localized_pokemon_size((t_localized_pokemon*)mensaje->mensaje);
+			break;
+	case SUSCRIPCION:
+		size = suscripcion_proceso_size((t_suscripcion*)mensaje->mensaje);
+			break;
+	}
+	return size;
+}
+
+void* mensaje_to_stream(t_mensaje* mensaje){
+	void* stream = malloc(mensaje_size(mensaje));
+
+	int offset = 0;
+
+	memcpy(stream + offset, &(mensaje->codigo), sizeof(op_code));
+	offset += sizeof(op_code);
+	memcpy(stream + offset, &(mensaje->id), sizeof(int32_t));
+	offset += sizeof(int32_t);
+	memcpy(stream + offset, &(mensaje->id_correlativo), sizeof(int32_t));
+	offset += sizeof(int32_t);
+
+	t_buffer* buffer;
+	switch(mensaje->codigo){
+	case NEW_POKEMON:
+		buffer = new_pokemon_to_buffer((t_new_pokemon*) mensaje->mensaje);
+		break;
+	case GET_POKEMON:
+		buffer = get_pokemon_to_buffer((t_get_pokemon*) mensaje->mensaje);
+		break;
+	case APPEARED_POKEMON:
+		buffer = appeared_pokemon_to_buffer((t_appeared_pokemon*) mensaje->mensaje);
+		break;
+	case LOCALIZED_POKEMON:
+		buffer = localized_pokemon_to_buffer((t_localized_pokemon*) mensaje->mensaje);
+		break;
+	case CATCH_POKEMON:
+		buffer = catch_pokemon_to_buffer((t_catch_pokemon*) mensaje->mensaje);
+		break;
+	case CAUGHT_POKEMON:
+		buffer = caught_pokemon_to_buffer((t_caught_pokemon*) mensaje->mensaje);
+		break;
+	case SUSCRIPCION:
+		buffer = suscripcion_proceso_to_buffer((t_suscripcion*) mensaje->mensaje);
+		break;
+	default:
+		break;
+	}
+
+	memcpy(stream + offset, buffer->stream, buffer->size);
+	offset += buffer->size;
+
+	free(buffer->stream);
+	free(buffer);
+	return stream;
+}
+
+t_mensaje* mensaje_from_stream(void* stream, int tamanio_stream){
+
+	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
+
+	t_buffer buffer;
+	buffer.size = tamanio_stream - sizeof(op_code) - sizeof(int32_t)*2;
+	buffer.stream = malloc( buffer.size );
+
+	memcpy(&(mensaje->codigo),stream,sizeof(op_code));
+	stream += sizeof(op_code);
+	memcpy(&(mensaje->id),stream,sizeof(int32_t));
+	stream += sizeof(int32_t);
+	memcpy(&(mensaje->id_correlativo),stream,sizeof(int32_t));
+	stream += sizeof(int32_t);
+	memcpy(buffer.stream, stream, buffer.size);
+	stream += buffer.size;
+
+	t_new_pokemon* new;
+	t_get_pokemon* get;
+	t_appeared_pokemon* appeared;
+	t_localized_pokemon* localized;
+	t_catch_pokemon* catch;
+	t_caught_pokemon* caught;
+	t_suscripcion* suscripcion;
+	switch(mensaje->codigo){
+	case NEW_POKEMON:
+		new = new_pokemon_from_buffer(&buffer);
+		mensaje->mensaje = (void*)new;
+		break;
+	case GET_POKEMON:
+		get = get_pokemon_from_buffer(&buffer);
+		mensaje->mensaje = (void*)get;
+		break;
+	case APPEARED_POKEMON:
+		appeared = appeared_pokemon_from_buffer(&buffer);
+		mensaje->mensaje = (void*)appeared;
+		break;
+	case LOCALIZED_POKEMON:
+		localized = localized_pokemon_from_buffer(&buffer);
+		mensaje->mensaje = (void*) localized;
+		break;
+	case CATCH_POKEMON:
+		catch = catch_pokemon_from_buffer(&buffer);
+		mensaje->mensaje = (void*) catch;
+		break;
+	case CAUGHT_POKEMON:
+		caught = caught_pokemon_from_buffer(&buffer);
+		mensaje->mensaje = (void*) caught;
+		break;
+	case SUSCRIPCION:
+		suscripcion = suscripcion_proceso_from_buffer(&buffer);
+		mensaje->mensaje = (void*) suscripcion;
+		break;
+	default:
+		break;
+	}
+
+	free(buffer.stream);
+
+	return mensaje;
+}
+
+op_code mensaje_stream_obtener_codigo(void* stream){
+	op_code codigo;
+	memcpy(&codigo, stream, sizeof(op_code));
+	return codigo;
 }

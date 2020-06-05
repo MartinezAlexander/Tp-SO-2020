@@ -58,5 +58,6 @@ int get_pokemon_size(t_get_pokemon* get){
 }
 
 void get_pokemon_destroy(t_get_pokemon* get_pokemon){
+	//TODO se libera la memoria del  nombre?
 	free(get_pokemon);
 }

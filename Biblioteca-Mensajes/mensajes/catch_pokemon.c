@@ -68,6 +68,7 @@ int catch_pokemon_size(t_catch_pokemon* pokemon){
 }
 
 void catch_pokemon_destroy(t_catch_pokemon* catch_pokemon){
+	pokemon_destroy(catch_pokemon->pokemon);
 	free(catch_pokemon);
 }
 

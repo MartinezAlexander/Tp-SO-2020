@@ -13,5 +13,6 @@ int pokemon_size(t_pokemon* pokemon){
 }
 
 void pokemon_destroy(t_pokemon* pokemon){
+	//TODO Se libera la memoria del char* especie?
 	free(pokemon);
 }
