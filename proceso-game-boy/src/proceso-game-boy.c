@@ -62,26 +62,10 @@ uint32_t atrapo_pokemon(char* confirmacion) {
 	return atrapado;
 }
 
-void desconectar_suscriptor(int socket, int32_t tiempo_desconexion) {
-	sleep(tiempo_desconexion);
-	pthread_mutex_lock(&mutex);
-	hay_tiempo = 0;
-	pthread_mutex_unlock(&mutex);
-	liberar_conexion(socket);
-}
-
-void recepcion_mensajes(int socket) {
-	pthread_mutex_lock(&mutex);
-	int32_t t = hay_tiempo;
-	pthread_mutex_unlock(&mutex);
-	while (t) {
-		t_mensaje* mensaje = recibir_mensaje(socket);
-		enviar_ACK(socket);
-		mensaje_mostrar(mensaje);
-		pthread_mutex_lock(&mutex);
-		t = hay_tiempo;
-		pthread_mutex_unlock(&mutex);
-	}
+void desconectar_suscriptor() {
+	sleep(tiempo_conexion);
+	printf("terminaron los %d segundos deberia finalizar el programa\n",tiempo_conexion);
+	exit(0);
 }
 
 t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
@@ -101,7 +85,8 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
 		int32_t id_c = atoi(mensaje[6]);
 		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
-		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado, codigo, id_c);
+		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
+				codigo, id_c);
 	}
 
 	if (id == BROKER && codigo == CATCH_POKEMON) {
@@ -115,7 +100,8 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		int32_t id_c = atoi(mensaje[3]);
 		uint32_t situacion = atrapo_pokemon(mensaje[4]);
 		mensaje_creado = (void*) caught_pokemon_create(situacion);
-		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado, codigo, id_c);
+		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
+				codigo, id_c);
 	}
 
 	if (id == BROKER && codigo == GET_POKEMON) {
@@ -212,23 +198,29 @@ int main(int arg, char** args) {
 			id_proceso);
 
 	if (id_proceso == SUSCRIPTOR) {
-		pthread_mutex_init(&mutex,NULL);
+
 		tiempo_conexion = atoi(args[3]);
+		printf("el tiempo es %d \n",tiempo_conexion);
 		int socket = crear_conexion(ip_broker, puerto_broker);
 		enviar_mensaje(mensaje_procesado, socket);
 		int estoy_suscripto = recibir_confirmacion_suscripcion(socket);
+
 		if (estoy_suscripto) {
+
 			printf("Estoy suscripto\n");
-			pthread_t receptor_mensajes;
+
 			pthread_t suscriptor_desconexion;
 
-			pthread_create(&receptor_mensajes, NULL, (void*) recepcion_mensajes,&socket);
-			pthread_create(&suscriptor_desconexion, NULL,(void*) desconectar_suscriptor, &socket);
+			pthread_create(&suscriptor_desconexion, NULL,(void*) desconectar_suscriptor, NULL);
 
-			pthread_join(receptor_mensajes,NULL);
-			pthread_join(suscriptor_desconexion,NULL);
-		}
-		else{
+			while (1) {
+				t_mensaje* mensaje = recibir_mensaje(socket);
+				enviar_ACK(socket);
+				mensaje_mostrar(mensaje);
+				printf("Imprimo esto por %d segundos\n",tiempo_conexion);
+			}
+
+		} else {
 			printf("No pude suscribirme\n");
 		}
 
@@ -255,7 +247,7 @@ t_config* leer_config(void) {
 
 	t_config* config =
 			config_create(
-					"/home/utnso/workspace/tp-2020-1c-Grupo-7-SO/proceso-game-boy/gameboy.config");
+					"/home/utnso/workspace/tp-2020-1c-Grupo-7-SO/proceso-game-boy/src/gameboy.config");
 
 	if (config == NULL) {
 		printf("No puede leer la config\n");

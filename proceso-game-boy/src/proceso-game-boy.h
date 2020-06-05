@@ -47,7 +47,7 @@ t_log* iniciar_logger(char* path);
 t_config* leer_config(void);
 void enviar_a(t_proceso id, t_mensaje* mensaje);
 void inicializar_variables();
-void desconectar_suscriptor(int socket,int32_t tiempo_desconexion);
+void desconectar_suscriptor();
 void recepcion_mensajes(int socket);
 void terminar_programa(t_log* logger, t_config* config);
 
