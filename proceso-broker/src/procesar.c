@@ -1,7 +1,7 @@
 #include "procesar.h"
 #include <unistd.h>
 
-void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memoria){
+void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
 	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
 
@@ -9,7 +9,7 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memor
 
 	confirmar_suscripcion(*socket);
 
-	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria);
+	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria_cache);
 	pthread_t envio_mensajes_cacheados;
 	pthread_create(&envio_mensajes_cacheados,NULL,(void*)memoria_cache_enviar_mensajes_cacheados,parametros);
 	t_cola_mensajeria* cola = cola_mensajeria_obtener(suscripcion->cola_suscripcion);
@@ -31,6 +31,8 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memor
 	if (list_size(cola->suscriptores) == 1) {
 		sem_post(&cola->semaforoSuscriptores);
 	}
+
+	mensaje_destroy(mensaje);
 }
 
 void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
@@ -60,7 +62,8 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 
 		envio_a_suscriptores(cola->suscriptores, mensaje);
 
-		memoria_cache_agregar_mensaje(memoria_cache,mensaje);
+		//memoria_cache_agregar_mensaje(memoria_cache,mensaje);
+		administrador_cachear_mensaje(mensaje);
 
 		sem_post(&cola->semaforoSuscriptores);
 	}

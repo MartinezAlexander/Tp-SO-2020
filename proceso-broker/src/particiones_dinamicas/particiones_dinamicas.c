@@ -9,6 +9,10 @@ t_particion* particion_create(int base, int limite, int libre){
 	return nueva_particion;
 }
 
+int particion_tamanio(t_particion* particion){
+	return particion->limite - particion->base;
+}
+
 int particion_esta_libre(t_particion* particion){
 	return particion->libre;
 }
@@ -29,11 +33,11 @@ t_particion* particion_combinar(t_particion* particion1, t_particion* particion2
 }
 
 int particion_puede_guardarlo(t_particion* particion, int tamanio_a_guardar){
-	return tamanio_a_guardar <= particion->limite;
+	return tamanio_a_guardar <= particion_tamanio(particion);
 }
 
 int particion_justa(t_particion* particion, int tamanio_a_guardar){
-	return particion->limite == tamanio_a_guardar;
+	return particion_tamanio(particion) == tamanio_a_guardar;
 }
 
 t_particion* particion_ocuparla(t_particion* particion_libre, int tamanio_a_ocupar){
@@ -45,10 +49,9 @@ t_particion* particion_ocuparla(t_particion* particion_libre, int tamanio_a_ocup
 		//TODO Guardar en cache
 	}else{
 		particion_libre->libre = 0;
-		int nuevo_limite_libre = particion_libre->limite - tamanio_a_ocupar;
-		particion_libre->limite = tamanio_a_ocupar;
 		particion_libre->lru = time(NULL);
-		nueva_particion_libre = particion_create(particion_libre->limite+1,nuevo_limite_libre,1);
+		nueva_particion_libre = particion_create(particion_libre->base + tamanio_a_ocupar,particion_libre->limite,1);
+		particion_libre->limite = particion_libre->base + tamanio_a_ocupar;
 		//TODO Guardar en cache
 	}
 

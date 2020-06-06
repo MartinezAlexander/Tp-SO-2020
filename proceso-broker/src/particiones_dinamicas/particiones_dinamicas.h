@@ -19,6 +19,8 @@ guardando la hora en la que se creo dicha particion
 */
 t_particion* particion_create(int base, int limite, int libre);
 
+int particion_tamanio(t_particion* particion);
+
 /*
 particion_esta_libre devuelve verdadero si la particion puede guardar bytes y
 falso si ya esta ocupada

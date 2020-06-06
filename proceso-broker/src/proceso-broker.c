@@ -23,6 +23,8 @@ int main(void){
 
 	memoria_cache_create();
 
+	iniciar_administrador();
+
 	inicializar_colas_mensajeria(procesar_pokemon);
 
 	iniciar_servidor(ip_broker,puerto_broker,administrar_mensajes);

@@ -55,7 +55,7 @@ void administrar_mensajes(int* socket){
 	t_mensaje* mensaje = recibir_mensaje(*socket);
 	switch(mensaje->codigo){
 		case SUSCRIPCION:
-			procesar_suscripcion(mensaje, socket, memoria_cache);
+			procesar_suscripcion(mensaje, socket);
 			break;
 		case NEW_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_new,mensaje,&ultimo_id);
@@ -84,5 +84,4 @@ void administrar_mensajes(int* socket){
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
 	}
-	//TODO liberar memoria de suscripcion
 }
