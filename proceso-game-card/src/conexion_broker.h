@@ -20,6 +20,7 @@
 #include <mensajes/get_pokemon.h>
 
 #include "variables_globales.h"
+#include "procesamiento_mensajes.h"
 
 sem_t semaforo_procesamiento_catch;
 sem_t semaforo_procesamiento_get;

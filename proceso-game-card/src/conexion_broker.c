@@ -92,7 +92,7 @@ void procesar_catch(){
 		}else{
 			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_catch);
-			//TODO procesar catch
+			ejecutar_catch(mensaje);
 		}
 	}
 	liberar_conexion(socket_catch);
@@ -107,7 +107,7 @@ void procesar_get(){
 		}else{
 			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_get);
-			//TODO procesar get
+			ejecutar_get(mensaje);
 		}
 	}
 	liberar_conexion(socket_get);
@@ -122,7 +122,7 @@ void procesar_new(){
 		}else{
 			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_new);
-			//TODO procesar new
+			ejecutar_new(mensaje);
 		}
 	}
 	liberar_conexion(socket_new);
