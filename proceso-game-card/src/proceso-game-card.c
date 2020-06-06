@@ -14,7 +14,7 @@
 int main(void) {
 	inicializar_variables_globales();
 	inicializar_filesystem();
-	//iniciar_conexion_broker();
+	iniciar_conexion_broker();
 	//iniciar_puerto_escucha();
 
 	terminar_programa();
@@ -30,6 +30,8 @@ void inicializar_variables_globales(){
 	ip_broker = config_get_string_value(config, "IP_BROKER");
 	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
 	iniciar_logger(config_get_string_value(config, "LOG_FILE"));
+	//TODO inicializar correctamente (es el sustituto del process id, como haciamos en team)
+	card_id = 1;
 }
 
 void inicializar_filesystem(){
