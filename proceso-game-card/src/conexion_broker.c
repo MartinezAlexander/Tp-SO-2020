@@ -92,7 +92,7 @@ void procesar_catch(){
 		}else{
 			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_catch);
-			ejecutar_catch(mensaje);
+			ejecutar_catch((t_catch_pokemon*)mensaje->mensaje, mensaje->id);
 		}
 	}
 	liberar_conexion(socket_catch);
@@ -107,7 +107,7 @@ void procesar_get(){
 		}else{
 			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_get);
-			ejecutar_get(mensaje);
+			ejecutar_get((t_get_pokemon*)mensaje->mensaje, mensaje->id);
 		}
 	}
 	liberar_conexion(socket_get);
@@ -122,7 +122,7 @@ void procesar_new(){
 		}else{
 			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_new);
-			ejecutar_new(mensaje);
+			ejecutar_new((t_new_pokemon*)mensaje->mensaje, mensaje->id);
 		}
 	}
 	liberar_conexion(socket_new);

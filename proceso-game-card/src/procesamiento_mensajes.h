@@ -12,8 +12,8 @@
 #include <stdlib.h>
 #include <mensajes/mensajes.h>
 
-void ejecutar_new(t_mensaje* mensaje);
-void ejecutar_catch(t_mensaje* mensaje);
-void ejecutar_get(t_mensaje* mensaje);
+void ejecutar_new(t_new_pokemon* pokemon, int id);
+void ejecutar_catch(t_catch_pokemon* pokemon, int id);
+void ejecutar_get(t_get_pokemon* pokemon, int id);
 
 #endif /* PROCESAMIENTO_MENSAJES_H_ */

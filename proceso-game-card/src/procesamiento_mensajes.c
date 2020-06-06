@@ -1,18 +1,21 @@
 #include "procesamiento_mensajes.h"
 
 //TODO Todas las ejecuciones
-void ejecutar_new(t_mensaje* mensaje){
+void ejecutar_new(t_new_pokemon* new_pokemon, int id){
 	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem (Si no existe->Se crea)
+	FILE* archivo_pokemon = buscar_pokemon(new_pokemon->pokemon->especie);
 	//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
+	abrir_archivo(archivo_pokemon);
 	//3. Verificar si las posiciones ya existen dentro del archivo (Si existen se suma la
 	//cantidad pasada, si no, se agrega una linea
+	nuevo_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
 	//4. Esperar la cantidad de segundos definidos por archivo de configuracion
 	//5. Cerrar el archivo
 	//6. Conectarse y enviar al broker APPEARED_POKEMON (ID recibido, poke, posicion)
 	// Si no se puede conectar, se loggea y continua la ejecucion
 }
 
-void ejecutar_catch(t_mensaje* mensaje){
+void ejecutar_catch(t_catch_pokemon* pokemon, int id){
 	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem (Si no existe->se
 	//informa el error
 	//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
@@ -24,7 +27,7 @@ void ejecutar_catch(t_mensaje* mensaje){
 	// Si no se puede conectar, se loggea y continua la ejecucion
 }
 
-void ejecutar_get(t_mensaje* mensaje){
+void ejecutar_get(t_get_pokemon* pokemon, int id){
 	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem (Si no existe->se
 	//informa el mensaje sin posiciones ni cantidades (???)
 	//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)

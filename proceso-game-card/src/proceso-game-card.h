@@ -13,6 +13,9 @@
 #include <commons/log.h>
 #include <commons/string.h>
 #include <commons/config.h>
+#include <mensajes/catch_pokemon.h>
+#include <mensajes/new_pokemon.h>
+#include <mensajes/get_pokemon.h>
 
 #include "variables_globales.h"
 #include "conexion_broker.h"
