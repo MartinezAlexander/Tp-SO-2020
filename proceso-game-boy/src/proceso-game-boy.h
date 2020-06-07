@@ -21,11 +21,9 @@
 #include <mensajes/localized_pokemon.h>
 #include <mensajes/suscripcion.h>
 #include <commons/string.h>
-#include <commons/config.h>
 #include <commons/log.h>
-
-t_config* config;
-t_log* logger;
+#include <commons/config.h>
+#include "logger.h"
 
 char* ip_broker;
 char* ip_team;
@@ -33,20 +31,20 @@ char* ip_gamecard;
 char* puerto_broker;
 char* puerto_team;
 char* puerto_gamecard;
+char* path_logger;
 
 int32_t tiempo_conexion;
 int32_t hay_tiempo = 1;
 
-pthread_mutex_t mutex;
-
+t_config* config;
 t_proceso obtener_id_proceso(char* id);
+t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id);
+t_config* leer_config(void);
 op_code obtener_tipo_mensaje(char* tipo);
 uint32_t atrapo_pokemon(char* confirmacion);
-t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id);
-t_log* iniciar_logger(char* path);
-t_config* leer_config(void);
-void enviar_a(t_proceso id, t_mensaje* mensaje);
+
 void inicializar_variables();
+void enviar_a(t_proceso id, t_mensaje* mensaje);
 void desconectar_suscriptor();
 void recepcion_mensajes(int socket);
 void terminar_programa(t_log* logger, t_config* config);
