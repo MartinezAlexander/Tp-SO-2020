@@ -14,7 +14,7 @@
 int main(void) {
 	inicializar_variables_globales();
 	inicializar_filesystem();
-	iniciar_conexion_broker();
+	//iniciar_conexion_broker();
 	//iniciar_puerto_escucha();
 
 	terminar_programa();
