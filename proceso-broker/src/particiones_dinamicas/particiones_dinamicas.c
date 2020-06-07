@@ -17,19 +17,8 @@ int particion_esta_libre(t_particion* particion){
 	return particion->libre;
 }
 
-t_particion* particion_combinar(t_particion* particion1, t_particion* particion2){
-	int nuevo_limite = particion1->limite + particion2->limite;
-	int nueva_base;
-
-	if(particion1->base <= particion2->base){
-		nueva_base = particion1->base;
-	}else{
-		nueva_base = particion2->base;
-	}
-
-	return particion_create(nueva_base,nuevo_limite,1);
-
-	//TODO liberar memoria de las dos particiones que llegan por parametro
+void particion_combinar(t_particion* particionIzq, t_particion* particionDer){
+	particionIzq->limite = particionDer->limite;
 }
 
 int particion_puede_guardarlo(t_particion* particion, int tamanio_a_guardar){
@@ -56,6 +45,14 @@ t_particion* particion_ocuparla(t_particion* particion_libre, int tamanio_a_ocup
 	}
 
 	return nueva_particion_libre;
+}
+
+void particion_liberar(t_particion* particion){
+	particion->libre = 1;
+}
+
+int particion_son_iguales(t_particion* particion1, t_particion* particion2){
+	return particion1->base == particion2->base && particion1->libre == particion2->libre && particion1->limite == particion2->limite && particion1->lru == particion2->lru;
 }
 
 void particion_destroy(t_particion* particion){

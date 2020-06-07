@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <commons/collections/list.h>
+#include <commons/collections/queue.h>
 #include <commons/string.h>
 #include <mensajes/mensajes.h>
 #include "particiones_dinamicas.h"
@@ -18,23 +19,29 @@ typedef struct{
 
 t_list* particiones;
 
+t_queue* particiones_victimas;
+
 int busquedas_fallidas;
 
 void iniciar_administrador();
 
 int first_fit(t_mensaje* mensaje);
 
-void best_fit();
+int best_fit(t_mensaje* mensaje);
 
 int es_hora_de_compactar();
 
-void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algorimo)(t_mensaje* mensaje));
+void fifo_eliminar();
+
+void lru_eliminar();
+
+void compactar_particiones();
+
+void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algorimo)(t_mensaje* mensaje), void(*eliminar)(void));
 
 void administrador_cachear_mensaje(t_mensaje* mensaje);
 
 t_list* obtener_mensajes_cacheados_por_cola(op_code cola);
-
-void compactar_particiones();
 
 void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros);
 

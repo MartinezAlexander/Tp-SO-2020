@@ -28,9 +28,10 @@ falso si ya esta ocupada
 int particion_esta_libre(t_particion* particion);
 
 /*
-particion_combinar crea una unica particion a partir de dos particiones
+particion_combinar agranda la particion izquierda combinandola con la particion
+derecha
 */
-t_particion* particion_combinar(t_particion* particion1, t_particion* particion2);
+void particion_combinar(t_particion* particionIzq, t_particion* particionDer);
 
 /*
 particion_puede_guardarlo devuelve verdadero si la cantidad de bytes que se desean
@@ -52,6 +53,16 @@ En caso de que el tamanio a ocupar se menor que el libre retorna una nueva parti
 libre y modifica la que pasa por parametro dejandola ocupada
 */
 t_particion* particion_ocuparla(t_particion* particion_libre, int tamanio_a_ocupar);
+
+/*
+particion_liberar hace que una particion se libere
+*/
+void particion_liberar(t_particion* particion);
+
+/*
+particion_son_iguales indica si dos particiones tiene los mismos atributos
+*/
+int particion_son_iguales(t_particion* particion1, t_particion* particion2);
 
 /*
 particion_destroy liberar la memoria usada al crear la particion

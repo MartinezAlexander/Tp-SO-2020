@@ -1,10 +1,18 @@
 #include "administrador_particiones.h"
 
+int es_fifo;
+
 void iniciar_administrador(){
 	particiones = list_create();
 	t_particion* primer_particion = particion_create(0,tamano_memoria,1);
 	list_add(particiones,primer_particion);
 	busquedas_fallidas = 0;
+	if (string_equals_ignore_case(algoritmo_reemplazo, "FIFO")) {
+		particiones_victimas = queue_create();
+		es_fifo = 1;
+	} else {
+		es_fifo = 0;
+	}
 }
 
 int first_fit(t_mensaje* mensaje){
@@ -25,6 +33,11 @@ int first_fit(t_mensaje* mensaje){
 			}
 
 			memoria_cache_agregar_mensaje(mensaje,particion->base);
+
+			if(es_fifo){
+				queue_push(particiones_victimas,particion);
+			}
+
 			i = list_size(particiones);
 			pude_cachear = 1;
 		}
@@ -32,62 +45,47 @@ int first_fit(t_mensaje* mensaje){
 	return pude_cachear;
 }
 
-void best_fit(){
-
+int best_fit(t_mensaje* mensaje){
+	//TODO falta best_fit
+	return 0;
 }
 
 int es_hora_de_compactar(){
 	return busquedas_fallidas == frecuencia_compactacion;
 }
 
-void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algoritmo)(t_mensaje* mensaje) ){
-	int pudo_cachear = algoritmo(mensaje);
-	while (!pudo_cachear) {
-		busquedas_fallidas++;
-		if (es_hora_de_compactar()) {
-			compactar_particiones();
-			//TODO reintentar pudo_cachear = algoritmo(mensaje);
-			//TODO busquedas_fallidas = 0;
+void fifo_eliminar(){
+	t_particion* particion_victima = queue_pop(particiones_victimas);
+	particion_liberar(particion_victima);
+
+	int indice;
+	for(int i = 0; i < list_size(particiones); i++){
+		t_particion* particion = list_get(particiones,i);
+		if(particion_victima == particion){
+			indice = i;
+			i = list_size(particiones);
 		}
-		if (!pudo_cachear) {
-			//TODO eliminar un particion
-			//TODO reintentar pudo_cachear = algoritmo(mensaje);
+	}
+
+	if((indice + 1) < list_size(particiones)){
+		t_particion* particion_derecha = list_get(particiones,indice + 1);
+		if(particion_esta_libre(particion_derecha)){
+			particion_combinar(particion_victima,particion_derecha);
+			list_remove_and_destroy_element(particiones,indice + 1, (void*)particion_destroy);
+		}
+	}
+
+	if ((indice - 1) >= 0) {
+		t_particion* particion_izquierda = list_get(particiones,indice - 1);
+		if (particion_esta_libre(particion_izquierda)) {
+			particion_combinar(particion_izquierda, particion_victima);
+			list_remove_and_destroy_element(particiones,indice, (void*)particion_destroy);
 		}
 	}
 }
 
-void administrador_cachear_mensaje(t_mensaje* mensaje){
-
-	//primer ajuste
-	if(string_equals_ignore_case(algoritmo_particion_libre,"FF")){
-		procedimiento_para_almacenamiento_de_datos(mensaje,first_fit);
-	}else{
-		//TODO procedimiento_para_almacenamiento_de_datos(mensaje,best_fit);
-	}
-}
-
-t_list* obtener_mensajes_cacheados_por_cola(op_code cola){
-	t_list* mensajes = list_create();
-	int hay_mensajes_de_esa_cola = 0;
-
-	for (int i = 0; i < list_size(particiones); i++) {
-		t_particion* particion = list_get(particiones, i);
-		if (!particion_esta_libre(particion)) {
-			if (memoria_cache_es_un_mensaje_tipo(particion->base,particion_tamanio(particion), cola)) {
-				// TODO actualizar LRU ?
-				t_mensaje* mensaje_c = memoria_cache_leer_mensaje(particion->base, particion_tamanio(particion));
-				list_add(mensajes,mensaje_c);
-				hay_mensajes_de_esa_cola = 1;
-			}
-		}
-	}
-
-	if(!hay_mensajes_de_esa_cola){
-		list_destroy(mensajes);
-		mensajes = NULL;
-	}
-
-	return mensajes;
+void lru_eliminar(){
+	// TODO falta eliminar particiones por lru
 }
 
 void compactar_particiones(){
@@ -98,6 +96,7 @@ void compactar_particiones(){
 		t_particion* particion = list_get(particiones,i);
 		if(particion_esta_libre(particion)){
 			list_remove_and_destroy_element(particiones,i,(void*)particion_destroy);
+			i--;
 		}
 	}
 
@@ -112,9 +111,65 @@ void compactar_particiones(){
 
 	}
 
-	t_particion* particion_compactada = particion_create(base,memoria_cache_tamanio(),1);
+	t_particion* particion_compactada = particion_create(base,tamano_memoria,1);
 	list_add(particiones,particion_compactada);
 
+}
+
+void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algoritmo)(t_mensaje* mensaje), void(*eliminar)(void)){
+	int pudo_cachear = algoritmo(mensaje);
+	while (!pudo_cachear) {
+		busquedas_fallidas++;
+		if (es_hora_de_compactar()) {
+			compactar_particiones();
+			pudo_cachear = algoritmo(mensaje);
+			busquedas_fallidas = 0;
+		}
+		if (!pudo_cachear) {
+			eliminar();
+			pudo_cachear = algoritmo(mensaje);
+		}
+	}
+}
+
+void administrador_cachear_mensaje(t_mensaje* mensaje){
+
+	//primer ajuste
+	if(string_equals_ignore_case(algoritmo_particion_libre,"FF") &&  string_equals_ignore_case(algoritmo_reemplazo,"FIFO") ){
+		procedimiento_para_almacenamiento_de_datos(mensaje,first_fit, fifo_eliminar);
+	}
+	if (string_equals_ignore_case(algoritmo_particion_libre, "FF") &&  string_equals_ignore_case(algoritmo_reemplazo,"LRU")) {
+		procedimiento_para_almacenamiento_de_datos(mensaje, first_fit, lru_eliminar);
+	}
+	if (string_equals_ignore_case(algoritmo_particion_libre, "BF") && string_equals_ignore_case(algoritmo_reemplazo, "FIFO")) {
+		procedimiento_para_almacenamiento_de_datos(mensaje, best_fit, fifo_eliminar);
+	}
+	if (string_equals_ignore_case(algoritmo_particion_libre, "BF") && string_equals_ignore_case(algoritmo_reemplazo, "LRU")) {
+		procedimiento_para_almacenamiento_de_datos(mensaje, best_fit, lru_eliminar);
+	}
+}
+t_list* obtener_mensajes_cacheados_por_cola(op_code cola){
+	t_list* mensajes = list_create();
+	int hay_mensajes_de_esa_cola = 0;
+
+	for (int i = 0; i < list_size(particiones); i++) {
+		t_particion* particion = list_get(particiones, i);
+		if (!particion_esta_libre(particion)) {
+			if (memoria_cache_es_un_mensaje_tipo(particion->base,particion_tamanio(particion), cola)) {
+				particion->lru = time(NULL);
+				t_mensaje* mensaje_c = memoria_cache_leer_mensaje(particion->base, particion_tamanio(particion));
+				list_add(mensajes,mensaje_c);
+				hay_mensajes_de_esa_cola = 1;
+			}
+		}
+	}
+
+	if(!hay_mensajes_de_esa_cola){
+		list_destroy(mensajes);
+		mensajes = NULL;
+	}
+
+	return mensajes;
 }
 
 void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros){
