@@ -45,7 +45,7 @@ void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algorit
 	while (!pudo_cachear) {
 		busquedas_fallidas++;
 		if (es_hora_de_compactar()) {
-			//TODO compactar
+			compactar_particiones();
 			//TODO reintentar pudo_cachear = algoritmo(mensaje);
 			//TODO busquedas_fallidas = 0;
 		}
@@ -90,6 +90,32 @@ t_list* obtener_mensajes_cacheados_por_cola(op_code cola){
 	return mensajes;
 }
 
+void compactar_particiones(){
+	int base = 0;
+	int i;
+
+	for(i = 0; i < list_size(particiones); i++){
+		t_particion* particion = list_get(particiones,i);
+		if(particion_esta_libre(particion)){
+			list_remove_and_destroy_element(particiones,i,(void*)particion_destroy);
+		}
+	}
+
+	for(i = 0; i < list_size(particiones); i++){
+		t_particion* particion = list_get(particiones,i);
+		int tamanio = particion_tamanio(particion);
+		void* mensaje = memoria_cache_leer_stream(particion->base,tamanio);
+		particion->base = base;
+		particion->limite = base + tamanio;
+		base = particion->limite;
+		memoria_cache_agregar_stream(mensaje, particion->base,tamanio);
+
+	}
+
+	t_particion* particion_compactada = particion_create(base,memoria_cache_tamanio(),1);
+	list_add(particiones,particion_compactada);
+
+}
 
 void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros){
 	t_list* mensajes = obtener_mensajes_cacheados_por_cola(parametros->cola);

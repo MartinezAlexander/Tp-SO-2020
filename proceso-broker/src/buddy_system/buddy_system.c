@@ -1,5 +1,5 @@
 #include "buddy_system.h"
-
+/*
 t_buddy* buddy_create(int tamanio, int base){
 	t_buddy* buddy = malloc(sizeof(t_buddy));
 	buddy->tamanio = tamanio;
@@ -55,4 +55,4 @@ void buddy_destroy(t_buddy* buddy){
 		puts("Liberar hijos antes de liberar al buddy");
 	}
 }
-
+*/

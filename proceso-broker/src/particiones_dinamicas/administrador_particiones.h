@@ -34,6 +34,8 @@ void administrador_cachear_mensaje(t_mensaje* mensaje);
 
 t_list* obtener_mensajes_cacheados_por_cola(op_code cola);
 
+void compactar_particiones();
+
 void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros);
 
 para_envio_mensaje_cacheados* parametros_create(t_suscriptor* suscriptor, op_code cola, t_memoria_cache* memoria);

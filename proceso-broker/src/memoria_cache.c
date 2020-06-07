@@ -27,6 +27,21 @@ int memoria_cache_es_un_mensaje_tipo(int desde_donde, int cuanto_leer, op_code c
 	return es_del_tipo;
 }
 
+void* memoria_cache_leer_stream(int desde_donde, int cuanto_leer){
+	void* stream = malloc(cuanto_leer);
+	memcpy(stream, memoria_cache->cache + desde_donde, cuanto_leer);
+	return stream;
+}
+
+void memoria_cache_agregar_stream(void* stream, int donde_agregar, int cuanto_agregar){
+	memcpy(memoria_cache->cache + donde_agregar, stream, cuanto_agregar);
+	free(stream);
+}
+
+int memoria_cache_tamanio(){
+	return tamano_memoria;
+}
+
 void memoria_cache_destroy(){
 	free(memoria_cache->cache);
 	free(memoria_cache);
