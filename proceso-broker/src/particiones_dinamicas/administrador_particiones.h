@@ -21,6 +21,8 @@ t_list* particiones;
 
 t_queue* particiones_victimas;
 
+t_list* particiones_victimas_lru;
+
 int busquedas_fallidas;
 
 void iniciar_administrador();
@@ -33,7 +35,11 @@ int es_hora_de_compactar();
 
 void fifo_eliminar();
 
+void actualizar_lru(t_particion* particion);
+
 void lru_eliminar();
+
+void combinar_particiones_contiguas_a(t_particion* particion_victima);
 
 void compactar_particiones();
 

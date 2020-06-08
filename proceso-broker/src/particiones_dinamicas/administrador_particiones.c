@@ -12,6 +12,7 @@ void iniciar_administrador(){
 		es_fifo = 1;
 	} else {
 		es_fifo = 0;
+		particiones_victimas_lru = list_create();
 	}
 }
 
@@ -36,6 +37,8 @@ int first_fit(t_mensaje* mensaje){
 
 			if(es_fifo){
 				queue_push(particiones_victimas,particion);
+			}else{
+				list_add(particiones_victimas_lru,particion);
 			}
 
 			i = list_size(particiones);
@@ -57,35 +60,55 @@ int es_hora_de_compactar(){
 void fifo_eliminar(){
 	t_particion* particion_victima = queue_pop(particiones_victimas);
 	particion_liberar(particion_victima);
+	combinar_particiones_contiguas_a(particion_victima);
+}
 
-	int indice;
-	for(int i = 0; i < list_size(particiones); i++){
-		t_particion* particion = list_get(particiones,i);
-		if(particion_victima == particion){
-			indice = i;
-			i = list_size(particiones);
-		}
-	}
-
-	if((indice + 1) < list_size(particiones)){
-		t_particion* particion_derecha = list_get(particiones,indice + 1);
-		if(particion_esta_libre(particion_derecha)){
-			particion_combinar(particion_victima,particion_derecha);
-			list_remove_and_destroy_element(particiones,indice + 1, (void*)particion_destroy);
-		}
-	}
-
-	if ((indice - 1) >= 0) {
-		t_particion* particion_izquierda = list_get(particiones,indice - 1);
-		if (particion_esta_libre(particion_izquierda)) {
-			particion_combinar(particion_izquierda, particion_victima);
-			list_remove_and_destroy_element(particiones,indice, (void*)particion_destroy);
+void actualizar_lru(t_particion* particion){
+	int i;
+	for(i = 0; i < list_size(particiones_victimas_lru); i++ ){
+		t_particion* particion_aux = list_get(particiones_victimas_lru,i);
+		if(particion == particion_aux){
+			list_remove(particiones_victimas_lru,i);
+			list_add(particiones_victimas_lru,particion);
+			i = list_size(particiones_victimas_lru);
 		}
 	}
 }
 
 void lru_eliminar(){
-	// TODO falta eliminar particiones por lru
+	t_particion* particion_victima = list_get(particiones_victimas_lru,0);
+	list_remove(particiones_victimas_lru,0);
+	particion_liberar(particion_victima);
+	combinar_particiones_contiguas_a(particion_victima);
+}
+
+void combinar_particiones_contiguas_a(t_particion* particion_victima){
+	int indice;
+	for (int i = 0; i < list_size(particiones); i++) {
+		t_particion* particion = list_get(particiones, i);
+		if (particion_victima == particion) {
+			indice = i;
+			i = list_size(particiones);
+		}
+	}
+
+	if ((indice + 1) < list_size(particiones)) {
+		t_particion* particion_derecha = list_get(particiones, indice + 1);
+		if (particion_esta_libre(particion_derecha)) {
+			particion_combinar(particion_victima, particion_derecha);
+			list_remove_and_destroy_element(particiones, indice + 1,
+					(void*) particion_destroy);
+		}
+	}
+
+	if ((indice - 1) >= 0) {
+		t_particion* particion_izquierda = list_get(particiones, indice - 1);
+		if (particion_esta_libre(particion_izquierda)) {
+			particion_combinar(particion_izquierda, particion_victima);
+			list_remove_and_destroy_element(particiones, indice,
+					(void*) particion_destroy);
+		}
+	}
 }
 
 void compactar_particiones(){
@@ -156,9 +179,11 @@ t_list* obtener_mensajes_cacheados_por_cola(op_code cola){
 		t_particion* particion = list_get(particiones, i);
 		if (!particion_esta_libre(particion)) {
 			if (memoria_cache_es_un_mensaje_tipo(particion->base,particion_tamanio(particion), cola)) {
-				particion->lru = time(NULL);
+				time_t tiempo = time(NULL);
+				particion->lru = localtime(&tiempo);
 				t_mensaje* mensaje_c = memoria_cache_leer_mensaje(particion->base, particion_tamanio(particion));
 				list_add(mensajes,mensaje_c);
+				actualizar_lru(particion);
 				hay_mensajes_de_esa_cola = 1;
 			}
 		}
