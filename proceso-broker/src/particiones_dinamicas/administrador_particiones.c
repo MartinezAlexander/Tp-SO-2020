@@ -30,6 +30,7 @@ int first_fit(t_mensaje* mensaje){
 			t_particion* particion_libre = particion_ocuparla(particion,tamanio_mensaje);
 
 			if(particion_libre != NULL){
+				//TODO Chequear si ubicacion_mejor_particion + 1 supera el list_size
 				list_add_in_index(particiones,i+1,particion_libre);
 			}
 
@@ -49,8 +50,48 @@ int first_fit(t_mensaje* mensaje){
 }
 
 int best_fit(t_mensaje* mensaje){
-	//TODO falta best_fit
-	return 0;
+	int pude_cachear = 0;
+	int tamanio_mensaje = mensaje_size(mensaje);
+
+	t_particion* mejor_particion = NULL;
+	int mejor_tamanio = tamano_memoria;
+	int ubicacion_mejor_particion;
+
+	int i;
+	for(i = 0; i < list_size(particiones);i++){
+
+		t_particion* particion = list_get(particiones,i);
+
+		if(particion_esta_libre(particion) && particion_puede_guardarlo(particion,tamanio_mensaje)){
+
+			if(particion_tamanio(particion) <= mejor_tamanio){
+				mejor_particion = particion;
+				mejor_tamanio = particion_tamanio(particion);
+				ubicacion_mejor_particion = i;
+			}
+		}
+	}
+
+	if(mejor_particion != NULL){
+		t_particion* particion_libre = particion_ocuparla(mejor_particion,tamanio_mensaje);
+
+		if (particion_libre != NULL) {
+			//TODO Chequear si ubicacion_mejor_particion + 1 supera el list_size
+			list_add_in_index(particiones, ubicacion_mejor_particion + 1, particion_libre);
+		}
+
+		memoria_cache_agregar_mensaje(mensaje, mejor_particion->base);
+
+		if (es_fifo) {
+			queue_push(particiones_victimas, mejor_particion);
+		} else {
+			list_add(particiones_victimas_lru, mejor_particion);
+		}
+
+		pude_cachear = 1;
+	}
+
+	return pude_cachear;
 }
 
 int es_hora_de_compactar(){
