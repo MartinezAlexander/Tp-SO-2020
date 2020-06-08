@@ -23,7 +23,11 @@ int main(void){
 
 	memoria_cache_create();
 
-	iniciar_administrador();
+	if(string_equals_ignore_case(algoritmo_memoria,"BS")){
+		// iniciar_buddy_system();
+	}else{
+		iniciar_administrador_pd();
+	}
 
 	inicializar_colas_mensajeria(procesar_pokemon);
 

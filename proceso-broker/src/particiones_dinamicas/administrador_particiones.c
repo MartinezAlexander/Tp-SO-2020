@@ -2,7 +2,7 @@
 
 int es_fifo;
 
-void iniciar_administrador(){
+void iniciar_administrador_pd(){
 	particiones = list_create();
 	t_particion* primer_particion = particion_create(0,tamano_memoria,1);
 	list_add(particiones,primer_particion);
@@ -212,7 +212,7 @@ void administrador_cachear_mensaje(t_mensaje* mensaje){
 		procedimiento_para_almacenamiento_de_datos(mensaje, best_fit, lru_eliminar);
 	}
 }
-t_list* obtener_mensajes_cacheados_por_cola(op_code cola){
+t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola){
 	t_list* mensajes = list_create();
 	int hay_mensajes_de_esa_cola = 0;
 
@@ -237,43 +237,3 @@ t_list* obtener_mensajes_cacheados_por_cola(op_code cola){
 
 	return mensajes;
 }
-
-void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros){
-	t_list* mensajes = obtener_mensajes_cacheados_por_cola(parametros->cola);
-
-	if(mensajes != NULL){
-		int i;
-		for (i = 0; i < list_size(mensajes); i++) {
-			t_mensaje* mensaje = (t_mensaje*) list_get(mensajes, i);
-			int resultado_envio = enviar_mensaje(mensaje,parametros->suscriptor->socket);
-
-			if (resultado_envio > 0) {
-				//TODO pasar a log personal
-				loggear_envio_mensaje(mensaje_to_string(mensaje));
-
-				//TODO verificar retorno de ack
-				recibir_ACK(parametros->suscriptor->socket);
-				loggear_recepcion_ACK(suscriptor_to_string(parametros->suscriptor));
-			} else {
-				log_personal_error_envio_a_suscriptor(suscriptor_to_string(parametros->suscriptor));
-				i = list_size(mensajes);
-			}
-		}
-		list_destroy_and_destroy_elements(mensajes,(void*)mensaje_destroy);
-	}
-
-	parametros_destroy(parametros);
-}
-
-para_envio_mensaje_cacheados* parametros_create(t_suscriptor* suscriptor, op_code cola, t_memoria_cache* memoria){
-	para_envio_mensaje_cacheados* parametros = malloc(sizeof(para_envio_mensaje_cacheados));
-	parametros->suscriptor = suscriptor;
-	parametros->cola = cola;
-	parametros->memoria = memoria;
-	return parametros;
-}
-
-void parametros_destroy(para_envio_mensaje_cacheados* parametros){
-	free(parametros);
-}
-

@@ -11,12 +11,6 @@
 #include "../suscriptor.h"
 #include "../logger.h"
 
-typedef struct{
-	t_suscriptor* suscriptor;
-	op_code cola;
-	t_memoria_cache* memoria;
-}para_envio_mensaje_cacheados;
-
 t_list* particiones;
 
 t_queue* particiones_victimas;
@@ -25,7 +19,7 @@ t_list* particiones_victimas_lru;
 
 int busquedas_fallidas;
 
-void iniciar_administrador();
+void iniciar_administrador_pd();
 
 int first_fit(t_mensaje* mensaje);
 
@@ -47,12 +41,6 @@ void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algorim
 
 void administrador_cachear_mensaje(t_mensaje* mensaje);
 
-t_list* obtener_mensajes_cacheados_por_cola(op_code cola);
-
-void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros);
-
-para_envio_mensaje_cacheados* parametros_create(t_suscriptor* suscriptor, op_code cola, t_memoria_cache* memoria);
-
-void parametros_destroy(para_envio_mensaje_cacheados* parametros);
+t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola);
 
 #endif

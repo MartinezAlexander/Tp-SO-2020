@@ -8,7 +8,7 @@
 #include "memoria_cache.h"
 #include <pthread.h>
 #include "logger.h"
-#include "particiones_dinamicas/administrador_particiones.h"
+#include "manejador_suscripciones.h"
 
 typedef struct{
 	int32_t id_mensaje;
