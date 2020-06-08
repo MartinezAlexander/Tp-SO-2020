@@ -24,7 +24,7 @@ int main(void){
 	memoria_cache_create();
 
 	if(string_equals_ignore_case(algoritmo_memoria,"BS")){
-		// iniciar_buddy_system();
+		//iniciar_buddy_system();
 	}else{
 		iniciar_administrador_pd();
 	}

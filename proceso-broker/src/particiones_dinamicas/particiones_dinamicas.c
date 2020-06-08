@@ -37,14 +37,12 @@ t_particion* particion_ocuparla(t_particion* particion_libre, int tamanio_a_ocup
 		particion_libre->libre = 0;
 		time_t tiempo = time(NULL);
 		particion_libre->lru = localtime(&tiempo);
-		//TODO Guardar en cache
 	}else{
 		particion_libre->libre = 0;
 		time_t tiempo = time(NULL);
 		particion_libre->lru = localtime(&tiempo);
 		nueva_particion_libre = particion_create(particion_libre->base + tamanio_a_ocupar,particion_libre->limite,1);
 		particion_libre->limite = particion_libre->base + tamanio_a_ocupar;
-		//TODO Guardar en cache
 	}
 
 	return nueva_particion_libre;

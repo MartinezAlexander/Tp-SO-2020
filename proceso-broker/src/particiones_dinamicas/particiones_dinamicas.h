@@ -10,7 +10,6 @@ typedef struct{
 	int limite;
 	int libre;
 	struct tm* lru;
-	//TODO podria guardar la cola para agilizar la busqueda
 }t_particion;
 
 /*

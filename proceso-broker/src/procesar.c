@@ -21,7 +21,6 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 		loggear_suscripcion_proceso(suscripcion_proceso_to_string(suscripcion));
 	}else{
 		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
-		//TODO pasar a log personal
 		loggear_reconexion_proceso(suscripcion_proceso_to_string(suscripcion));
 	}
 
@@ -46,7 +45,6 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 			recibir_ACK(suscriptor->socket);
 			loggear_recepcion_ACK(suscriptor_to_string(suscriptor));
 		}else{
-			//TODO pasar a log personal
 			log_personal_error_envio_a_suscriptor(suscriptor_to_string(suscriptor));
 		}
 	}
@@ -63,22 +61,12 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		envio_a_suscriptores(cola->suscriptores, mensaje);
 
 		//memoria_cache_agregar_mensaje(memoria_cache,mensaje);
-		administrador_cachear_mensaje(mensaje);
+		if(string_equals_ignore_case(algoritmo_memoria,"BS")){
+			//TODO cachear mensaje en buddy system
+		}else{
+			administrador_cachear_mensaje(mensaje);
+		}
 
 		sem_post(&cola->semaforoSuscriptores);
 	}
-}
-
-t_estado_mensaje* estado_mensaje_create(int32_t id){
-	t_estado_mensaje* estado = malloc(sizeof(t_estado_mensaje));
-	estado->id_mensaje = id;
-	estado->enviados = list_create();
-	estado->fallidos = list_create();
-	return estado;
-}
-
-void estado_mensaje_destroy(t_estado_mensaje* estado){
-	list_destroy_and_destroy_elements(estado->enviados,free);
-	list_destroy_and_destroy_elements(estado->fallidos,free);
-	free(estado);
 }
