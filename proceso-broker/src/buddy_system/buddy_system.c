@@ -1,5 +1,44 @@
 #include "buddy_system.h"
 
+void iniciar_buddy_system(){
+	double exp = log2((double)tamano_memoria);
+	int exp_int = (int)exp;
+
+	if(exp - exp_int == 0){
+		t_buddy* buddy = buddy_create(exp_int,0);
+
+		//TODO cosas
+
+	}
+	else{
+		puts("No se puede implementar un BS de un tamano que no sea potencia de 2");
+		exit(1);
+	}
+}
+
+t_list* obtener_mensajes_cacheados_por_cola_bs(op_code cola){
+	//TODO esto
+	return 0;
+}
+
+void bs_cachear_mensaje(t_mensaje* mensaje){
+	//TODO esto
+}
+
+
+
+void recolectar_hojas_libres(t_buddy* raiz, t_list* hojas){
+	if(buddy_es_hoja(raiz)){
+		if(buddy_esta_libre(raiz)){
+			list_add(hojas, raiz);
+		}
+	}else{
+		recolectar_hojas_libres(raiz->izq,hojas);
+		recolectar_hojas_libres(raiz->der,hojas);
+	}
+}
+
+
 t_buddy* buddy_create(int tamanio, int base){
 	t_buddy* buddy = malloc(sizeof(t_buddy));
 	buddy->tamanio = tamanio;
