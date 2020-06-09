@@ -1,5 +1,6 @@
 #include "memoria_cache.h"
 
+
 void memoria_cache_create(){
 	memoria_cache = malloc(sizeof(t_memoria_cache));
 	memoria_cache->cache = malloc(tamano_memoria);
@@ -46,3 +47,4 @@ void memoria_cache_destroy(){
 	free(memoria_cache->cache);
 	free(memoria_cache);
 }
+

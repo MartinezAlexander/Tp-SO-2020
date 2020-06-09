@@ -152,6 +152,7 @@ int enviar_mensaje(t_mensaje* mensaje, int socket_cliente)
 	buffer->size = nuevo_tamanio;
 	buffer->stream = nuevo_stream;
 
+
 	t_paquete* paquete = empaquetar_buffer(buffer,mensaje->codigo);
 
 	int size_serializado;
@@ -195,6 +196,11 @@ int enviar_id(int socket,int32_t id){
 	return resultado;
 }
 
+int enviar_ACK(int socket){
+	int resultado = enviar_confirmacion(1,ACK,socket);
+	return resultado;
+}
+
 int32_t recibir_id(int socket){
 	cod_confirmacion codigo;
 	int32_t id =  recibir_confirmacion(socket,&codigo);
@@ -202,11 +208,6 @@ int32_t recibir_id(int socket){
 		id = (-1);
 	}
 	return id;
-}
-
-int enviar_ACK(int socket){
-	int resultado = enviar_confirmacion(1,ACK,socket);
-	return resultado;
 }
 
 int recibir_ACK(int socket){
@@ -234,6 +235,7 @@ int recibir_confirmacion_suscripcion(int socket){
 	return correcto;
 }
 
+/*
 t_mensaje* recibir_mensaje(int socket_cliente)
 {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
@@ -281,10 +283,9 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 
 
 	return mensaje;
-}
+}*/
 
-/*
- * version sin probar, controla errores en el socket que envia mensajes
+
 t_mensaje* recibir_mensaje(int socket_cliente)
 {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
@@ -337,7 +338,8 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 	}
 
 	return mensaje;
-}*/
+}
+
 
 char* id_to_string(int32_t id){
 	char* sin_id = "| No tiene id ";

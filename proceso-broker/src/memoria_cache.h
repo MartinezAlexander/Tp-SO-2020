@@ -5,6 +5,8 @@
 #include <mensajes/mensajes.h>
 #include <stdlib.h>
 #include "config.h"
+#include "logger.h"
+#include <commons/string.h>
 
 typedef struct{
 	void* cache;

@@ -12,14 +12,19 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria_cache);
 	pthread_t envio_mensajes_cacheados;
 	pthread_create(&envio_mensajes_cacheados,NULL,(void*)memoria_cache_enviar_mensajes_cacheados,parametros);
+
 	t_cola_mensajeria* cola = cola_mensajeria_obtener(suscripcion->cola_suscripcion);
 
 	int posicion_suscriptor = suscriptor_esta_suscripto(cola->suscriptores,suscriptor);
 
 	if(posicion_suscriptor < 0){
+		//TODO asegurar mutua exclusion
 		suscriptor_suscribirse_a(cola->suscriptores,suscriptor);
+
 		loggear_suscripcion_proceso(suscripcion_proceso_to_string(suscripcion));
+
 	}else{
+		//TODO asegurar mutua exclusion
 		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
 		loggear_reconexion_proceso(suscripcion_proceso_to_string(suscripcion));
 	}

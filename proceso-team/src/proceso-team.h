@@ -3,37 +3,34 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<unistd.h>
 #include<commons/log.h>
 #include<commons/string.h>
 #include<commons/config.h>
 #include<readline/readline.h>
 #include<commons/collections/list.h>
-#include<mensajes/server.h>
-#include<mensajes/mensajes.h>
-#include<mensajes/localized_pokemon.h>
-#include<mensajes/appeared_pokemon.h>
-#include<mensajes/get_pokemon.h>
-#include<mensajes/catch_pokemon.h>
-#include<mensajes/caught_pokemon.h>
+#include <pthread.h>
 
+#include "variables_globales.h"
 #include "entrenador.h"
 #include "objetivos.h"
+#include "planificacion/planificador.h"
+#include "conexiones/conexion_gameboy.h"
+#include "conexiones/conexion_broker.h"
+//Includes necesarios para el test manual que hay
 
-int cantidad_de_elementos(char** array);
+#include "planificacion/planificacion.h"
+#include<mensajes/appeared_pokemon.h>
+#include<mensajes/mensajes.h>
+#include<mensajes/pokemon.h>
+#include"test.h"
 
 void terminar_programa(t_log* logger, t_config* config);
 t_config* leer_config(void);
 t_log* iniciar_logger(char*);
+void inicializar_variables();
 
-void enviar_get_objetivo(t_list* objetivo_global);
-void iniciar_conexion_broker(char* ip, char* puerto);
-void iniciar_puerto_de_escucha();
-
-void procesar_mensajes(int* socket);
-void procesar_localized(t_localized_pokemon* localized_pokemon);
-void procesar_appeared(t_appeared_pokemon* appeared_pokemon);
-void procesar_caught(t_caught_pokemon* caught_pokemon);
-
+void test();
 
 #endif
 

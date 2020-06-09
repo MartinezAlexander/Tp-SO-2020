@@ -81,6 +81,7 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
 		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
 				codigo, id_c);
+		/*Modificar mensaje_con_id_correlativo_create*/
 	}
 
 	if (id == BROKER && codigo == CATCH_POKEMON) {
@@ -208,7 +209,7 @@ t_config* leer_config(void) {
 
 	t_config* config =
 			config_create(
-					"/home/utnso/workspace/tp-2020-1c-Grupo-7-SO/proceso-game-boy/gameboy.config");
+					"/home/utnso/tp-2020-1c-Grupo-7-SO/proceso-game-boy/gameboy.config");
 
 	if (config == NULL) {
 		printf("No puede leer la config\n");
