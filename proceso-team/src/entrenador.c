@@ -23,6 +23,8 @@ int ejecutar_entrenador(t_entrenador* entrenador){
 }
 
 void enviar_catch(t_entrenador* entrenador){
+	sleep(retardo_cpu);
+	actualizar_estadistica_entrenador(entrenador->identificador);
 	entrenador->estado = BLOCKED_BY_CATCH;
 	//Cambie de estado, entonces habilito el semaforo
 	//del planificador para que pueda mandar a ejecutar
@@ -84,8 +86,26 @@ void resolver_caught_positivo(t_entrenador* entrenador){
 
 void resolver_caught_negativo(t_entrenador* entrenador){
 	printf("Entrenador %d no pudo atrapar su pokemon\n", entrenador->identificador);
+
+	agregar_a_objetivos_globales(entrenador->objetivo_actual->especie);
 	entrenador_resetear_objetivo(entrenador);
 	entrenador->estado = BLOCKED;
+}
+
+void agregar_a_objetivos_globales(char* especie){
+	list_add(objetivo_global, especie);
+	list_sort(objetivo_global, strcmp);
+}
+
+void sacar_de_objetivos_globales(char* especie){
+	for(int i = 0 ; i < list_size(objetivo_global) ; i++){
+	char* p = list_get(objetivo_global, i);
+
+		if(string_equals_ignore_case(especie, p)){
+			list_remove(objetivo_global, i);
+			break;
+		}
+	}
 }
 
 /**
@@ -168,6 +188,7 @@ void entrenador_atrapar_objetivo(t_entrenador* entrenador){
 	char* nuevo_pokemon = entrenador->objetivo_actual->especie;
 	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
 
+	sacar_de_objetivos_globales(nuevo_pokemon);
 	entrenador_resetear_objetivo(entrenador);
 }
 

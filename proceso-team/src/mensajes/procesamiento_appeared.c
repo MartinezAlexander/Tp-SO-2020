@@ -19,13 +19,15 @@ void procesar_appeared(t_appeared_pokemon* appeared_pokemon){
  * Procesa un pokemon y devuelve en 1 caso de que planifique, 0 en caso contrario
  */
 int procesar_pokemon(t_pokemon* pokemon){
-	int cumplio_objetivos = cumplio_objetivo_global(objetivo_global, entrenadores);
-	int necesito_pokemon = pokemon_dentro_de_objetivos(objetivo_global, pokemon->especie);
 
-	int planifico = !cumplio_objetivos && necesito_pokemon;
+	int planifico = pokemon_dentro_de_objetivos(objetivo_global, pokemon->especie);
 
 	if(planifico){
+		pthread_mutex_lock(&mutex_diccionario_especies);
 		dictionary_put(diccionario_especies_recibidas, pokemon->especie, 1);
+		pthread_mutex_unlock(&mutex_diccionario_especies);
+
+		sacar_de_objetivos_globales(pokemon->especie);
 		entrenador_entrar_a_planificacion(pokemon);
 	}else
 		descartar_pokemon(pokemon);

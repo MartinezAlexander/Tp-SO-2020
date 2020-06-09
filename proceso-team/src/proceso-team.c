@@ -20,9 +20,9 @@ int main(void) {
 	//Me suscribo a las colas y abro hilos para recibir mensajes
 	iniciar_conexion_broker();
 	//Envio mensaje GET al broker segun objetivos globales
-	//enviar_get_objetivo(objetivo_global);
+	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
-	//iniciar_puerto_de_escucha();
+	iniciar_puerto_de_escucha();
 
 	//test();
 
@@ -66,7 +66,9 @@ void inicializar_variables(){
 
 	entrenadores = leer_entrenadores(config, estimacion_inicial);
 	objetivo_global = obtener_objetivo_global(entrenadores);
+
 	diccionario_especies_recibidas = inicializar_diccionario_especies();
+	pthread_mutex_init(&mutex_diccionario_especies, NULL);
 
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");

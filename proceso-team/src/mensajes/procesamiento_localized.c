@@ -6,7 +6,9 @@ int especie_no_procesada(char* especie){
 
 void procesar_localized(t_localized_pokemon* localized_pokemon){
 
+	pthread_mutex_lock(&mutex_diccionario_especies);
 	if(especie_no_procesada(localized_pokemon->nombre)){
+		pthread_mutex_unlock(&mutex_diccionario_especies);
 
 		t_list* pokemones = localized_pokemon_get_list(localized_pokemon);
 
@@ -16,6 +18,7 @@ void procesar_localized(t_localized_pokemon* localized_pokemon){
 			procesar_pokemon(pokemon);
 		}
 	}else{
+		pthread_mutex_unlock(&mutex_diccionario_especies);
 		localized_pokemon_destroy(localized_pokemon);
 	}
 }

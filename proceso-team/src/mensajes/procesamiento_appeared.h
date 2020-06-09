@@ -11,6 +11,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<mensajes/appeared_pokemon.h>
+#include <pthread.h>
 #include "../objetivos.h"
 #include "../variables_globales.h"
 #include "../planificacion/planificacion.h"

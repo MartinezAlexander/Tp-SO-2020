@@ -71,6 +71,9 @@ int ejecutar_entrenador(t_entrenador* entrenador);
 void resolver_caught_positivo(t_entrenador* entrenador);
 void resolver_caught_negativo(t_entrenador* entrenador);
 
+void agregar_a_objetivos_globales(char* especie);
+void sacar_de_objetivos_globales(char* especie);
+
 void actualizar_estadistica_entrenador(int id_entrenador);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);

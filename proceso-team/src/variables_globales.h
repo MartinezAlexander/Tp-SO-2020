@@ -35,6 +35,7 @@ int32_t team_id;
 t_log* logger;
 
 t_dictionary* diccionario_especies_recibidas;
+pthread_mutex_t mutex_diccionario_especies;
 
 //Estadisticas
 t_dictionary* diccionario_ciclos_entrenador;

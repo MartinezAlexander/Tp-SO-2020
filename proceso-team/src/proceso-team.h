@@ -9,6 +9,7 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 #include<commons/collections/list.h>
+#include <pthread.h>
 
 #include "variables_globales.h"
 #include "entrenador.h"
@@ -17,7 +18,7 @@
 #include "conexiones/conexion_gameboy.h"
 #include "conexiones/conexion_broker.h"
 //Includes necesarios para el test manual que hay
-#include <pthread.h>
+
 #include "planificacion/planificacion.h"
 #include<mensajes/appeared_pokemon.h>
 #include<mensajes/mensajes.h>
