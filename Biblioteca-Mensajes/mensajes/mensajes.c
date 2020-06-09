@@ -196,6 +196,11 @@ int enviar_id(int socket,int32_t id){
 	return resultado;
 }
 
+int enviar_ACK(int socket){
+	int resultado = enviar_confirmacion(1,ACK,socket);
+	return resultado;
+}
+
 int32_t recibir_id(int socket){
 	cod_confirmacion codigo;
 	int32_t id =  recibir_confirmacion(socket,&codigo);
@@ -203,11 +208,6 @@ int32_t recibir_id(int socket){
 		id = (-1);
 	}
 	return id;
-}
-
-int enviar_ACK(int socket){
-	int resultado = enviar_confirmacion(1,ACK,socket);
-	return resultado;
 }
 
 int recibir_ACK(int socket){

@@ -121,6 +121,7 @@ char* proceso_to_string(t_proceso proceso){
 }
 
 char* cola_to_string(op_code cola){
+
 	char* cola_new = "NEW_POKEMON";
 	char* cola_appeared = "APPEARED_POKEMON";
 	char* cola_get = "GET_POKEMON";

@@ -85,7 +85,9 @@ void localized_pokemon_mostrar(t_localized_pokemon* localized_pokemon){
 }
 
 char* localized_pokemon_to_string(t_localized_pokemon* localized_pokemon){
+
 	char* mensaje = string_from_format("Tipo = LOCALIZED_POKEMON | Contenido = Pokemon: %s | Cantidad de posiciones: %d | Posiciones (x,y): ",localized_pokemon->nombre,localized_pokemon->cantidadPos);
+
 	for(int i=0; i<localized_pokemon->cantidadPos; i++){
 		uint32_t x = *posiciones_get_X(localized_pokemon->posiciones,i);
 		uint32_t y = *posiciones_get_Y(localized_pokemon->posiciones,i);
