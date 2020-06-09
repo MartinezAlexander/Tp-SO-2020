@@ -40,6 +40,11 @@ caught_pokemon_to_string convierte un mensaje caught_pokemon en un string
 char* caught_pokemon_to_string(t_caught_pokemon* caught_pokemon);
 
 /*
+caught_pokemon_size devuelve la cantidad de bytes que ocupa un mensaje caught_pokemon especifico
+*/
+int caught_pokemon_size(t_caught_pokemon* caught);
+
+/*
 caught_pokemon_destroy libera la memoria utilizada para crear el mensaje caught pokemon
 */
 void caught_pokemon_destroy(t_caught_pokemon* caught_pokemon);

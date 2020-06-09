@@ -54,6 +54,11 @@ localized_pokemon_destroy libera la memoria utilizada para crear el mensaje loca
 void localized_pokemon_destroy(t_localized_pokemon* localized_pokemon);
 
 /*
+localized_pokemon_size devuelve la cantidad de bytes que ocupada un localized_pokemon especifico
+*/
+int localized_pokemon_size(t_localized_pokemon* localized);
+
+/*
  * localized_pokemon_get_list devuelve una lista de t_pokemon
  */
 t_list* localized_pokemon_get_list(t_localized_pokemon* localized_pokemon);

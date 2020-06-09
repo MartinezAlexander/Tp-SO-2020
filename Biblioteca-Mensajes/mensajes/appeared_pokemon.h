@@ -43,6 +43,11 @@ appeared_pokemon_to_string convierte un mensaje appeared pokemon en un string
 char* appeared_pokemon_to_string(t_appeared_pokemon* appeared_pokemon);
 
 /*
+appeared_size te dice cuantos bytes ocupa un mensaje appeared_pokemon especifico
+*/
+int appeared_pokemon_size(t_appeared_pokemon* appeared);
+
+/*
 appeared_pokemon_destroy libera la memoria utilizada para crear el mensaje appeared pokemon
 */
 void appeared_pokemon_destroy(t_appeared_pokemon* appeared_pokemon);
