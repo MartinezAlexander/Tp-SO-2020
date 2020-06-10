@@ -29,7 +29,7 @@ void enviar_catch(t_entrenador* entrenador){
 	//Cambie de estado, entonces habilito el semaforo
 	//del planificador para que pueda mandar a ejecutar
 	//a alguien mas, ya que yo me quedo esperando nada mas
-	habilitar_hilo_planificacion();
+	sem_post(&semaforo_planificacion);
 
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
 
@@ -97,12 +97,12 @@ void agregar_a_objetivos_globales(char* especie){
 	list_sort(objetivo_global, strcmp);
 }
 
-void sacar_de_objetivos_globales(char* especie){
-	for(int i = 0 ; i < list_size(objetivo_global) ; i++){
-	char* p = list_get(objetivo_global, i);
+void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
+	for(int i = 0 ; i < list_size(objetivos) ; i++){
+	char* p = list_get(objetivos, i);
 
 		if(string_equals_ignore_case(especie, p)){
-			list_remove(objetivo_global, i);
+			list_remove(objetivos, i);
 			break;
 		}
 	}
@@ -188,7 +188,7 @@ void entrenador_atrapar_objetivo(t_entrenador* entrenador){
 	char* nuevo_pokemon = entrenador->objetivo_actual->especie;
 	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
 
-	sacar_de_objetivos_globales(nuevo_pokemon);
+	sacar_de_objetivos_globales(nuevo_pokemon, objetivo_global);
 	entrenador_resetear_objetivo(entrenador);
 }
 

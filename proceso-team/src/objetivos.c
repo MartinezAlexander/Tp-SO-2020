@@ -26,7 +26,7 @@ t_list* obtener_objetivo_global(t_list* entrenadores){
 	for(int i = 0 ; i < list_size(adquiridos_globales) ; i++){
 		char* pokemon = list_get(adquiridos_globales, i);
 
-		sacar_de_objetivos(pokemon);
+		sacar_de_objetivos_globales(pokemon, objetivos_globales);
 	}
 
 	return objetivos_globales;

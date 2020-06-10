@@ -20,7 +20,7 @@ t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t 
 	planificador->alpha = alpha;
 	planificador->cola = queue_create();
 	planificador->entrenador_en_exec = NULL;
-	sem_init(&(planificador->semaforo), 0, 0);
+	sem_init(&(semaforo_planificacion), 0, 0);
 	pthread_mutex_init(&(planificador->mutex_planificacion), NULL);
 	planificador->quantum_actual = 0;
     return planificador;

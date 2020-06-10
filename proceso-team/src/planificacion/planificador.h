@@ -35,7 +35,7 @@ typedef struct{
 
 	t_entrenador* entrenador_en_exec;
 
-	sem_t semaforo;
+	//sem_t semaforo;
 	pthread_t hilo_planificacion;
 
 	pthread_mutex_t mutex_planificacion;

@@ -19,10 +19,6 @@ typedef struct {
 }t_buddy;
 
 
-void iniciar_buddy_system();
-t_list* obtener_mensajes_cacheados_por_cola_bs(op_code cola);
-void bs_cachear_mensaje(t_mensaje* mensaje);
-
 //recorrido en pre orden del arbol binario, le mando la lista de hojas VACIA
 void recolectar_hojas_libres(t_buddy* raiz, t_list* hojas);
 
