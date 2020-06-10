@@ -28,7 +28,7 @@ t_list* obtener_objetivo_global(t_list* entrenadores){
 
 		sacar_de_objetivos_globales(pokemon, objetivos_globales);
 	}
-
+	list_destroy(adquiridos_globales);
 	return objetivos_globales;
 }
 
