@@ -347,6 +347,7 @@ char* id_to_string(int32_t id){
 		string = con_id;
 	}else{
 		string = sin_id;
+		free(con_id);
 	}
 	return string;
 }
@@ -359,6 +360,7 @@ char* id_c_to_string(int32_t id_c){
 		string = con_id;
 	}else{
 		string = sin_id;
+		free(con_id);
 	}
 	return string;
 }
@@ -398,6 +400,15 @@ char* mensaje_to_string(t_mensaje* mensaje){
 	char* id_c = id_c_to_string(mensaje->id_correlativo);
 	string_append(&string_mensaje, id);
 	string_append(&string_mensaje, id_c);
+
+	if(mensaje->id > 0){
+		free(id);
+	}
+	if(mensaje->id_correlativo > 0){
+		free(id_c);
+	}
+
+	free(string);
 
 	return string_mensaje;
 }

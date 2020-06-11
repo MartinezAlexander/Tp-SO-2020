@@ -3,7 +3,7 @@
 
 t_catch_pokemon* catch_pokemon_create(char* nombre, uint32_t posX, uint32_t posY){
 	t_catch_pokemon* catch_pokemon = malloc( sizeof(t_catch_pokemon) );
-	catch_pokemon->pokemon = pokemon_create(nombre,*posicion_create(posX,posY));
+	catch_pokemon->pokemon = pokemon_create(nombre,posicion_create(posX,posY));
 	catch_pokemon->tamanio_nombre = strlen(nombre) + 1;
 	return catch_pokemon;
 }

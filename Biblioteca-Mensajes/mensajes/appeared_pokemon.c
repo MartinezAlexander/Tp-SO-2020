@@ -3,7 +3,7 @@
 
 t_appeared_pokemon* appeared_pokemon_create(char* nombre, uint32_t posX, uint32_t posY){
 	t_appeared_pokemon* appeared_pokemon = malloc( sizeof(t_appeared_pokemon) );
-	appeared_pokemon->pokemon = pokemon_create(nombre,*posicion_create(posX,posY));
+	appeared_pokemon->pokemon = pokemon_create(nombre,posicion_create(posX,posY));
 	appeared_pokemon->tamanio_nombre = strlen(nombre) + 1;
     return appeared_pokemon;
 }

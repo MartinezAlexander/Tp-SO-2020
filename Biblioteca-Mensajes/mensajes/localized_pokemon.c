@@ -33,9 +33,11 @@ t_buffer* localized_pokemon_to_buffer(t_localized_pokemon* localized_pokemon){
 
 	//Por cada posicion segun la cantidad, hago memcpy de x e y.
 	for(int i = 0 ; i < localized_pokemon->cantidadPos ; i++){
-		memcpy(stream + offset, posiciones_get_X(localized_pokemon->posiciones,i), sizeof(uint32_t));
+		uint32_t x = posiciones_get_X(localized_pokemon->posiciones,i);
+		memcpy(stream + offset, &(x), sizeof(uint32_t));
 		offset += sizeof(uint32_t);
-		memcpy(stream + offset, posiciones_get_Y(localized_pokemon->posiciones,i), sizeof(uint32_t));
+		uint32_t y = posiciones_get_Y(localized_pokemon->posiciones,i);
+		memcpy(stream + offset, &(y), sizeof(uint32_t));
 		offset += sizeof(uint32_t);
 	}
 
@@ -77,8 +79,8 @@ void localized_pokemon_mostrar(t_localized_pokemon* localized_pokemon){
 	printf("Cantidad de posiciones: %d\n",localized_pokemon->cantidadPos);
 	printf("Posiciones: \n");
 	for(int i=0; i<localized_pokemon->cantidadPos; i++){
-		uint32_t x = *posiciones_get_X(localized_pokemon->posiciones,i);
-		uint32_t y = *posiciones_get_Y(localized_pokemon->posiciones,i);
+		uint32_t x = posiciones_get_X(localized_pokemon->posiciones,i);
+		uint32_t y = posiciones_get_Y(localized_pokemon->posiciones,i);
 		printf("Posicion numero %d: x = %d , y = %d \n",i+1,x,y);
 	}
 	puts("------------");
@@ -87,18 +89,17 @@ void localized_pokemon_mostrar(t_localized_pokemon* localized_pokemon){
 char* localized_pokemon_to_string(t_localized_pokemon* localized_pokemon){
 
 	char* mensaje = string_from_format("Tipo = LOCALIZED_POKEMON | Contenido = Pokemon: %s | Cantidad de posiciones: %d | Posiciones (x,y): ",localized_pokemon->nombre,localized_pokemon->cantidadPos);
-
 	for(int i=0; i<localized_pokemon->cantidadPos; i++){
-		uint32_t x = *posiciones_get_X(localized_pokemon->posiciones,i);
-		uint32_t y = *posiciones_get_Y(localized_pokemon->posiciones,i);
+		uint32_t x = posiciones_get_X(localized_pokemon->posiciones,i);
+		uint32_t y = posiciones_get_Y(localized_pokemon->posiciones,i);
 		char* posicion = string_from_format("(%d,%d) ",x,y);
 		string_append(&mensaje,posicion);
+		free(posicion);
 	}
 	return mensaje;
 }
 
 void localized_pokemon_destroy(t_localized_pokemon* localized_pokemon){
-	//TODO se libera la memoria del char* nombre ?
 	posiciones_destroy(localized_pokemon->posiciones);
 	free(localized_pokemon);
 }
@@ -112,7 +113,6 @@ t_list* localized_pokemon_get_list(t_localized_pokemon* localized_pokemon){
 
 	for(int i = 0 ; i < localized_pokemon->cantidadPos ; i++){
 		t_pokemon* pokemon = pokemon_create(localized_pokemon->nombre,*((t_posicion*)list_get(localized_pokemon->posiciones, i)));
-
 		list_add(pokemons, pokemon);
 	}
 

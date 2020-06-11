@@ -3,7 +3,7 @@
 
 t_new_pokemon* new_pokemon_create(char* nombre, uint32_t posX, uint32_t posY, uint32_t cantidad){
 	t_new_pokemon* new_pokemon = malloc( sizeof(t_new_pokemon) );
-	new_pokemon->pokemon = pokemon_create(nombre,*posicion_create(posX,posY));
+	new_pokemon->pokemon = pokemon_create(nombre,posicion_create(posX,posY));
 	new_pokemon->cantidad = cantidad;
 	new_pokemon->tamanio_nombre = strlen(nombre) + 1;
     return new_pokemon;
