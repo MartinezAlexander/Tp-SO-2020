@@ -38,6 +38,7 @@ t_suscripcion* suscripcion_proceso_from_buffer(t_buffer* buffer){
 	buffer->stream += sizeof(int32_t);
 	memcpy(&(suscripcion->cola_suscripcion), buffer->stream, sizeof(op_code));
 	buffer->stream += sizeof(op_code);
+
 	return suscripcion;
 }
 

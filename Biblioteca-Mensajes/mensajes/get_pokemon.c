@@ -3,7 +3,7 @@
 
 t_get_pokemon* get_pokemon_create(char* nombre){
 	t_get_pokemon* get_pokemon = malloc( sizeof(t_get_pokemon) );
-	get_pokemon->nombre = nombre;
+	get_pokemon->nombre = string_from_format("%s",nombre);
 	get_pokemon->tamanio_nombre = strlen(nombre) + 1;
 	return get_pokemon;
 }
@@ -58,5 +58,6 @@ int get_pokemon_size(t_get_pokemon* get){
 }
 
 void get_pokemon_destroy(t_get_pokemon* get_pokemon){
+	free(get_pokemon->nombre);
 	free(get_pokemon);
 }

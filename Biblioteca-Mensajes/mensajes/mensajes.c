@@ -148,6 +148,7 @@ int enviar_mensaje(t_mensaje* mensaje, int socket_cliente)
 	memcpy(nuevo_stream + offset, &(mensaje->id_correlativo), sizeof(int32_t));
 	offset += sizeof(int32_t);
 	memcpy(nuevo_stream + offset, buffer->stream, buffer->size);
+	free(buffer->stream);
 	offset += buffer->size;
 	buffer->size = nuevo_tamanio;
 	buffer->stream = nuevo_stream;
@@ -160,6 +161,7 @@ int enviar_mensaje(t_mensaje* mensaje, int socket_cliente)
 
 	int se_envio = send(socket_cliente,serializado,size_serializado,MSG_NOSIGNAL);
 
+	free(nuevo_stream);
 	free(serializado);
 	free(paquete->buffer);
 	free(paquete);
@@ -294,11 +296,12 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 	t_buffer* buffer = malloc(sizeof(t_buffer));
 	int size = recv(socket_cliente, &(buffer->size), sizeof(buffer->size),0);
 
-	buffer->stream = malloc(buffer->size);
-	int buffer_recibido = recv(socket_cliente, buffer->stream, buffer->size,0);
+	void* stream = malloc(buffer->size);
+	int buffer_recibido = recv(socket_cliente, stream, buffer->size,0);
 
 
 	if(codigo > 0 && size > 0 && buffer_recibido > 0){
+		buffer->stream = stream;
 		memcpy(&(mensaje->id), buffer->stream, sizeof(int32_t));
 		buffer->stream += sizeof(int32_t);
 		memcpy(&(mensaje->id_correlativo), buffer->stream, sizeof(int32_t));
@@ -336,6 +339,9 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 		mensaje = NULL;
 	}
 
+	free(stream);
+	free(buffer);
+
 	return mensaje;
 }
 
@@ -369,6 +375,7 @@ char* mensaje_to_string(t_mensaje* mensaje){
 	char* string_mensaje = string_new();
 
 	char* string;
+	char* suscripcion_string;
 
 	switch(mensaje->codigo){
 	case NEW_POKEMON:
@@ -390,7 +397,9 @@ char* mensaje_to_string(t_mensaje* mensaje){
 		string = localized_pokemon_to_string((t_localized_pokemon*)mensaje->mensaje);
 			break;
 	case SUSCRIPCION:
-		string = string_from_format("Tipo = Suscripcion | Contenido = %s",suscripcion_proceso_to_string((t_suscripcion*)mensaje->mensaje));
+		suscripcion_string = suscripcion_proceso_to_string((t_suscripcion*)mensaje->mensaje);
+		string = string_from_format("Tipo = Suscripcion | Contenido = %s",suscripcion_string);
+		free(suscripcion_string);
 			break;
 	}
 

@@ -3,7 +3,7 @@
 
 t_localized_pokemon* localized_pokemon_create(char* nombre, t_list* posiciones){
 	t_localized_pokemon* localized_pokemon = malloc( sizeof(t_localized_pokemon) );
-	localized_pokemon->nombre = nombre;
+	localized_pokemon->nombre = string_from_format("%s",nombre);
 	localized_pokemon->tamanio_nombre = strlen(nombre) + 1;
 	localized_pokemon->posiciones = posiciones;
 	localized_pokemon->cantidadPos = (uint32_t)list_size(posiciones);
@@ -100,6 +100,7 @@ char* localized_pokemon_to_string(t_localized_pokemon* localized_pokemon){
 }
 
 void localized_pokemon_destroy(t_localized_pokemon* localized_pokemon){
+	free(localized_pokemon->nombre);
 	posiciones_destroy(localized_pokemon->posiciones);
 	free(localized_pokemon);
 }
