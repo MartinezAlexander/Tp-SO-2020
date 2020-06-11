@@ -24,6 +24,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Obtengo entrenador mas cercano al pokemon a atrapar
 	t_entrenador *entrenador_mas_cercano = obtener_entrenador_mas_cercano(entrenadores_disponibles, pokemon->posicion);
+	list_destroy(entrenadores_disponibles);
 
 	//Le doy el objetivo actual al entrenador
 	entrenador_mas_cercano->objetivo_actual = pokemon;
