@@ -131,7 +131,7 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	char** posiciones_separadas = string_split(posicion, "|");
-	entrenador->posicion = *posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
+	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
 
 	entrenador->pokemones_adquiridos = array_to_list(string_split(pokemones, "|"));
 	entrenador->objetivos = array_to_list(string_split(objetivos, "|"));

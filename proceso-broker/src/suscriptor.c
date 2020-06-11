@@ -22,6 +22,7 @@ int suscriptor_esta_suscripto(t_list* lista_suscriptores, t_suscriptor* suscript
 char* suscriptor_to_string(t_suscriptor* suscriptor){
 	int socket = suscriptor->socket;
 	int32_t id = suscriptor->pid;
+	//TODO Conditional jump or move depends on uninitialised value(s)
 	return string_from_format("ID suscriptor: %d conectado a traves del socket %d ",id,socket);
 }
 

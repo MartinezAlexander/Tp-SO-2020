@@ -6,7 +6,7 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
 
 	loggear_recepcion_mensaje(mensaje_to_string(mensaje));
-
+	//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
 	confirmar_suscripcion(*socket);
 
 	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria_cache);
@@ -43,11 +43,15 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 	int x;
 	for(int i = 0; i < list_size(suscriptores); i++){
 		t_suscriptor* suscriptor = list_get(suscriptores,i);
+		//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
 		x = enviar_mensaje(mensaje,suscriptor->socket);
 		if(x > 0){
 			loggear_envio_mensaje(mensaje_to_string(mensaje));
 			//TODO verificar el retorno del ACK
+			//TODO Syscall param socketcall.recv(args) points to uninitialised byte(s)
 			recibir_ACK(suscriptor->socket);
+			//Use of uninitialised value of size 4
+			//TODO char* suscriptor = suscriptor_to_string(suscriptor);
 			loggear_recepcion_ACK(suscriptor_to_string(suscriptor));
 		}else{
 			log_personal_error_envio_a_suscriptor(suscriptor_to_string(suscriptor));

@@ -11,6 +11,8 @@ void procesar_localized(t_localized_pokemon* localized_pokemon){
 		pthread_mutex_unlock(&mutex_diccionario_especies);
 
 		t_list* pokemones = localized_pokemon_get_list(localized_pokemon);
+		posiciones_destroy_elements(localized_pokemon->posiciones);
+		localized_pokemon_destroy(localized_pokemon);
 
 		//Por cada uno en la lista proceso como appeared
 		for(int i = 0 ; i< list_size(pokemones) ; i++){
@@ -19,6 +21,7 @@ void procesar_localized(t_localized_pokemon* localized_pokemon){
 		}
 	}else{
 		pthread_mutex_unlock(&mutex_diccionario_especies);
+		posiciones_destroy_elements(localized_pokemon->posiciones);
 		localized_pokemon_destroy(localized_pokemon);
 	}
 }
