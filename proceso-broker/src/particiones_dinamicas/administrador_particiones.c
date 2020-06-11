@@ -35,6 +35,7 @@ int first_fit(t_mensaje* mensaje){
 			}
 
 			memoria_cache_agregar_mensaje(mensaje,particion->base);
+			mensaje_destroy(mensaje);
 
 			if(es_fifo){
 				queue_push(particiones_victimas,particion);
@@ -81,6 +82,7 @@ int best_fit(t_mensaje* mensaje){
 		}
 
 		memoria_cache_agregar_mensaje(mensaje, mejor_particion->base);
+		mensaje_destroy(mensaje);
 
 		if (es_fifo) {
 			queue_push(particiones_victimas, mejor_particion);
@@ -224,7 +226,9 @@ t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola){
 				particion->lru = localtime(&tiempo);
 				t_mensaje* mensaje_c = memoria_cache_leer_mensaje(particion->base, particion_tamanio(particion));
 				list_add(mensajes,mensaje_c);
-				actualizar_lru(particion);
+				if(string_equals_ignore_case(algoritmo_reemplazo,"LRU")){
+					actualizar_lru(particion);
+				}
 				hay_mensajes_de_esa_cola = 1;
 			}
 		}

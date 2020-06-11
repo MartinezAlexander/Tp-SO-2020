@@ -17,6 +17,7 @@ void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* param
 		mensajes = obtener_mensajes_cacheados_por_cola_pd(parametros->cola);
 	}
 
+
 	if(mensajes != NULL){
 		int i;
 		for (i = 0; i < list_size(mensajes); i++) {
