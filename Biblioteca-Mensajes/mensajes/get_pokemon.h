@@ -50,4 +50,8 @@ get_pokemon_destroy libera la memoria utilizada para crear el mensaje get pokemo
 */
 void get_pokemon_destroy(t_get_pokemon* get_pokemon);
 
+void* get_pokemon_to_stream(t_get_pokemon* get_pokemon);
+
+t_get_pokemon* get_pokemon_from_stream(void* stream);
+
 #endif

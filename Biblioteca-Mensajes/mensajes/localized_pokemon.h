@@ -63,4 +63,8 @@ int localized_pokemon_size(t_localized_pokemon* localized);
  */
 t_list* localized_pokemon_get_list(t_localized_pokemon* localized_pokemon);
 
+void* localized_pokemon_to_stream(t_localized_pokemon* localized_pokemon);
+
+t_localized_pokemon* localized_pokemon_from_stream(void* stream);
+
 #endif

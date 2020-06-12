@@ -10,7 +10,7 @@ t_pokemon* pokemon_create(char* especie, t_posicion posicion){
 }
 
 int pokemon_size(t_pokemon* pokemon){
-	return strlen(pokemon->especie) + 1 + posicion_size(pokemon->posicion) ;
+	return strlen(pokemon->especie) + posicion_size(pokemon->posicion) ;
 }
 
 void pokemon_destroy(t_pokemon* pokemon){
