@@ -75,7 +75,7 @@ t_new_pokemon* new_pokemon_from_stream(void* stream){
 	stream += sizeof(uint32_t);
 	new_pokemon->pokemon->especie = malloc(new_pokemon->tamanio_nombre + 1);
 	memcpy(new_pokemon->pokemon->especie,stream, new_pokemon->tamanio_nombre);
-	new_pokemon->pokemon->especie[new_pokemon->tamanio_nombre + 1] = '\0';
+	new_pokemon->pokemon->especie[new_pokemon->tamanio_nombre] = '\0';
 	stream += (new_pokemon->tamanio_nombre);
 	memcpy(&(new_pokemon->pokemon->posicion.posicionX), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);

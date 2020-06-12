@@ -72,7 +72,7 @@ t_catch_pokemon* catch_pokemon_from_stream(void* stream){
 	stream += sizeof(uint32_t);
 	catch_pokemon->pokemon->especie = malloc(catch_pokemon->tamanio_nombre + 1);
 	memcpy(catch_pokemon->pokemon->especie, stream,catch_pokemon->tamanio_nombre);
-	catch_pokemon->pokemon->especie[catch_pokemon->tamanio_nombre + 1] = '\0';
+	catch_pokemon->pokemon->especie[catch_pokemon->tamanio_nombre] = '\0';
 	stream += catch_pokemon->tamanio_nombre;
 	memcpy(&(catch_pokemon->pokemon->posicion.posicionX), stream,sizeof(uint32_t));
 	stream += sizeof(uint32_t);

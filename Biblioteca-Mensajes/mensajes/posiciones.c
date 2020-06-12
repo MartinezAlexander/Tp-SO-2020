@@ -39,7 +39,7 @@ void posiciones_destroy(t_list* posiciones){
 }
 
 void posiciones_destroy_elements(t_list* posiciones){
-	for(int i = 0; i<list_size(posiciones); i++){
+	for(int i = 0; i< list_size(posiciones); i++){
 		list_remove_and_destroy_element(posiciones,i,free);
 	}
 }

@@ -112,7 +112,7 @@ t_localized_pokemon* localized_pokemon_from_stream(void* stream){
 	stream += sizeof(uint32_t);
 	localized_pokemon->nombre = malloc(localized_pokemon->tamanio_nombre + 1);
 	memcpy(localized_pokemon->nombre, stream, localized_pokemon->tamanio_nombre);
-	localized_pokemon->nombre[localized_pokemon->tamanio_nombre + 1] = '\0';
+	localized_pokemon->nombre[localized_pokemon->tamanio_nombre] = '\0';
 	stream += localized_pokemon->tamanio_nombre;
 	memcpy(&(localized_pokemon->cantidadPos), stream, sizeof(uint32_t));
 	stream += sizeof(uint32_t);

@@ -64,7 +64,7 @@ t_get_pokemon* get_pokemon_from_stream(void* stream){
 	stream += sizeof(uint32_t);
 	get_pokemon->nombre = malloc(get_pokemon->tamanio_nombre + 1);
 	memcpy(get_pokemon->nombre, stream, get_pokemon->tamanio_nombre);
-	get_pokemon->nombre[get_pokemon->tamanio_nombre + 1] = '\0';
+	get_pokemon->nombre[get_pokemon->tamanio_nombre] = '\0';
 	stream += get_pokemon->tamanio_nombre;
 
 	return get_pokemon;
