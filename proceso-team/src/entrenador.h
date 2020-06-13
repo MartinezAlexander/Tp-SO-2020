@@ -80,7 +80,8 @@ void actualizar_estadistica_entrenador(int id_entrenador);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);
 
-t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador, double estimacion_inicial);
+void asignar_pokemones(t_entrenador* entrenador, char* pokemones);
+t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial);
 t_list* leer_entrenadores(t_config* config, double estimacion_inicial);
 
 void entrenador_resetear_objetivo(t_entrenador* entrenador);

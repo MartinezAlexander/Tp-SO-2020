@@ -7,7 +7,9 @@ void iniciar_puerto_de_escucha(){
 void procesar_mensajes_directos(int* socket){
 	t_mensaje* mensaje = recibir_mensaje(*socket);
 	loggear_nuevo_mensaje(mensaje);
+	enviar_ACK(*socket);
 
+	//TODO: VER - Recbio todos los mensajes o solo appeared?
 	switch(mensaje->codigo){
 		case APPEARED_POKEMON:
 			procesar_appeared((t_appeared_pokemon*)mensaje->mensaje);

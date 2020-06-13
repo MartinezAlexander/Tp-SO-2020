@@ -15,10 +15,11 @@
 int main(void) {
 	inicializar_variables();
 
+
 	iniciar_hilos_planificacion();
 
 	//Me suscribo a las colas y abro hilos para recibir mensajes
-	iniciar_conexion_broker();
+	//iniciar_conexion_broker();
 	//Envio mensaje GET al broker segun objetivos globales
 	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
@@ -35,7 +36,7 @@ int main(void) {
 	//estan en estado exit, por lo que puedo liberar las conexiones
 	//con el broker y joinear los hilos que llevaban a cabo
 	//la escucha y el procesamiento de mensajes
-	cerrar_conexion_broker();
+	//cerrar_conexion_broker();
 
 	int ciclos_cpu_totales = 0;
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
@@ -46,6 +47,7 @@ int main(void) {
 
 	//Loggear estadisticas
 
+	//quedaria liberar variables globales
 	terminar_programa(logger, config);
 }
 
@@ -98,8 +100,8 @@ t_log* iniciar_logger(char* path)
 
 t_config* leer_config(void)
 {
-	t_config *config;//Puede que este mal el path
-	if((config = config_create("src/team.config")) == NULL)//Nota: para correr desde Debug
+	t_config *config;
+	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
 	{														//hay que agregar ../ al path
 		printf("No pude leer la config\n");
 		exit(2);

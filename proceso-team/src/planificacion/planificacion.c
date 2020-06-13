@@ -17,6 +17,8 @@ void esperar_hilos_planificacion(){
 	pthread_join(planificador->hilo_planificacion, NULL);
 }
 
+//TODO: ver que pasa si la lista de disponibles da vacia.
+//Ver en enunciado y de todas formas catchear la situacion
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Filtro entrenadores disponibles
@@ -70,7 +72,6 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 void ejecutar_hilo_planificador(){
 	while(!finalizo_team){
 		sem_wait(&(semaforo_planificacion));
-		printf("Entro al hilo de planificacion\n");
 		planificar();
 		//Aca tendria que habilitar el semaforo
 		//del entrenador, pero eso se hace dentro
@@ -86,7 +87,6 @@ void ejecutar_hilo(t_entrenador* entrenador){
 	//esto lo verificamos a traves de su estado
 	while(entrenador->estado != EXIT){
 		sem_wait(&(entrenador->semaforo));
-		printf("Entro al hilo de entrenador %d\n", entrenador->identificador);
 		int termino_ejecucion = ejecutar_entrenador(entrenador);
 
 		//Ahora tengo que habilitar el semaforo del
