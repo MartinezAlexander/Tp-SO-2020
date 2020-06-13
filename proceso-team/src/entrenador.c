@@ -5,8 +5,10 @@ void iniciarlizar_diccionario_catch(){
 }
 
 void actualizar_estadistica_entrenador(int id_entrenador){
-	int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, string_itoa(id_entrenador));
-	dictionary_put(diccionario_ciclos_entrenador, string_itoa(id_entrenador), (void*)ciclos+1);
+	char* id = string_itoa(id_entrenador);
+	int ciclos = (int) dictionary_get(diccionario_ciclos_entrenador, id);
+	dictionary_put(diccionario_ciclos_entrenador, id, (void*)ciclos+1);
+	free(id);
 }
 
 int ejecutar_entrenador(t_entrenador* entrenador){
@@ -29,7 +31,7 @@ void enviar_catch(t_entrenador* entrenador){
 	//Cambie de estado, entonces habilito el semaforo
 	//del planificador para que pueda mandar a ejecutar
 	//a alguien mas, ya que yo me quedo esperando nada mas
-	habilitar_hilo_planificacion();
+	sem_post(&semaforo_planificacion);
 
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
 
@@ -97,12 +99,12 @@ void agregar_a_objetivos_globales(char* especie){
 	list_sort(objetivo_global, strcmp);
 }
 
-void sacar_de_objetivos_globales(char* especie){
-	for(int i = 0 ; i < list_size(objetivo_global) ; i++){
-	char* p = list_get(objetivo_global, i);
+void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
+	for(int i = 0 ; i < list_size(objetivos) ; i++){
+		char* p = list_get(objetivos, i);
 
 		if(string_equals_ignore_case(especie, p)){
-			list_remove(objetivo_global, i);
+			list_remove(objetivos, i);
 			break;
 		}
 	}
@@ -132,9 +134,16 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 
 	char** posiciones_separadas = string_split(posicion, "|");
 	entrenador->posicion = *posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
+	free(posiciones_separadas);
 
-	entrenador->pokemones_adquiridos = array_to_list(string_split(pokemones, "|"));
-	entrenador->objetivos = array_to_list(string_split(objetivos, "|"));
+	char** pokemones_adquiridos_array = string_split(pokemones, "|");
+	entrenador->pokemones_adquiridos = array_to_list(pokemones_adquiridos_array);
+	free(pokemones_adquiridos_array);
+
+	char** objetivos_array = string_split(objetivos, "|");
+	entrenador->objetivos = array_to_list(objetivos_array);
+	free(objetivos_array);
+
 	entrenador->estado = NEW;
 	entrenador->identificador = identificador;
 
@@ -144,7 +153,9 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	entrenador->estado_sjf->ultima_rafaga = 0;
 	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
 
-	dictionary_put(diccionario_ciclos_entrenador, string_itoa(entrenador->identificador), 0);
+	char* id_entrenador = string_itoa(entrenador->identificador);
+	dictionary_put(diccionario_ciclos_entrenador, id_entrenador, 0);
+	free(id_entrenador);
 
 	return entrenador;
 }
@@ -175,6 +186,10 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 				objetivos_entrenadores[i], (i+1), estimacion_inicial));
 	}
 
+	free(posiciones_entrenadores);
+	free(pokemones_entrenadores);
+	free(objetivos_entrenadores);
+
 	return entrenadores;
 }
 
@@ -188,7 +203,7 @@ void entrenador_atrapar_objetivo(t_entrenador* entrenador){
 	char* nuevo_pokemon = entrenador->objetivo_actual->especie;
 	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
 
-	sacar_de_objetivos_globales(nuevo_pokemon);
+	sacar_de_objetivos_globales(nuevo_pokemon, objetivo_global);
 	entrenador_resetear_objetivo(entrenador);
 }
 

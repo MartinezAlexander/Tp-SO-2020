@@ -24,6 +24,8 @@
 #include "utils/log_utils.h"
 
 
+
+
 uint32_t retardo_cpu;
 
 t_list* entrenadores;
@@ -72,7 +74,7 @@ void resolver_caught_positivo(t_entrenador* entrenador);
 void resolver_caught_negativo(t_entrenador* entrenador);
 
 void agregar_a_objetivos_globales(char* especie);
-void sacar_de_objetivos_globales(char* especie);
+void sacar_de_objetivos_globales(char* especie, t_list* objetivos);
 
 void actualizar_estadistica_entrenador(int id_entrenador);
 

@@ -1,15 +1,14 @@
 /*
  ============================================================================
- Name        : proceso-game-boy.c
- Author      : Grupo 7 - SO
- Version     : v1.0
+ Name        : gameboy.c
+ Author      : 
+ Version     :
  Copyright   : Your copyright notice
- Description : Proceso game boy sirve para testear los demas procesos por
- separado.
+ Description : Hello World in C, Ansi-style
  ============================================================================
  */
 
-#include "proceso-game-boy.h"
+#include "gameboy.h"
 
 t_proceso obtener_id_proceso(char* id) {
 	t_proceso id_proceso;
@@ -62,6 +61,11 @@ uint32_t atrapo_pokemon(char* confirmacion) {
 	return atrapado;
 }
 
+void desconectar_suscriptor() {
+	sleep(tiempo_conexion);
+	exit(0);
+}
+
 t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 	void* mensaje_creado = NULL;
 	t_mensaje* mensaje_procesado = NULL;
@@ -79,9 +83,7 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
 		int32_t id_c = atoi(mensaje[6]);
 		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
-		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
-				codigo, id_c);
-		/*Modificar mensaje_con_id_correlativo_create*/
+		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,codigo, id_c);
 	}
 
 	if (id == BROKER && codigo == CATCH_POKEMON) {
@@ -133,7 +135,10 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		mensaje_creado = (void*) get_pokemon_create(mensaje[3]);
 		mensaje_procesado = mensaje_con_id_create(mensaje_creado, codigo, id_m);
 	}
-
+	if (id == SUSCRIPTOR) {
+		t_suscripcion* mensaje_suscripcion = suscripcion_proceso_create(id,getpid(), codigo);
+		mensaje_procesado = mensaje_simple_create((void*) mensaje_suscripcion,SUSCRIPCION);
+	}
 	return mensaje_procesado;
 }
 
@@ -142,6 +147,7 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	switch (id) {
 	case BROKER:
 		socket = crear_conexion(ip_broker, puerto_broker);
+		loggear_conexion(id);
 		enviar_mensaje(mensaje, socket);
 		recibir_id(socket);
 		liberar_conexion(socket);
@@ -149,22 +155,21 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	case TEAM:
 		socket = crear_conexion(ip_team, puerto_team);
 		enviar_mensaje(mensaje, socket);
+		loggear_conexion(id);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
 	case GAMECARD:
 		socket = crear_conexion(ip_gamecard, puerto_gamecard);
+		loggear_conexion(id);
 		enviar_mensaje(mensaje, socket);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
-		break;
-	case SUSCRIPTOR:
 		break;
 	default:
 		break;
 	}
 }
-
 void inicializar_variables() {
 	ip_broker = config_get_string_value(config, "IP_BROKER");
 	ip_team = config_get_string_value(config, "IP_TEAM");
@@ -174,54 +179,63 @@ void inicializar_variables() {
 	puerto_team = config_get_string_value(config, "PUERTO_TEAM");
 	puerto_gamecard = config_get_string_value(config, "PUERTO_GAMECARD");
 
-	char* path_logger = config_get_string_value(config, "LOG_FILE");
+	path_logger = config_get_string_value(config, "LOG_FILE");
 
-	logger = iniciar_logger(path_logger);
 }
-
 int main(int arg, char** args) {
 
 	config = leer_config();
-
 	inicializar_variables();
+	iniciar_logger(path_logger);
 
 	t_proceso id_proceso = obtener_id_proceso(args[1]);
 	op_code tipo_mensaje = obtener_tipo_mensaje(args[2]);
-	t_mensaje* mensaje_procesado = procesar_mensaje(args, tipo_mensaje,
-			id_proceso);
-	enviar_a(id_proceso, mensaje_procesado);
+	t_mensaje* mensaje_procesado = procesar_mensaje(args, tipo_mensaje,id_proceso);
+
+	if (id_proceso == SUSCRIPTOR) {
+
+		tiempo_conexion = atoi(args[3]);
+		int socket = crear_conexion(ip_broker, puerto_broker);
+		loggear_conexion(id_proceso);
+		enviar_mensaje(mensaje_procesado, socket);
+		int estoy_suscripto = recibir_confirmacion_suscripcion(socket);
+
+		if (estoy_suscripto) {
+
+			loggear_suscripcion(tipo_mensaje);
+			pthread_t suscriptor_desconexion;
+
+			pthread_create(&suscriptor_desconexion, NULL,(void*) desconectar_suscriptor, NULL);
+
+			while (1) {
+				t_mensaje* mensaje = recibir_mensaje(socket);
+				enviar_ACK(socket);
+				loggear_nuevo_mensaje(tipo_mensaje);
+				mensaje_mostrar(mensaje);
+			}
+		}
+
+	} else {
+		enviar_a(id_proceso, mensaje_procesado);
+	}
 	return 0;
 }
 
-t_log* iniciar_logger(char* path) {
-
-	t_log* logger;
-
-	if ((logger = log_create(path, "gameboy", true, LOG_LEVEL_INFO)) == NULL) {
-		printf("No se pudo crear el log\n");
-		exit(1);
-	}
-
-	return logger;
-}
 
 t_config* leer_config(void) {
 
-	t_config* config =
-			config_create(
-					"/home/utnso/tp-2020-1c-Grupo-7-SO/proceso-game-boy/gameboy.config");
+	t_config* config = config_create("src/gameboy.config");
 
 	if (config == NULL) {
-		printf("No puede leer la config\n");
 		exit(2);
 	}
 	return config;
 }
 
+
 void terminar_programa(t_log* logger, t_config* config) {
 
 	if (logger != NULL) {
-		log_info(logger, "finalizando programa...");
 		log_destroy(logger);
 	}
 
@@ -229,4 +243,3 @@ void terminar_programa(t_log* logger, t_config* config) {
 		config_destroy(config);
 	}
 }
-

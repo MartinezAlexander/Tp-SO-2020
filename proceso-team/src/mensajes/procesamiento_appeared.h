@@ -18,6 +18,6 @@
 
 void descartar_pokemon(t_pokemon* pokemon);
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon);
-int procesar_pokemon(t_pokemon* pokemon);
+void procesar_pokemon(t_pokemon* pokemon);
 
 #endif /* PROCESAMIENTO_APPEARED_H_ */

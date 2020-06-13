@@ -24,6 +24,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Obtengo entrenador mas cercano al pokemon a atrapar
 	t_entrenador *entrenador_mas_cercano = obtener_entrenador_mas_cercano(entrenadores_disponibles, pokemon->posicion);
+	list_destroy(entrenadores_disponibles);
 
 	//Le doy el objetivo actual al entrenador
 	entrenador_mas_cercano->objetivo_actual = pokemon;
@@ -68,17 +69,13 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 //innecesariamente.
 void ejecutar_hilo_planificador(){
 	while(!finalizo_team){
-		sem_wait(&(planificador->semaforo));
+		sem_wait(&(semaforo_planificacion));
 		printf("Entro al hilo de planificacion\n");
 		planificar();
 		//Aca tendria que habilitar el semaforo
 		//del entrenador, pero eso se hace dentro
 		//de planificar()
 	}
-}
-
-void habilitar_hilo_planificacion(){
-	sem_post(&(planificador->semaforo));
 }
 
 void ejecutar_hilo(t_entrenador* entrenador){
@@ -98,7 +95,7 @@ void ejecutar_hilo(t_entrenador* entrenador){
 		//ya que si cambie de estado a BLOCKED_BY_CATCH
 		//asumo que ya mande este post
 		if(!termino_ejecucion){
-			habilitar_hilo_planificacion();
+			sem_post(&semaforo_planificacion);
 		}
 	}
 }

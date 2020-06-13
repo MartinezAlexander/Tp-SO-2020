@@ -116,7 +116,7 @@ void suscribirse_a_cola(int* socket, op_code cola){
 		printf("Error: el broker no acepto la suscripcion a la cola %d\n", cola);
 	}
 
-	printf("Suscripcion a la cola %d del broker exitosa\n");
+	printf("Suscripcion a la cola %d del broker exitosa\n", cola);
 }
 
 void recibir_appeared(){

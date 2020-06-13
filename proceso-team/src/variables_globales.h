@@ -17,6 +17,9 @@
 #include<commons/collections/dictionary.h>
 #include<commons/log.h>
 #include<commons/string.h>
+#include<semaphore.h>
+
+sem_t semaforo_planificacion;
 
 t_config* config;
 

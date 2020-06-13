@@ -12,6 +12,7 @@
 #include<semaphore.h>
 #include<unistd.h>
 
+#include "../variables_globales.h"
 #include "../entrenador.h"
 #include "../utils/posicion_utils.h"
 #include "planificacion_fifo.h"
@@ -19,13 +20,11 @@
 #include "planificacion_sjf.h"
 #include "planificador.h"
 
-
 int entrenador_disponible(t_entrenador *entrenador);
 
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon);
 
 void ejecutar_hilo_planificador();
-void habilitar_hilo_planificacion();
 
 void planificar();
 void ejecutar_hilo(t_entrenador* entrenador);
