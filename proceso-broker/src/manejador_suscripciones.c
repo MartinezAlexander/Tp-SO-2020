@@ -17,15 +17,18 @@ void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* param
 		mensajes = obtener_mensajes_cacheados_por_cola_pd(parametros->cola);
 	}
 
+
 	if(mensajes != NULL){
 		int i;
 		for (i = 0; i < list_size(mensajes); i++) {
 			t_mensaje* mensaje = (t_mensaje*) list_get(mensajes, i);
+			//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
 			int resultado_envio = enviar_mensaje(mensaje,parametros->suscriptor->socket);
 
 			if (resultado_envio > 0) {
 				loggear_envio_mensaje(mensaje_to_string(mensaje));
 				//TODO verificar retorno de ack
+				//TODO Syscall param socketcall.recv(args) points to uninitialised byte(s)
 				recibir_ACK(parametros->suscriptor->socket);
 				loggear_recepcion_ACK(suscriptor_to_string(parametros->suscriptor));
 			} else {

@@ -3,8 +3,8 @@
 
 t_get_pokemon* get_pokemon_create(char* nombre){
 	t_get_pokemon* get_pokemon = malloc( sizeof(t_get_pokemon) );
-	get_pokemon->nombre = nombre;
-	get_pokemon->tamanio_nombre = strlen(nombre) + 1;
+	get_pokemon->nombre = string_from_format("%s",nombre);
+	get_pokemon->tamanio_nombre = strlen(nombre);
 	return get_pokemon;
 }
 
@@ -15,31 +15,12 @@ op_code get_pokemon_codigo(t_get_pokemon* get_pokemon){
 t_buffer* get_pokemon_to_buffer(t_get_pokemon* get_pokemon){
 	t_buffer* buffer = malloc( sizeof(t_buffer) );
 	buffer->size = sizeof(uint32_t) + get_pokemon->tamanio_nombre;
-
-	void* stream = malloc(buffer->size);
-	int offset = 0;
-
-	memcpy(stream + offset, &(get_pokemon->tamanio_nombre), sizeof(uint32_t));
-	offset += sizeof(uint32_t);
-	memcpy(stream + offset, get_pokemon->nombre, get_pokemon->tamanio_nombre);
-	offset += get_pokemon->tamanio_nombre;
-
-	buffer->stream = stream;
-
+	buffer->stream = get_pokemon_to_stream(get_pokemon);
 	return buffer;
 }
 
 t_get_pokemon* get_pokemon_from_buffer(t_buffer* buffer){
-	t_get_pokemon* get_pokemon = malloc( sizeof(t_get_pokemon) );
-	void* stream = buffer->stream;
-
-	memcpy(&(get_pokemon->tamanio_nombre), stream, sizeof(uint32_t));
-	stream += sizeof(uint32_t);
-	get_pokemon->nombre = malloc(get_pokemon->tamanio_nombre);
-	memcpy(get_pokemon->nombre, stream, get_pokemon->tamanio_nombre);
-	stream += get_pokemon->tamanio_nombre;
-
-	return get_pokemon;
+	return get_pokemon_from_stream(buffer->stream);
 }
 
 void get_pokemon_mostrar(t_get_pokemon* get_pokemon){
@@ -58,6 +39,33 @@ int get_pokemon_size(t_get_pokemon* get){
 }
 
 void get_pokemon_destroy(t_get_pokemon* get_pokemon){
-	//TODO se libera la memoria del  nombre?
+	free(get_pokemon->nombre);
 	free(get_pokemon);
+}
+
+void* get_pokemon_to_stream(t_get_pokemon* get_pokemon){
+	int size = sizeof(uint32_t) + get_pokemon->tamanio_nombre;
+
+	void* stream = malloc(size);
+	int offset = 0;
+
+	memcpy(stream + offset, &(get_pokemon->tamanio_nombre), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(stream + offset, get_pokemon->nombre, get_pokemon->tamanio_nombre);
+	offset += get_pokemon->tamanio_nombre;
+
+	return stream;
+}
+
+t_get_pokemon* get_pokemon_from_stream(void* stream){
+	t_get_pokemon* get_pokemon = malloc( sizeof(t_get_pokemon) );
+
+	memcpy(&(get_pokemon->tamanio_nombre), stream, sizeof(uint32_t));
+	stream += sizeof(uint32_t);
+	get_pokemon->nombre = malloc(get_pokemon->tamanio_nombre + 1);
+	memcpy(get_pokemon->nombre, stream, get_pokemon->tamanio_nombre);
+	get_pokemon->nombre[get_pokemon->tamanio_nombre] = '\0';
+	stream += get_pokemon->tamanio_nombre;
+
+	return get_pokemon;
 }

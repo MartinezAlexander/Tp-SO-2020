@@ -52,4 +52,8 @@ appeared_pokemon_destroy libera la memoria utilizada para crear el mensaje appea
 */
 void appeared_pokemon_destroy(t_appeared_pokemon* appeared_pokemon);
 
+void* appeared_pokemon_to_stream(t_appeared_pokemon* appeared_pokemon);
+
+t_appeared_pokemon* appeared_pokemon_from_stream(void* stream);
+
 #endif

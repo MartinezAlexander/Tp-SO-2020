@@ -15,31 +15,49 @@ void loggear_info(char* info){
 void loggear_recepcion_ACK(char* suscriptor){
 	char* log = string_from_format("[ACK] Recibi confirmacion de %s",suscriptor);
 	log_info(logger,log);
+	free(log);
+	free(suscriptor);
 }
 
 void loggear_envio_mensaje(char* mensaje){
 	char* log = string_from_format("[Enviado] %s",mensaje);
 	log_info(logger,log);
+	free(log);
+	free(mensaje);
 }
 
 void loggear_recepcion_mensaje(char* mensaje){
 	char* log = string_from_format("[Recibido] %s", mensaje);
 	log_info(logger,log);
+	free(log);
+	free(mensaje);
 }
 
 void loggear_suscripcion_proceso(char* suscriptor){
 	char* log = string_from_format("[Suscripcion] %s",suscriptor);
 	log_info(logger,log);
+	free(log);
+	free(suscriptor);
 }
 
 void loggear_reconexion_proceso(char* suscriptor){
 	char* log = string_from_format("[Reconexion] %s",suscriptor);
 	log_info(logger,log);
+	free(log);
+	free(suscriptor);
 }
 
 void loggear_conexion_al_broker(int socket_cliente){
 	char* log = string_from_format("[Conexion] Proceso se conecto a traves del socket %d", socket_cliente);
 	log_info(logger,log);
+	free(log);
+}
+
+void loggear_mensaje_cacheado(char* mensaje, int base_particion){
+	char* log = string_from_format("[Cache] Mensaje: %s | almacenado en la particion con base %d",mensaje,base_particion);
+	log_info(logger,log);
+	free(log);
+	free(mensaje);
 }
 
 void logger_destroy(){
@@ -57,6 +75,8 @@ void iniciar_log_personal(char* path){
 void log_personal_error_envio_a_suscriptor(char* suscriptor){
 	char* string = string_from_format("[Envio fallido] a %s",suscriptor);
 	log_error(logger_personal,string);
+	free(string);
+	free(suscriptor);
 }
 
 void log_personal_destroy(){

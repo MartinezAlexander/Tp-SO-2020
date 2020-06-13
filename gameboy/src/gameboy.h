@@ -1,12 +1,12 @@
 /*
- * proceso-game-boy.h
+ * gameboy.h
  *
- *  Created on: 14 may. 2020
+ *  Created on: 12 jun. 2020
  *      Author: utnso
  */
 
-#ifndef PROCESO_GAME_BOY_H_
-#define PROCESO_GAME_BOY_H_
+#ifndef GAMEBOY_H_
+#define GAMEBOY_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,4 +49,4 @@ void desconectar_suscriptor();
 void recepcion_mensajes(int socket);
 void terminar_programa(t_log* logger, t_config* config);
 
-#endif /* PROCESO_GAME_BOY_H_ */
+#endif /* GAMEBOY_H_ */

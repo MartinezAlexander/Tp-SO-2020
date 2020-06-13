@@ -4,12 +4,18 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <mensajes/mensajes.h>
+#include "../config.h"
 
 typedef struct{
 	int base;
 	int limite;
 	int libre;
 	struct tm* lru;
+	op_code cola;
+	int32_t id;
+	int32_t id_c;
+	int tamanio_real;
 }t_particion;
 
 /*

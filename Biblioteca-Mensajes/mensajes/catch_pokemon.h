@@ -52,4 +52,8 @@ catch_pokemon_destroy libera la memoria utilizada para crear el mensaje catch po
 */
 void catch_pokemon_destroy(t_catch_pokemon* catch_pokemon);
 
+void* catch_pokemon_to_stream(t_catch_pokemon* catch_pokemon);
+
+t_catch_pokemon* catch_pokemon_from_stream(void* stream);
+
 #endif

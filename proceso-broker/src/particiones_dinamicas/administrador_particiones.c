@@ -29,12 +29,22 @@ int first_fit(t_mensaje* mensaje){
 		if(particion_esta_libre(particion) && particion_puede_guardarlo(particion,tamanio_mensaje)){
 			t_particion* particion_libre = particion_ocuparla(particion,tamanio_mensaje);
 
+			particion->cola = mensaje->codigo;
+			particion->id = mensaje->id;
+			particion->id_c = mensaje->id_correlativo;
+
+			if(tamanio_mensaje < particion_tamanio(particion)){
+				particion->tamanio_real = tamanio_mensaje;
+			}
+
 			if(particion_libre != NULL){
 				//TODO Chequear si ubicacion_mejor_particion + 1 supera el list_size
 				list_add_in_index(particiones,i+1,particion_libre);
 			}
 
 			memoria_cache_agregar_mensaje(mensaje,particion->base);
+			loggear_mensaje_cacheado(mensaje_to_string(mensaje),particion->base);
+			mensaje_destroy(mensaje);
 
 			if(es_fifo){
 				queue_push(particiones_victimas,particion);
@@ -75,12 +85,21 @@ int best_fit(t_mensaje* mensaje){
 	if(mejor_particion != NULL){
 		t_particion* particion_libre = particion_ocuparla(mejor_particion,tamanio_mensaje);
 
+		mejor_particion->cola = mensaje->codigo;
+		mejor_particion->id = mensaje->id;
+		mejor_particion->id_c = mensaje->id_correlativo;
+
+		if (tamanio_mensaje < particion_tamanio(mejor_particion)) {
+			mejor_particion->tamanio_real = tamanio_mensaje;
+		}
+
 		if (particion_libre != NULL) {
 			//TODO Chequear si ubicacion_mejor_particion + 1 supera el list_size
 			list_add_in_index(particiones, ubicacion_mejor_particion + 1, particion_libre);
 		}
 
 		memoria_cache_agregar_mensaje(mensaje, mejor_particion->base);
+		mensaje_destroy(mensaje);
 
 		if (es_fifo) {
 			queue_push(particiones_victimas, mejor_particion);
@@ -212,6 +231,7 @@ void administrador_cachear_mensaje(t_mensaje* mensaje){
 		procedimiento_para_almacenamiento_de_datos(mensaje, best_fit, lru_eliminar);
 	}
 }
+
 t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola){
 	t_list* mensajes = list_create();
 	int hay_mensajes_de_esa_cola = 0;
@@ -219,12 +239,15 @@ t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola){
 	for (int i = 0; i < list_size(particiones); i++) {
 		t_particion* particion = list_get(particiones, i);
 		if (!particion_esta_libre(particion)) {
-			if (memoria_cache_es_un_mensaje_tipo(particion->base,particion_tamanio(particion), cola)) {
-				time_t tiempo = time(NULL);
-				particion->lru = localtime(&tiempo);
-				t_mensaje* mensaje_c = memoria_cache_leer_mensaje(particion->base, particion_tamanio(particion));
+			if (particion->cola == cola) {
+				t_mensaje* mensaje_c = memoria_cache_leer_mensaje(particion->base, particion_tamanio(particion), cola);
+				mensaje_c->codigo = particion->cola;
+				mensaje_c->id = particion->id;
+				mensaje_c->id_correlativo = particion->id_c;
 				list_add(mensajes,mensaje_c);
-				actualizar_lru(particion);
+				if(!es_fifo){
+					actualizar_lru(particion);
+				}
 				hay_mensajes_de_esa_cola = 1;
 			}
 		}
