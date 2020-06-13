@@ -140,7 +140,7 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	char** posiciones_separadas = string_split(posicion, "|");
-	entrenador->posicion = *posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
+	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
 	free(posiciones_separadas);
 
 	char** objetivos_array = string_split(objetivos, "|");
