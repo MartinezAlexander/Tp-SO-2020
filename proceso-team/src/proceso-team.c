@@ -19,7 +19,7 @@ int main(void) {
 	iniciar_hilos_planificacion();
 
 	//Me suscribo a las colas y abro hilos para recibir mensajes
-	//iniciar_conexion_broker();
+	iniciar_conexion_broker();
 	//Envio mensaje GET al broker segun objetivos globales
 	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
@@ -36,7 +36,7 @@ int main(void) {
 	//estan en estado exit, por lo que puedo liberar las conexiones
 	//con el broker y joinear los hilos que llevaban a cabo
 	//la escucha y el procesamiento de mensajes
-	//cerrar_conexion_broker();
+	cerrar_conexion_broker();
 
 	int ciclos_cpu_totales = 0;
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
