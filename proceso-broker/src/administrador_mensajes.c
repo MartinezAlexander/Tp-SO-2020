@@ -54,41 +54,49 @@ void esperar_cliente(int socket_servidor,void (*serve_client)(int *socket))
 void administrar_mensajes(int* socket){
 	//TODO Syscall param socketcall.recv(args) points to uninitialised byte(s)
 	t_mensaje* mensaje = recibir_mensaje(*socket);
-	switch(mensaje->codigo){
+	if(mensaje != NULL){
+		switch (mensaje->codigo) {
 		case SUSCRIPCION:
 			procesar_suscripcion(mensaje, socket);
 			break;
 		case NEW_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_new,mensaje,&ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_new, mensaje,
+					&ultimo_id);
 			//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-			enviar_id(*socket,ultimo_id);
+			enviar_id(*socket, ultimo_id);
 			break;
 		case LOCALIZED_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized,mensaje,&ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized, mensaje,
+					&ultimo_id);
 			//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-			enviar_id(*socket,ultimo_id);
+			enviar_id(*socket, ultimo_id);
 			break;
 		case GET_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_get,mensaje,&ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_get, mensaje,
+					&ultimo_id);
 			//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-			enviar_id(*socket,ultimo_id);
+			enviar_id(*socket, ultimo_id);
 			break;
 		case APPEARED_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared,mensaje,&ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared, mensaje,
+					&ultimo_id);
 			//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-			enviar_id(*socket,ultimo_id);
+			enviar_id(*socket, ultimo_id);
 			break;
 		case CATCH_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch,mensaje,&ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch, mensaje,
+					&ultimo_id);
 			//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-			enviar_id(*socket,ultimo_id);
+			enviar_id(*socket, ultimo_id);
 			break;
 		case CAUGHT_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught,mensaje,&ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught, mensaje,
+					&ultimo_id);
 			//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-			enviar_id(*socket,ultimo_id);
+			enviar_id(*socket, ultimo_id);
 			break;
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
+		}
 	}
 }

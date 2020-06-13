@@ -186,9 +186,9 @@ int enviar_confirmacion(int32_t num, cod_confirmacion codigo, int socket){
 
 int32_t recibir_confirmacion(int socket, cod_confirmacion* codigo){
 	cod_confirmacion codigo_recibido;
-	recv(socket,&codigo_recibido,sizeof(cod_confirmacion),0);
+	recv(socket,&codigo_recibido,sizeof(cod_confirmacion),MSG_WAITALL);
 	int32_t num;
-	recv(socket,&num,sizeof(int32_t),0);
+	recv(socket,&num,sizeof(int32_t),MSG_WAITALL);
 	(*codigo) = codigo_recibido;
 	return num;
 }
@@ -291,13 +291,13 @@ t_mensaje* recibir_mensaje(int socket_cliente)
 {
 	t_mensaje* mensaje = malloc(sizeof(t_mensaje));
 
-	int codigo = recv(socket_cliente, &(mensaje->codigo), sizeof(op_code),0);
+	int codigo = recv(socket_cliente, &(mensaje->codigo), sizeof(op_code),MSG_WAITALL);
 
 	t_buffer* buffer = malloc(sizeof(t_buffer));
-	int size = recv(socket_cliente, &(buffer->size), sizeof(buffer->size),0);
+	int size = recv(socket_cliente, &(buffer->size), sizeof(buffer->size),MSG_WAITALL);
 
 	void* stream = malloc(buffer->size);
-	int buffer_recibido = recv(socket_cliente, stream, buffer->size,0);
+	int buffer_recibido = recv(socket_cliente, stream, buffer->size,MSG_WAITALL);
 
 
 	if(codigo > 0 && size > 0 && buffer_recibido > 0){
