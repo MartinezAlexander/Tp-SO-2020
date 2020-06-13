@@ -1,15 +1,14 @@
 /*
  ============================================================================
- Name        : proceso-game-boy.c
- Author      : Grupo 7 - SO
- Version     : v1.0
+ Name        : gameboy.c
+ Author      : 
+ Version     :
  Copyright   : Your copyright notice
- Description : Proceso game boy sirve para testear los demas procesos por
- separado.
+ Description : Hello World in C, Ansi-style
  ============================================================================
  */
 
-#include "proceso-game-boy.h"
+#include "gameboy.h"
 
 t_proceso obtener_id_proceso(char* id) {
 	t_proceso id_proceso;
@@ -209,9 +208,9 @@ int main(int arg, char** args) {
 			pthread_create(&suscriptor_desconexion, NULL,(void*) desconectar_suscriptor, NULL);
 
 			while (1) {
-				loggear_nuevo_mensaje(tipo_mensaje);
 				t_mensaje* mensaje = recibir_mensaje(socket);
 				enviar_ACK(socket);
+				loggear_nuevo_mensaje(tipo_mensaje);
 				mensaje_mostrar(mensaje);
 			}
 		}
@@ -225,7 +224,7 @@ int main(int arg, char** args) {
 
 t_config* leer_config(void) {
 
-	t_config* config = config_create("src/gameboy.config");
+	t_config* config = config_create("../src/gameboy.config");
 
 	if (config == NULL) {
 		exit(2);
