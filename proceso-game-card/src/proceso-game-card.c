@@ -49,9 +49,9 @@ t_log* iniciar_logger(char* path){
 }
 
 t_config* leer_config(void){
-	t_config *config;//Puede que este mal el path
-	if((config = config_create("src/gamecard.config")) == NULL)//Nota: para correr desde Debug
-	{														//hay que agregar ../ al path
+	t_config *config;
+	if((config = config_create("../src/gamecard.config")) == NULL)
+	{
 		printf("No pude leer la config\n");
 		exit(2);
 	}
