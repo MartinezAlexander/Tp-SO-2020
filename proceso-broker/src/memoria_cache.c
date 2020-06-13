@@ -12,8 +12,11 @@ void memoria_cache_agregar_mensaje(t_mensaje* mensaje, int donde_agregar){
 	free(stream_mensaje);
 }
 
-t_mensaje* memoria_cache_leer_mensaje(int desde_donde, int cuanto_leer){
-	return mensaje_from_stream(memoria_cache->cache + desde_donde, cuanto_leer);
+t_mensaje* memoria_cache_leer_mensaje(int desde_donde, int cuanto_leer, op_code que_leer){
+	void* stream = malloc(cuanto_leer);
+	memcpy(stream, memoria_cache->cache + desde_donde, cuanto_leer);
+	t_mensaje* mensaje = mensaje_from_stream(stream, que_leer);
+	return mensaje;
 }
 
 int memoria_cache_es_un_mensaje_tipo(int desde_donde, int cuanto_leer, op_code cola){
