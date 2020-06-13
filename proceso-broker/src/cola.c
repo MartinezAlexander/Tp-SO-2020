@@ -3,16 +3,22 @@
 void inicializar_colas_mensajeria(void (*procesar_pokemon)(t_cola_mensajeria* cola)){
 	cola_mensajeria_new = cola_mensajeria_create();
 	pthread_create(&(cola_mensajeria_new->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_new);
+	pthread_detach(&(cola_mensajeria_new->hilo));
 	cola_mensajeria_appeared = cola_mensajeria_create();
 	pthread_create(&(cola_mensajeria_appeared->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_appeared);
+	pthread_detach(&(cola_mensajeria_appeared->hilo));
 	cola_mensajeria_get = cola_mensajeria_create();
 	pthread_create(&(cola_mensajeria_get->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_get);
+	pthread_detach(&(cola_mensajeria_get->hilo));
 	cola_mensajeria_localized = cola_mensajeria_create();
 	pthread_create(&(cola_mensajeria_localized->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_localized);
+	pthread_detach(&(cola_mensajeria_localized->hilo));
 	cola_mensajeria_catch = cola_mensajeria_create();
 	pthread_create(&(cola_mensajeria_catch->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_catch);
+	pthread_detach(&(cola_mensajeria_catch->hilo));
 	cola_mensajeria_caught = cola_mensajeria_create();
 	pthread_create(&(cola_mensajeria_caught->hilo),NULL,(void*)procesar_pokemon,cola_mensajeria_caught);
+	pthread_detach(&(cola_mensajeria_caught->hilo));
 	//TODO 136 bytes in 1 block are possibly lost in loss record 56 of 67 (join)
 }
 
