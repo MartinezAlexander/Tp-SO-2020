@@ -43,6 +43,7 @@ int first_fit(t_mensaje* mensaje){
 			}
 
 			memoria_cache_agregar_mensaje(mensaje,particion->base);
+			loggear_mensaje_cacheado(mensaje_to_string(mensaje),particion->base);
 			mensaje_destroy(mensaje);
 
 			if(es_fifo){

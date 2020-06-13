@@ -53,6 +53,13 @@ void loggear_conexion_al_broker(int socket_cliente){
 	free(log);
 }
 
+void loggear_mensaje_cacheado(char* mensaje, int base_particion){
+	char* log = string_from_format("[Cache] Mensaje: %s | almacenado en la particion con base %d",mensaje,base_particion);
+	log_info(logger,log);
+	free(log);
+	free(mensaje);
+}
+
 void logger_destroy(){
 	log_destroy(logger);
 }
