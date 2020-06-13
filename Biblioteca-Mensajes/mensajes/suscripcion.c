@@ -16,29 +16,13 @@ op_code suscripcion_proceso_codigo(t_suscripcion* id_proceso){
 t_buffer* suscripcion_proceso_to_buffer(t_suscripcion* suscripcion){
 	t_buffer* buffer = malloc( sizeof(t_suscripcion) );
 	buffer->size = sizeof(int32_t) + sizeof(t_proceso) + sizeof(op_code);
-	buffer->stream = malloc(buffer->size);
-
-	int offset = 0;
-
-	memcpy(buffer->stream + offset, &(suscripcion->id), sizeof(t_proceso));
-	offset += sizeof(t_proceso);
-	memcpy(buffer->stream + offset, &(suscripcion->pid), sizeof(int32_t));
-	offset += sizeof(int32_t);
-	memcpy(buffer->stream + offset, &(suscripcion->cola_suscripcion), sizeof(op_code));
-	offset += sizeof(op_code);
+	buffer->stream = suscripcion_proceso_to_stream(suscripcion);
 
 	return buffer;
 }
 
 t_suscripcion* suscripcion_proceso_from_buffer(t_buffer* buffer){
-	t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
-	memcpy(&(suscripcion->id),buffer->stream, sizeof(t_proceso));
-	buffer->stream += sizeof(t_proceso);
-	memcpy(&(suscripcion->pid), buffer->stream, sizeof(int32_t));
-	buffer->stream += sizeof(int32_t);
-	memcpy(&(suscripcion->cola_suscripcion), buffer->stream, sizeof(op_code));
-	buffer->stream += sizeof(op_code);
-	return suscripcion;
+	return suscripcion_proceso_from_stream(buffer->stream);
 }
 
 void que_cola_soy(op_code codigo){
@@ -168,3 +152,33 @@ int suscripcion_proceso_size(t_suscripcion* suscripcion){
 void suscripcion_proceso_destroy(t_suscripcion* suscripcion){
 	free(suscripcion);
 }
+
+void* suscripcion_proceso_to_stream(t_suscripcion* suscripcion){
+
+	int size = sizeof(int32_t) + sizeof(t_proceso) + sizeof(op_code);
+	void* stream = malloc(size);
+
+	int offset = 0;
+
+	memcpy(stream + offset, &(suscripcion->id), sizeof(t_proceso));
+	offset += sizeof(t_proceso);
+	memcpy(stream + offset, &(suscripcion->pid), sizeof(int32_t));
+	offset += sizeof(int32_t);
+	memcpy(stream + offset, &(suscripcion->cola_suscripcion), sizeof(op_code));
+	offset += sizeof(op_code);
+
+	return stream;
+}
+
+t_suscripcion* suscripcion_proceso_from_stream(void* stream){
+	t_suscripcion* suscripcion = malloc(sizeof(t_suscripcion));
+	memcpy(&(suscripcion->id),stream, sizeof(t_proceso));
+	stream += sizeof(t_proceso);
+	memcpy(&(suscripcion->pid), stream, sizeof(int32_t));
+	stream += sizeof(int32_t);
+	memcpy(&(suscripcion->cola_suscripcion), stream, sizeof(op_code));
+	stream += sizeof(op_code);
+
+	return suscripcion;
+}
+
