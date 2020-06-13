@@ -19,22 +19,26 @@ void procesar_suscripcion(t_mensaje* mensaje, int* socket){
 
 	if(posicion_suscriptor < 0){
 		//TODO asegurar mutua exclusion
+		pthread_mutex_lock(&cola->semaforoSuscriptores);
 		suscriptor_suscribirse_a(cola->suscriptores,suscriptor);
+		pthread_mutex_unlock(&cola->semaforoSuscriptores);
 
 		loggear_suscripcion_proceso(suscripcion_proceso_to_string(suscripcion));
 
 	}else{
 		//TODO asegurar mutua exclusion
+		pthread_mutex_lock(&cola->semaforoSuscriptores);
 		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
+		pthread_mutex_unlock(&cola->semaforoSuscriptores);
 		loggear_reconexion_proceso(suscripcion_proceso_to_string(suscripcion));
 	}
 
 	//TODO dudoso, turbio, probar en maquina de ale
 	pthread_join(envio_mensajes_cacheados,NULL);
 
-	if (list_size(cola->suscriptores) == 1) {
+	/*if (list_size(cola->suscriptores) == 1) {
 		sem_post(&cola->semaforoSuscriptores);
-	}
+	}*/
 
 	mensaje_destroy(mensaje);
 }
@@ -61,13 +65,13 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 
 void procesar_pokemon(t_cola_mensajeria* cola){
 	while(1){
-		sem_wait(&cola->semaforoSuscriptores);
+		//sem_wait(&cola->semaforoSuscriptores);
 		sem_wait(&cola->semaforoMensajes);
 
 		//TODO hacer un queue_peek
+		pthread_mutex_lock(&cola->mutex_cola_mensaje);
 		t_mensaje* mensaje = (t_mensaje*) queue_pop(cola->queue);
-
-		envio_a_suscriptores(cola->suscriptores, mensaje);
+		pthread_mutex_unlock(&cola->mutex_cola_mensaje);
 
 		//memoria_cache_agregar_mensaje(memoria_cache,mensaje);
 		if(string_equals_ignore_case(algoritmo_memoria,"BS")){
@@ -76,6 +80,13 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 			administrador_cachear_mensaje(mensaje);
 		}
 
-		sem_post(&cola->semaforoSuscriptores);
+		pthread_mutex_lock(&cola->semaforoSuscriptores);
+		int no_hay_suscriptores = !list_is_empty(cola->suscriptores);
+		pthread_mutex_unlock(&cola->semaforoSuscriptores);
+		if(no_hay_suscriptores){
+			envio_a_suscriptores(cola->suscriptores, mensaje);
+		}
+
+		//sem_post(&cola->semaforoSuscriptores);
 	}
 }

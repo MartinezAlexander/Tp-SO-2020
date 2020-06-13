@@ -14,6 +14,8 @@ void iniciar_administrador_pd(){
 		es_fifo = 0;
 		particiones_victimas_lru = list_create();
 	}
+
+	pthread_mutex_init(&mutex_cacheo,NULL);
 }
 
 int first_fit(t_mensaje* mensaje){
@@ -219,16 +221,24 @@ void administrador_cachear_mensaje(t_mensaje* mensaje){
 
 	//primer ajuste
 	if(string_equals_ignore_case(algoritmo_particion_libre,"FF") &&  string_equals_ignore_case(algoritmo_reemplazo,"FIFO") ){
+		pthread_mutex_lock(&mutex_cacheo);
 		procedimiento_para_almacenamiento_de_datos(mensaje,first_fit, fifo_eliminar);
+		pthread_mutex_unlock(&mutex_cacheo);
 	}
 	if (string_equals_ignore_case(algoritmo_particion_libre, "FF") &&  string_equals_ignore_case(algoritmo_reemplazo,"LRU")) {
+		pthread_mutex_lock(&mutex_cacheo);
 		procedimiento_para_almacenamiento_de_datos(mensaje, first_fit, lru_eliminar);
+		pthread_mutex_unlock(&mutex_cacheo);
 	}
 	if (string_equals_ignore_case(algoritmo_particion_libre, "BF") && string_equals_ignore_case(algoritmo_reemplazo, "FIFO")) {
+		pthread_mutex_lock(&mutex_cacheo);
 		procedimiento_para_almacenamiento_de_datos(mensaje, best_fit, fifo_eliminar);
+		pthread_mutex_unlock(&mutex_cacheo);
 	}
 	if (string_equals_ignore_case(algoritmo_particion_libre, "BF") && string_equals_ignore_case(algoritmo_reemplazo, "LRU")) {
+		pthread_mutex_lock(&mutex_cacheo);
 		procedimiento_para_almacenamiento_de_datos(mensaje, best_fit, lru_eliminar);
+		pthread_mutex_unlock(&mutex_cacheo);
 	}
 }
 

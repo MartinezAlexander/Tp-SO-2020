@@ -21,7 +21,9 @@ t_cola_mensajeria* cola_mensajeria_create(){
 	cola_mensajeria->queue = queue_create();
 	cola_mensajeria->suscriptores = list_create();
 	sem_init(&cola_mensajeria->semaforoMensajes,0,0);
-	sem_init(&cola_mensajeria->semaforoSuscriptores,0,0);
+	//sem_init(&cola_mensajeria->semaforoSuscriptores,0,0);
+	pthread_mutex_init(&cola_mensajeria->semaforoSuscriptores,NULL);
+	pthread_mutex_init(&cola_mensajeria->mutex_cola_mensaje,NULL);
 	return cola_mensajeria;
 }
 
@@ -57,7 +59,9 @@ void cola_mensajeria_recibir_mensaje(t_cola_mensajeria* cola, t_mensaje* mensaje
 	mensaje->id = (*ultimo_id);
 
 	loggear_recepcion_mensaje(mensaje_to_string(mensaje));
+	pthread_mutex_lock(&cola->mutex_cola_mensaje);
 	queue_push(cola->queue, mensaje);
+	pthread_mutex_unlock(&cola->mutex_cola_mensaje);
 	sem_post(&cola->semaforoMensajes);
 }
 
