@@ -21,7 +21,9 @@ typedef struct{
 	t_list* suscriptores;
 	pthread_t hilo;
 	sem_t semaforoMensajes;
-	sem_t semaforoSuscriptores;
+	//sem_t semaforoSuscriptores;
+	pthread_mutex_t semaforoSuscriptores;
+	pthread_mutex_t mutex_cola_mensaje;
 }t_cola_mensajeria;
 
 t_cola_mensajeria* cola_mensajeria_new;

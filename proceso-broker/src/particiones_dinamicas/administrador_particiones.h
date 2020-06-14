@@ -10,6 +10,9 @@
 #include "../memoria_cache.h"
 #include "../suscriptor.h"
 #include "../logger.h"
+#include <pthread.h>
+
+pthread_mutex_t mutex_cacheo;
 
 t_list* particiones;
 
