@@ -103,7 +103,6 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 
 	if (id == BROKER && codigo == GET_POKEMON) {
 		mensaje_creado = (void*) get_pokemon_create(mensaje[3]);
-		log_info(logger,"size: %d",strlen(mensaje[3])+1);
 		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
 	}
 
