@@ -9,6 +9,7 @@
 #include "config.h"
 #include <commons/string.h>
 #include "particiones_dinamicas/administrador_particiones.h"
+#include "buddy_system/administrador_buddy_system.h"
 
 typedef struct{
 	t_suscriptor* suscriptor;

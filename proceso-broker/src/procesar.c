@@ -75,7 +75,7 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 
 		//memoria_cache_agregar_mensaje(memoria_cache,mensaje);
 		if(string_equals_ignore_case(algoritmo_memoria,"BS")){
-			//TODO cachear mensaje en buddy system
+			cachear_mensaje_bs(mensaje);
 		}else{
 			administrador_cachear_mensaje(mensaje);
 		}

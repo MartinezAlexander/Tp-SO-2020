@@ -1,5 +1,6 @@
 #include "buddy_system.h"
 
+int tamanio_minimo_particion = 32;
 
 void recolectar_hojas_libres(t_buddy* raiz, t_list* hojas){
 	if(buddy_es_hoja(raiz)){
@@ -12,6 +13,9 @@ void recolectar_hojas_libres(t_buddy* raiz, t_list* hojas){
 	}
 }
 
+bool menor_a_mayor(void* buddy1, void* buddy2){
+	return ((t_buddy*)buddy1)->tamanio <= ((t_buddy*)buddy2)->tamanio;
+}
 
 t_buddy* buddy_create(int tamanio, int base){
 	t_buddy* buddy = malloc(sizeof(t_buddy));
@@ -33,19 +37,27 @@ t_buddy* buddy_get_hijo_izquierdo(t_buddy* padre){
 	return (t_buddy*)padre->izq;
 }
 
+t_buddy* buddy_get_hermano(t_buddy* buddy){
+	t_buddy* hermano = NULL;
+	if(!buddy_es_raiz(buddy)){
+		if(((t_buddy*)buddy->padre)->der == buddy){
+			hermano = ((t_buddy*)buddy->padre)->izq;
+		}else{
+			hermano = ((t_buddy*)buddy->padre)->der;
+		}
+	}
+	return hermano;
+}
+
+
 int buddy_esta_libre(t_buddy* buddy){
 	return buddy->libre;
 }
 
 
 void buddy_ocupar(t_buddy* buddy, int tamanio_a_ocupar){
-	if( buddy_get_real_size(buddy)>tamanio_a_ocupar && buddy_esta_libre(buddy)){
-		buddy->libre = 0;
-		buddy->tamanio_mensaje = tamanio_a_ocupar;
-		//TODO guardar en cache
-	}else{
-		printf("No es posible ocupar el buddy con el tamanio %d\n", tamanio_a_ocupar);
-	}
+	buddy->libre = 0;
+	buddy->tamanio_mensaje = tamanio_a_ocupar;
 }
 
 int buddy_es_hoja(t_buddy* buddy){
@@ -57,7 +69,7 @@ int buddy_es_raiz(t_buddy* buddy){
 }
 
 void buddy_split(t_buddy* buddy){
-	if((buddy_get_real_size(buddy) >= (int)tamano_minimo_particion*2) && buddy_es_hoja(buddy)){
+	if((buddy_get_real_size(buddy) >= (int)tamanio_minimo_particion*2) && buddy_es_hoja(buddy)){
 		int tam_hijos = buddy->tamanio -1;
 
 		int base_izq = buddy->base;
@@ -91,6 +103,11 @@ int buddy_get_real_size(t_buddy* buddy){
 	return int_pow(2,buddy->tamanio);
 }
 
+int tamanio_ideal_para_el_buddy(t_mensaje* mensaje, t_buddy* buddy){
+	return mensaje_size(mensaje)<=buddy_get_real_size(buddy)  &&  mensaje_size(mensaje) > buddy_get_real_size(buddy)/2;
+}
+
+
 void buddy_mostrar(t_buddy* buddy){
 	printf("Tamanio: %d\n",buddy_get_real_size(buddy));
 	printf("Base: %d\n",buddy->base);
@@ -117,24 +134,21 @@ void buddy_mostrar(t_buddy* buddy){
 
 }
 
-void poner_hijos_en_null(t_buddy* buddy){
-	if(buddy_es_hoja(buddy->izq) && buddy_es_hoja(buddy->der)){
-		buddy->izq = NULL;
-		buddy->der = NULL;
-	}else{
-		puts("No puedo poner hijos en null, no son hojas!");
-	}
+void liberar_hijo_izquierdo(t_buddy* padre){
+	free(padre->izq);
+	padre->izq = NULL;
+}
+
+void liberar_hijo_derecho(t_buddy* padre){
+	free(padre->der);
+	padre->der = NULL;
 }
 
 void buddy_destroy(t_buddy* buddy){
-	if(buddy_es_hoja(buddy)){
+	if(buddy_es_raiz(buddy)){
+		liberar_hijo_derecho(buddy);
+		liberar_hijo_izquierdo(buddy);
 		free(buddy);
-	}else{
-		puts("Liberar hijos antes de liberar al buddy");
 	}
 }
 
-void buddy_liberar(t_buddy* buddy){
-	poner_hijos_en_null(buddy);
-	buddy_destroy(buddy);
-}
