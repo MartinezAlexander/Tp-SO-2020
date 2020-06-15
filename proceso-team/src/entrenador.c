@@ -129,16 +129,19 @@ int mover_proxima_posicion(t_entrenador* entrenador){
 	return movimientos_entre_posiciones(entrenador->posicion, entrenador->objetivo_actual->posicion) == 0;
 }
 
-t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos, int identificador, double estimacion_inicial ){
-	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
-
-	char** posiciones_separadas = string_split(posicion, "|");
-	entrenador->posicion = *posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
-	free(posiciones_separadas);
-
+//Recibe pokemones en un string separados por pipes y los asigna al entrenador
+void asignar_pokemones(t_entrenador* entrenador, char* pokemones){
 	char** pokemones_adquiridos_array = string_split(pokemones, "|");
 	entrenador->pokemones_adquiridos = array_to_list(pokemones_adquiridos_array);
 	free(pokemones_adquiridos_array);
+}
+
+t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial ){
+	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
+
+	char** posiciones_separadas = string_split(posicion, "|");
+	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
+	free(posiciones_separadas);
 
 	char** objetivos_array = string_split(objetivos, "|");
 	entrenador->objetivos = array_to_list(objetivos_array);
@@ -160,20 +163,41 @@ t_entrenador* entrenador_create(char* posicion, char* pokemones, char* objetivos
 	return entrenador;
 }
 
+//Toma un string del formato "Token,Token,Token"
+//y devuelve una list con cada item.
+//El item sera NULL si no hay token entre
+//dos separadores
+t_list* separar(char* listado){
+	t_list* listado_separado = list_create();
+
+	int len_no_brackets = strlen(listado) - 2;
+	char* listado_sin_brackets = string_substring(listado, 1, len_no_brackets);
+
+	char* token;
+	while((token = strsep(&listado_sin_brackets, ",")) != NULL){
+		if(!strcmp(token, "")){
+			list_add(listado_separado, NULL);
+		}else{
+			list_add(listado_separado, token);
+		}
+	}
+
+	return listado_separado;
+}
 
 t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
-	char** pokemones_entrenadores = config_get_array_value(config, "POKEMON_ENTRENADORES");
+	char* listado_pokemones_adquiridos = config_get_string_value(config, "POKEMON_ENTRENADORES");
 	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
 
 	int numero_posiciones = array_cantidad_de_elementos(posiciones_entrenadores);
-	int numero_pok_entrenadores = array_cantidad_de_elementos(pokemones_entrenadores);
 	int numero_obj_entrenadores = array_cantidad_de_elementos(objetivos_entrenadores);
 
+	t_list* pokemones_entrenadores = separar(listado_pokemones_adquiridos);
+
 	//Error si no coinciden las cantidades
-	if(numero_posiciones != numero_pok_entrenadores
-			|| numero_pok_entrenadores != numero_obj_entrenadores){
-		printf("Error: no coindiden las cantidades de pos-pok-obj de entrenadores en config!");
+	if(numero_posiciones != numero_obj_entrenadores){
+		printf("Error: no coindiden las cantidades de pos-obj de entrenadores en config!");
 	}
 
 	t_list* entrenadores = list_create();
@@ -181,13 +205,22 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	iniciarlizar_diccionario_catch();
 
 	for(int i = 0 ; i < numero_posiciones ; i++){
-		list_add(entrenadores,entrenador_create(posiciones_entrenadores[i],
-				pokemones_entrenadores[i],
-				objetivos_entrenadores[i], (i+1), estimacion_inicial));
+		t_entrenador* entrenador = entrenador_create(posiciones_entrenadores[i],
+				objetivos_entrenadores[i], (i+1), estimacion_inicial);
+
+		char* pokemones = list_get(pokemones_entrenadores, i);
+		//Asigno si veo que tiene pokemones de entrada
+		if(pokemones != NULL){
+			asignar_pokemones(entrenador, pokemones);
+		}else{
+			entrenador->pokemones_adquiridos = list_create();
+		}
+
+		list_add(entrenadores, entrenador);
 	}
 
 	free(posiciones_entrenadores);
-	free(pokemones_entrenadores);
+	free(listado_pokemones_adquiridos);
 	free(objetivos_entrenadores);
 
 	return entrenadores;
@@ -235,14 +268,14 @@ int entrenador_estado_deadlock(t_entrenador* entrenador){
 }
 
 t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion posicion){
-	int index_mas_cercano;
-	//Ya empieza como la maxima distancia posible
-	int distancia_mas_corta = posicion.posicionX + posicion.posicionY;
+	int index_mas_cercano = 0;
+	//Ya empieza como la distancia del primer entrenador que aparece
+	t_posicion posicion_entrenador = ((t_entrenador*)list_get(entrenadores, 0))->posicion;
+	int distancia_mas_corta = movimientos_entre_posiciones(posicion, posicion_entrenador);
 
 	//Comparo la cantidad de movimientos que necesito para llegar a pos.
-	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+	for(int i = 1 ; i < list_size(entrenadores) ; i++){
 		t_posicion posicion_entrenador = ((t_entrenador*)list_get(entrenadores, i))->posicion;
-
 		int distancia = movimientos_entre_posiciones(posicion, posicion_entrenador);
 
 		//En caso de empate se queda el que ya estaba (el primero)

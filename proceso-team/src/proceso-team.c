@@ -15,6 +15,7 @@
 int main(void) {
 	inicializar_variables();
 
+
 	iniciar_hilos_planificacion();
 
 	//Me suscribo a las colas y abro hilos para recibir mensajes
@@ -46,6 +47,7 @@ int main(void) {
 
 	//Loggear estadisticas
 
+	//quedaria liberar variables globales
 	terminar_programa(logger, config);
 }
 
@@ -98,8 +100,8 @@ t_log* iniciar_logger(char* path)
 
 t_config* leer_config(void)
 {
-	t_config *config;//Puede que este mal el path
-	if((config = config_create("src/team.config")) == NULL)//Nota: para correr desde Debug
+	t_config *config;
+	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
 	{														//hay que agregar ../ al path
 		printf("No pude leer la config\n");
 		exit(2);

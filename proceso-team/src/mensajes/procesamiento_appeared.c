@@ -25,6 +25,7 @@ void procesar_pokemon(t_pokemon* pokemon){
 		pthread_mutex_unlock(&mutex_diccionario_especies);
 
 		sacar_de_objetivos_globales(pokemon->especie, objetivo_global);
+
 		entrenador_entrar_a_planificacion(pokemon);
 	}else
 		descartar_pokemon(pokemon);

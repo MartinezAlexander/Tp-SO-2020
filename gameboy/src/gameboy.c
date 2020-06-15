@@ -147,7 +147,7 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	switch (id) {
 	case BROKER:
 		socket = crear_conexion(ip_broker, puerto_broker);
-		loggear_conexion(id);
+		loggear_conexion(id,socket);
 		enviar_mensaje(mensaje, socket);
 		recibir_id(socket);
 		liberar_conexion(socket);
@@ -155,13 +155,13 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	case TEAM:
 		socket = crear_conexion(ip_team, puerto_team);
 		enviar_mensaje(mensaje, socket);
-		loggear_conexion(id);
+		loggear_conexion(id,socket);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
 	case GAMECARD:
 		socket = crear_conexion(ip_gamecard, puerto_gamecard);
-		loggear_conexion(id);
+		loggear_conexion(id,socket);
 		enviar_mensaje(mensaje, socket);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
@@ -196,7 +196,7 @@ int main(int arg, char** args) {
 
 		tiempo_conexion = atoi(args[3]);
 		int socket = crear_conexion(ip_broker, puerto_broker);
-		loggear_conexion(id_proceso);
+		loggear_conexion(id_proceso,socket);
 		enviar_mensaje(mensaje_procesado, socket);
 		int estoy_suscripto = recibir_confirmacion_suscripcion(socket);
 
@@ -210,7 +210,7 @@ int main(int arg, char** args) {
 			while (1) {
 				t_mensaje* mensaje = recibir_mensaje(socket);
 				enviar_ACK(socket);
-				loggear_nuevo_mensaje(tipo_mensaje);
+				loggear_nuevo_mensaje(tipo_mensaje,mensaje_to_string(mensaje));
 				mensaje_mostrar(mensaje);
 			}
 		}
@@ -224,7 +224,7 @@ int main(int arg, char** args) {
 
 t_config* leer_config(void) {
 
-	t_config* config = config_create("src/gameboy.config");
+	t_config* config = config_create("../src/gameboy.config");
 
 	if (config == NULL) {
 		exit(2);
