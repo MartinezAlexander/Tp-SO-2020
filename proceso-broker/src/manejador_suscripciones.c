@@ -12,7 +12,9 @@ void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* param
 	t_list* mensajes;
 
 	if(string_equals_ignore_case(algoritmo_memoria,"BS")){
-		//TODO mensajes = obtener_mensajes_cacheados_por_cola_bs(parametros->cola);
+		pthread_mutex_lock(&mutex_bs);
+		mensajes = obtener_mensajes_cacheados_por_cola_bs(parametros->cola);
+		pthread_mutex_unlock(&mutex_bs);
 	}else{
 		pthread_mutex_lock(&mutex_cacheo);
 		mensajes = obtener_mensajes_cacheados_por_cola_pd(parametros->cola);
