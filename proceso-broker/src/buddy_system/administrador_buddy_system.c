@@ -46,6 +46,7 @@ t_list* obtener_mensajes_cacheados_por_cola_bs(op_code cola){
 
 void fifo(){
 	t_buddy* buddy_victima = queue_pop(buddies_victimas_fifo);
+	buddy_mostrar(buddy_victima);
 	buddy_liberar(buddy_victima);
 }
 
