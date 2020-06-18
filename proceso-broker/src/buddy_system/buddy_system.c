@@ -17,8 +17,8 @@ void recolectar_hojas_ocupadas(t_buddy* raiz, t_list* hojas){
 			list_add(hojas, raiz);
 		}
 	}else{
-		recolectar_hojas_libres(raiz->izq,hojas);
-		recolectar_hojas_libres(raiz->der,hojas);
+		recolectar_hojas_ocupadas(raiz->izq,hojas);
+		recolectar_hojas_ocupadas(raiz->der,hojas);
 	}
 }
 

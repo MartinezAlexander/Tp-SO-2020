@@ -41,6 +41,9 @@ void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* param
 			}
 		}
 		list_destroy_and_destroy_elements(mensajes,(void*)mensaje_destroy);
+	}else{
+		//TODO pasar a logger personal
+		puts("NO HAY MENSAJES DE ESA COLA");
 	}
 
 	parametros_destroy(parametros);

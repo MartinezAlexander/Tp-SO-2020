@@ -15,14 +15,16 @@ void iniciar_buddy_system(){
 		pthread_mutex_init(&mutex_bs,NULL);
 	}
 	else{
+		//TODO loguear esto en logger personal
 		puts("No se puede implementar un BS de un tamano que no sea potencia de 2");
-		exit(1);
+		//exit(1);
 	}
 }
 
 t_list* obtener_mensajes_cacheados_por_cola_bs(op_code cola){
 	t_list* mensajes = list_create();
 	t_list* hojas_ocupadas = list_create();
+	int hay_mensajes_de_esa_cola = 0;
 
 	recolectar_hojas_ocupadas(buddy_principal,hojas_ocupadas);
 
@@ -37,16 +39,21 @@ t_list* obtener_mensajes_cacheados_por_cola_bs(op_code cola){
 			if(string_equals_ignore_case(algoritmo_reemplazo,"LRU")){
 				lru_actualizar(buddy);
 			}
+			hay_mensajes_de_esa_cola = 1;
 		}
 	}
 	list_destroy(hojas_ocupadas);
+
+	if(!hay_mensajes_de_esa_cola){
+		list_destroy(mensajes);
+		mensajes = NULL;
+	}
 
 	return mensajes;
 }
 
 void fifo(){
 	t_buddy* buddy_victima = queue_pop(buddies_victimas_fifo);
-	buddy_mostrar(buddy_victima);
 	buddy_liberar(buddy_victima);
 }
 
@@ -92,7 +99,6 @@ int ff(t_mensaje* mensaje){
 		buddy_ocupar(seleccionado,mensaje);
 		memoria_cache_agregar_mensaje(mensaje,seleccionado->base);
 		loggear_mensaje_cacheado(mensaje_to_string(mensaje),seleccionado->base);
-		mensaje_destroy(mensaje);
 	}
 
 	list_destroy(hojas);
@@ -124,7 +130,6 @@ int bf(t_mensaje* mensaje){
 		buddy_ocupar(seleccionado,mensaje);
 		memoria_cache_agregar_mensaje(mensaje,seleccionado->base);
 		loggear_mensaje_cacheado(mensaje_to_string(mensaje),seleccionado->base);
-		mensaje_destroy(mensaje);
 	}
 
 	list_destroy(hojas);

@@ -86,7 +86,7 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		if(no_hay_suscriptores){
 			envio_a_suscriptores(cola->suscriptores, mensaje);
 		}
-
+		mensaje_destroy(mensaje);
 		//sem_post(&cola->semaforoSuscriptores);
 	}
 }
