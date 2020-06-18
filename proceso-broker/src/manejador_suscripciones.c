@@ -39,8 +39,11 @@ void iniciar_procesador_suscripciones(void(*procesar_suscripcion)(void)){
 	pthread_detach(procesador_suscripciones);
 }
 
-void memoria_cache_enviar_mensajes_cacheados(t_suscriptor* suscriptor, op_code cola){
+void memoria_cache_enviar_mensajes_cacheados(int socket, t_list* mensajes_enviados,int32_t pid , op_code cola){
 	t_list* mensajes;
+	t_suscriptor suscriptor;
+	suscriptor.socket = socket;
+	suscriptor.pid = pid;
 
 	if(string_equals_ignore_case(algoritmo_memoria,"BS")){
 		pthread_mutex_lock(&mutex_bs);
@@ -56,19 +59,30 @@ void memoria_cache_enviar_mensajes_cacheados(t_suscriptor* suscriptor, op_code c
 	if(mensajes != NULL){
 		int i;
 		for (i = 0; i < list_size(mensajes); i++) {
-			t_mensaje* mensaje = (t_mensaje*) list_get(mensajes, i);
-			//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-			int resultado_envio = enviar_mensaje(mensaje,suscriptor->socket);
 
-			if (resultado_envio > 0) {
-				loggear_envio_mensaje(mensaje_to_string(mensaje));
-				//TODO verificar retorno de ack
-				//TODO Syscall param socketcall.recv(args) points to uninitialised byte(s)
-				recibir_ACK(suscriptor->socket);
-				loggear_recepcion_ACK(suscriptor_to_string(suscriptor));
-			} else {
-				log_personal_error_envio_a_suscriptor(suscriptor_to_string(suscriptor));
-				i = list_size(mensajes);
+			t_mensaje* mensaje = (t_mensaje*) list_get(mensajes, i);
+
+			if(!suscriptor_ya_recibio_mensaje(mensajes_enviados,mensaje->id)){
+
+				//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
+				int resultado_envio = enviar_mensaje(mensaje,socket);
+
+				if (resultado_envio > 0) {
+					loggear_envio_mensaje(mensaje_to_string(mensaje));
+					//TODO Syscall param socketcall.recv(args) points to uninitialised byte(s)
+					if(recibir_ACK(socket)){
+						loggear_recepcion_ACK(suscriptor_to_string(&suscriptor));
+						suscriptor_agregar_mensaje_recibido(mensajes_enviados,mensaje->id);
+					}else{
+						//TODO loguear que no se recibio el ack en el loguer personal
+						i = list_size(mensajes);
+					}
+				} else {
+					log_personal_error_envio_a_suscriptor(suscriptor_to_string(&suscriptor));
+					i = list_size(mensajes);
+				}
+			}else{
+				//TODO loguear que el mensaje ya se lo habia mandado al suscriptor
 			}
 		}
 		list_destroy_and_destroy_elements(mensajes,(void*)mensaje_destroy);

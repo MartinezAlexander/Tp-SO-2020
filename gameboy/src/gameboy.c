@@ -136,7 +136,7 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		mensaje_procesado = mensaje_con_id_create(mensaje_creado, codigo, id_m);
 	}
 	if (id == SUSCRIPTOR) {
-		t_suscripcion* mensaje_suscripcion = suscripcion_proceso_create(id,getpid(), codigo);
+		t_suscripcion* mensaje_suscripcion = suscripcion_proceso_create(id,id_gameboy, codigo);
 		mensaje_procesado = mensaje_simple_create((void*) mensaje_suscripcion,SUSCRIPCION);
 	}
 	return mensaje_procesado;
@@ -180,6 +180,8 @@ void inicializar_variables() {
 	puerto_gamecard = config_get_string_value(config, "PUERTO_GAMECARD");
 
 	path_logger = config_get_string_value(config, "LOG_FILE");
+
+	id_gameboy = config_get_int_value(config, "ID");
 
 }
 int main(int arg, char** args) {

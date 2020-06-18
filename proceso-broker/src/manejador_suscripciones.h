@@ -28,7 +28,7 @@ pthread_t procesador_suscripciones;
 
 t_suscripciones* suscripciones_create(t_mensaje* mensaje, int* socket);
 void suscripciones_destroy(t_suscripciones* suscripciones);
-void memoria_cache_enviar_mensajes_cacheados(t_suscriptor* suscriptor, op_code cola);
+void memoria_cache_enviar_mensajes_cacheados(int socket, t_list* mensajes_enviados,int32_t pid , op_code cola);
 void cola_suscripciones_create();
 void iniciar_procesador_suscripciones(void(*procesa_suscripcion)(void));
 void cola_suscripciones_agregar_suscripcion(t_mensaje* mensaje, int* socket);
