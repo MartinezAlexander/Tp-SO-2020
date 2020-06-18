@@ -92,7 +92,7 @@ int ff(t_mensaje* mensaje){
 		buddy_ocupar(seleccionado,mensaje);
 		memoria_cache_agregar_mensaje(mensaje,seleccionado->base);
 		loggear_mensaje_cacheado(mensaje_to_string(mensaje),seleccionado->base);
-		mensaje_destroy(mensaje);
+		//mensaje_destroy(mensaje);
 	}
 
 	list_destroy(hojas);
@@ -124,7 +124,7 @@ int bf(t_mensaje* mensaje){
 		buddy_ocupar(seleccionado,mensaje);
 		memoria_cache_agregar_mensaje(mensaje,seleccionado->base);
 		loggear_mensaje_cacheado(mensaje_to_string(mensaje),seleccionado->base);
-		mensaje_destroy(mensaje);
+		//mensaje_destroy(mensaje);
 	}
 
 	list_destroy(hojas);
