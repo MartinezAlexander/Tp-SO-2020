@@ -84,6 +84,8 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 			envio_a_suscriptores(cola->suscriptores, mensaje);
 		}
 
+		mensaje_destroy(mensaje);
+
 		//sem_post(&cola->semaforoSuscriptores);
 	}
 }

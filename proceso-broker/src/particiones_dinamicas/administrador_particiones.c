@@ -46,7 +46,6 @@ int first_fit(t_mensaje* mensaje){
 
 			memoria_cache_agregar_mensaje(mensaje,particion->base);
 			loggear_mensaje_cacheado(mensaje_to_string(mensaje),particion->base);
-			mensaje_destroy(mensaje);
 
 			if(es_fifo){
 				queue_push(particiones_victimas,particion);
@@ -101,7 +100,6 @@ int best_fit(t_mensaje* mensaje){
 		}
 
 		memoria_cache_agregar_mensaje(mensaje, mejor_particion->base);
-		mensaje_destroy(mensaje);
 
 		if (es_fifo) {
 			queue_push(particiones_victimas, mejor_particion);
