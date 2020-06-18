@@ -57,7 +57,7 @@ void administrar_mensajes(int* socket){
 	if(mensaje != NULL){
 		switch (mensaje->codigo) {
 		case SUSCRIPCION:
-			procesar_suscripcion(mensaje, socket);
+			cola_suscripciones_agregar_suscripcion(mensaje,socket);
 			break;
 		case NEW_POKEMON:
 			cola_mensajeria_recibir_mensaje(cola_mensajeria_new, mensaje,

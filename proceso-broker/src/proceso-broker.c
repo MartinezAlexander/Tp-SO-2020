@@ -29,6 +29,8 @@ int main(void){
 		iniciar_administrador_pd();
 	}
 
+	iniciar_procesador_suscripciones(procesar_suscripcion);
+
 	inicializar_colas_mensajeria(procesar_pokemon);
 
 	iniciar_servidor(ip_broker,puerto_broker,administrar_mensajes);

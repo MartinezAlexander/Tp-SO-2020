@@ -11,7 +11,7 @@
 #include "logger.h"
 #include "manejador_suscripciones.h"
 
-void procesar_suscripcion(t_mensaje* mensaje, int* socket);
+void procesar_suscripcion();
 
 void procesar_pokemon(t_cola_mensajeria* cola);
 

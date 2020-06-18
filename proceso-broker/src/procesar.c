@@ -1,46 +1,43 @@
 #include "procesar.h"
 #include <unistd.h>
 
-void procesar_suscripcion(t_mensaje* mensaje, int* socket){
-	t_suscripcion* suscripcion = (t_suscripcion*)mensaje->mensaje;
-	t_suscriptor* suscriptor = suscriptor_create(*socket,suscripcion->pid);
+void procesar_suscripcion(){
 
-	loggear_recepcion_mensaje(mensaje_to_string(mensaje));
-	//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-	confirmar_suscripcion(*socket);
+	while(1){
+		sem_wait(&cola_suscripciones->semaforoSuscripcion);
 
-	para_envio_mensaje_cacheados* parametros = parametros_create(suscriptor,suscripcion->cola_suscripcion,memoria_cache);
-	pthread_t envio_mensajes_cacheados;
-	pthread_create(&envio_mensajes_cacheados,NULL,(void*)memoria_cache_enviar_mensajes_cacheados,parametros);
+		pthread_mutex_lock(&cola_suscripciones->mutex_cola_suscripcion);
+		t_suscripciones* info_suscripcion = queue_pop(cola_suscripciones->queue);
+		pthread_mutex_unlock(&cola_suscripciones->mutex_cola_suscripcion);
 
-	t_cola_mensajeria* cola = cola_mensajeria_obtener(suscripcion->cola_suscripcion);
+		t_suscripcion* suscripcion =(t_suscripcion*) info_suscripcion->mensaje->mensaje;
 
-	int posicion_suscriptor = suscriptor_esta_suscripto(cola->suscriptores,suscriptor);
+		t_cola_mensajeria* cola = cola_mensajeria_obtener(suscripcion->cola_suscripcion);
 
-	if(posicion_suscriptor < 0){
-		//TODO asegurar mutua exclusion
-		pthread_mutex_lock(&cola->semaforoSuscriptores);
-		suscriptor_suscribirse_a(cola->suscriptores,suscriptor);
-		pthread_mutex_unlock(&cola->semaforoSuscriptores);
+		int posicion_suscriptor = suscriptor_esta_suscripto(cola->suscriptores,suscripcion->pid);
 
-		loggear_suscripcion_proceso(suscripcion_proceso_to_string(suscripcion));
+		if (posicion_suscriptor < 0) {
+			//TODO asegurar mutua exclusion
+			t_suscriptor* suscriptor = suscriptor_create(*info_suscripcion->socket,suscripcion->pid);
+			memoria_cache_enviar_mensajes_cacheados(suscriptor,suscripcion->cola_suscripcion);
+			pthread_mutex_lock(&cola->semaforoSuscriptores);
+			suscriptor_suscribirse_a(cola->suscriptores, suscriptor);
+			pthread_mutex_unlock(&cola->semaforoSuscriptores);
 
-	}else{
-		//TODO asegurar mutua exclusion
-		pthread_mutex_lock(&cola->semaforoSuscriptores);
-		suscriptor_reconectar(cola->suscriptores,suscriptor,posicion_suscriptor);
-		pthread_mutex_unlock(&cola->semaforoSuscriptores);
-		loggear_reconexion_proceso(suscripcion_proceso_to_string(suscripcion));
+			loggear_suscripcion_proceso(suscripcion_proceso_to_string(suscripcion));
+
+		} else {
+			//TODO asegurar mutua exclusion
+			pthread_mutex_lock(&cola->semaforoSuscriptores);
+			t_suscriptor* suscriptor = list_get(cola->suscriptores,posicion_suscriptor);
+			memoria_cache_enviar_mensajes_cacheados(suscriptor,suscripcion->cola_suscripcion);
+			suscriptor_reconectar(cola->suscriptores, info_suscripcion->socket,posicion_suscriptor);
+			pthread_mutex_unlock(&cola->semaforoSuscriptores);
+			loggear_reconexion_proceso(suscripcion_proceso_to_string(suscripcion));
+		}
+
+		suscripciones_destroy(info_suscripcion);
 	}
-
-	//TODO dudoso, turbio, probar en maquina de ale
-	pthread_join(envio_mensajes_cacheados,NULL);
-
-	/*if (list_size(cola->suscriptores) == 1) {
-		sem_post(&cola->semaforoSuscriptores);
-	}*/
-
-	mensaje_destroy(mensaje);
 }
 
 void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
@@ -86,7 +83,9 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		if(no_hay_suscriptores){
 			envio_a_suscriptores(cola->suscriptores, mensaje);
 		}
+
 		mensaje_destroy(mensaje);
+
 		//sem_post(&cola->semaforoSuscriptores);
 	}
 }
