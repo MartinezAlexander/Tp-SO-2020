@@ -17,12 +17,26 @@ void esperar_hilos_planificacion(){
 	pthread_join(planificador->hilo_planificacion, NULL);
 }
 
-//TODO: ver que pasa si la lista de disponibles da vacia.
-//Ver en enunciado y de todas formas catchear la situacion
+//TODO: funcion para chequear entrenadores disponoibles,
+//si hay alguin pokemones en espera, y si hay, planificarlos
+//Idea: lo importante es encontrar donde podemos llamar a esta funcion
+//tiene que ser cuando un entrenador termina de ejecutar.
+//Estabamos viendo opciones y la que aparecia mejor
+//era llamarla en sacar_de_ejecucion() (funcion de planificador)
+//ya que no tengo que tocar los planificadores y siempre parece llamarse cuando
+//saco a uno porque termino de ejecutar
+
+//El tema es que para ver que estemos en lo correcto tendriamos
+//que terminar de hacer sjf con desalojo
+
+//TODO: Agregar mutex compartido entre esta funcion y la de arriba
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Filtro entrenadores disponibles
 	t_list* entrenadores_disponibles = list_filter(entrenadores, (void*)entrenador_disponible);
+	//TODO catchear error de que no haya disponibles - en ese caso:
+	//Si no hay entrenadores tengo que guardarme los pokemones en
+	//la cola de espera
 
 	//Obtengo entrenador mas cercano al pokemon a atrapar
 	t_entrenador *entrenador_mas_cercano = obtener_entrenador_mas_cercano(entrenadores_disponibles, pokemon->posicion);

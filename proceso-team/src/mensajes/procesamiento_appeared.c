@@ -27,7 +27,17 @@ void procesar_pokemon(t_pokemon* pokemon){
 		sacar_de_objetivos_globales(pokemon->especie, objetivo_global);
 
 		entrenador_entrar_a_planificacion(pokemon);
-	}else
+	}else{
+		//TODO: Antes de descartar me tengo que fijar si alguien ya esta
+		//yendo a buscar uno de la misma especie. En ese caso, este me lo voy
+		//a guardar por si ese falla.
+
+		//Entonces me fijo si algun entrenador lo tiene asignado como
+		//objetivo actual
+
+		//Lo pongo en Cola de pokemones en espera
 		descartar_pokemon(pokemon);
+	}
+
 
 }

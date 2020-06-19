@@ -30,10 +30,25 @@ void planificar_sjf_sd(){
 void planificar_sjf_cd(){
 	//Replanifica cuando:
 	//Termina proceso
-	//Llega uno NUEVO a la cola
+	//Llega uno NUEVO a la cola => en entrar a planificacion, me fijo si uso cd => planifico (esta comentado)
 
 
 }
+//Solucion para SJF CD
+//El algoritmo va a ser casi igual salvo el cambio de la variable esta
+
+//Entonces, cada objeto sjf va a tener una variable
+//que represente si empece a ejecutar y no termine
+//Entonces, si es 0 tengo que calcular como siempre
+//Si es 1 significa que para mi ultima estimacion no termine de ejecutar lo que estime
+//entonces calculo haciendo la resta ultima_est - ultima_raf
+
+//La variable esta la pongo en 1 cuando lo pongo en EXEC
+//Y la paso a 0 cuando termino de ejecutar
+
+
+
+
 
 //Estimacion proxima: Rafaga anterior * alpha + Est anterior * (1 - alpha)
 t_entrenador* shortest_job(){

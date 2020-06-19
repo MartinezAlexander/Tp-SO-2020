@@ -33,6 +33,12 @@ void cerrar_conexion_broker(){
 	pthread_join(hilo_localized, NULL);
 }
 
+//TODO: Testear bien cual es el problema aca.
+//Idea que se nos habia ocurrido pero no sabemos en realidad
+//es que puede que falle porque estamos liberando conexion
+//muy rapido
+
+//Posible solucion parecida a lo de la suscripcion: sleep entre cada envio
 void enviar_get_objetivo(t_list* objetivo_global){
 
 	//Por cada especie distinta a la anterior
@@ -43,6 +49,8 @@ void enviar_get_objetivo(t_list* objetivo_global){
 		char* pokemon = list_get(objetivo_global, i);
 
 		if(strcmp(pokemon, ultima_especie_enviada) != 0){
+
+			sleep(1);
 			//Envio mensaje GET al broker
 			t_get_pokemon* mensaje_get = get_pokemon_create(pokemon);
 			t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON);

@@ -9,6 +9,7 @@ void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo){
 
 	if(!dictionary_has_key(mensajes_catch_pendientes, key_id)){//Validar id mensaje
 		descartar_caught(caught_pokemon);
+		printf("Descartado mensaje caught\n");
 	}else{
 		t_entrenador* entrenador = dictionary_get(mensajes_catch_pendientes, key_id);
 
