@@ -36,7 +36,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	t_list* entrenadores_disponibles = list_filter(entrenadores, (void*)entrenador_disponible);
 	//Puede pasar que todos mis entrenadores esten ocupados, en ese caso
 	//voy a guardar el pokemon en la cola de espera
-	if(list_size(entrenadores_disponibles) == 0){
+	if(list_is_empty(entrenadores_disponibles)){
 		queue_push(cola_pokemones_en_espera, pokemon);
 		printf("[Pokemon] Pokemon puesto en espera, motivo: sin entrenadores disponibles\n");
 		return;
@@ -59,14 +59,15 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	//y encolarlo de nuevo
 	if(planificador->algoritmo_planificacion == SJF_CD){
 
-//TODO: Esto tendria que hacerlo cuando termina el ciclo del actual
-// y antes de que empieze el ciclo de planificador
-// (esto y lo de encolar al nuevo)
+		//>>>>MUTEX
 		if(hay_alguien_en_ejecucion()){
+			//TODO
+			//Aca solamente tengo que marcar una variable que sea 'me deben desalojar'
 			encolar(planificador->entrenador_en_exec);
 			sacar_de_ejecucion();
 			debo_planificar = 0;
 		}
+		//>>>>FIN MUTEX
 
 		//Yo aca solo tengo que sacarlo de ejecucion.
 		//Lo que logro con esto es que el entrenador actual va a terminar de ejecutar
@@ -79,11 +80,9 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 		//Sino, estaria planificando dos veces
 	}
 
-//TODO: DUDA, en caso de SJF cd, cual encolo primero, el nuevo o el de EXEC ?
-// la resolucion seria mover esta linea antes del if si es asi.
-// (asi como esta primero encolo el de EXEC)
-
-	//Agrego entrenador a la cola del planificador
+	//TODO
+	//hago un wait de un semaforo para esperar que termine el ciclo y
+	//se encole el de exec
 	encolar(entrenador_mas_cercano);
 
 	//En caso de que no haya nadie ejecutando en este instante, nadie me va a poder mandar
@@ -124,6 +123,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 void ejecutar_hilo_planificador(){
 	while(!finalizo_team){
 		sem_wait(&(semaforo_planificacion));
+
 		planificar();
 		//Aca tendria que habilitar el semaforo
 		//del entrenador, pero eso se hace dentro
@@ -139,7 +139,15 @@ void ejecutar_hilo(t_entrenador* entrenador){
 	//esto lo verificamos a traves de su estado
 	while(entrenador->estado != EXIT){
 		sem_wait(&(entrenador->semaforo));
+
 		int termino_ejecucion = ejecutar_entrenador(entrenador);
+
+		//TODO
+		//>>>> MUTEX
+		//Aca me fijo si me deben desalojar
+		//En ese caso, me encolo y me saco de exec
+		//y le doy signal al semaforo para que encole al nuevo
+		//>>>>FIN MUTEX
 
 		//Ahora tengo que habilitar el semaforo del
 		//planificador para que vea que hacer,

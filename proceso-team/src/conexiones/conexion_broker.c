@@ -18,6 +18,7 @@ void iniciar_conexion_broker(){
 	pthread_create(&hilo_caught, NULL, (void*) iniciar_suscripcion_broker,(void*)CAUGHT_POKEMON);
 	sleep(1);
 	pthread_create(&hilo_localized, NULL, (void*) iniciar_suscripcion_broker,(void*)LOCALIZED_POKEMON);
+	sleep(1);
 
 	//Iniciamos un hilo de reconexion, este comenzara bloqueado por lo que
 	//no ejecutara nada, hasta que haya un problema en la conexion
@@ -33,14 +34,19 @@ void cerrar_conexion_broker(){
 	pthread_join(hilo_localized, NULL);
 }
 
-//TODO: Testear bien cual es el problema aca.
-//Idea que se nos habia ocurrido pero no sabemos en realidad
-//es que puede que falle porque estamos liberando conexion
-//muy rapido
+//TODO: Problema en el envio de GET mientras me suscribo
+/*
+ * Luego de testear lo del envio de GET que descubri:
+ *
+ * 1. Cuando comento la suscripcion al broker anda perfecto. Asi que no es tema del GET.
+ * 2. Cuando falla, rompe en el recibimiento de id, y de ahi en adelante no procesa nada mas
+ * 		el main. El programa sigue andando solo porque estan los hilos, pero lo de abrir el
+ * 		puerto de escucha para el gameboy no lo hace, asi que ahi muere	el main.
+ *
+ * 	Solucion parcial: sleep(1) despues de crear el ultimo hilo de suscripcion
+ */
 
-//Posible solucion parecida a lo de la suscripcion: sleep entre cada envio
 void enviar_get_objetivo(t_list* objetivo_global){
-
 	//Por cada especie distinta a la anterior
 	//(la lista esta ordenada, asi que mandare
 	//un get por cada especie)
@@ -49,9 +55,6 @@ void enviar_get_objetivo(t_list* objetivo_global){
 		char* pokemon = list_get(objetivo_global, i);
 
 		if(strcmp(pokemon, ultima_especie_enviada) != 0){
-
-			sleep(1);
-			//Envio mensaje GET al broker
 			t_get_pokemon* mensaje_get = get_pokemon_create(pokemon);
 			t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON);
 
@@ -59,6 +62,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 
 			if(socket >= 0){
 				int envio = enviar_mensaje(mensaje, socket);
+
 				if(envio < 0){
 					loggear_error_broker("envio de mensaje get");
 				}else{
@@ -67,7 +71,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 
 				liberar_conexion(socket);
 
-				printf("Enviando especie GET al broker: %s\n", pokemon);
+				printf("[GET] Enviado mensaje GET al broker: %s\n", pokemon);
 			}else{
 				loggear_error_broker("envio de mensaje get");
 			}

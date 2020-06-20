@@ -2,6 +2,7 @@
 
 void iniciar_puerto_de_escucha(){
 	iniciar_servidor(ip_team, puerto_team,(void*) procesar_mensajes_directos);
+	printf("[Gameboy] Iniciando puerto de escucha directo al gameboy\n");
 }
 
 //Para procesar los mensajes usamos las mismas funciones de procesamiento
