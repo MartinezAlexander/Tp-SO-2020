@@ -19,6 +19,10 @@ void planificar_sjf_sd();
 void planificar_sjf_cd();
 
 t_entrenador* shortest_job();
+t_entrenador* shortest_job_con_desalojo();
+
+double calcular_estimacion_con_desalojo(t_entrenador* entrenador);
 double calcular_estimacion(t_entrenador* entrenador);
+
 
 #endif /* PLANIFICACION_PLANIFICACION_SJF_H_ */

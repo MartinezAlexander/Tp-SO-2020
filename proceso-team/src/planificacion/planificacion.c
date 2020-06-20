@@ -45,13 +45,46 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	//Le doy el objetivo actual al entrenador
 	entrenador_mas_cercano->objetivo_actual = pokemon;
 
+	//Me voy a guardar el valor de si no hay alguien ejecutando,
+	//ya que podra ser modificado en caso de que use desalojo
+	int debo_planificar = !hay_alguien_en_ejecucion();
+
+	//En caso de que este usando planificacion SJF con desalojo
+	//antes de encolar el nuevo, debo desalojar el entrenador actual
+	//y encolarlo de nuevo
+	if(planificador->algoritmo_planificacion == SJF_CD){
+
+//TODO: Esto tendria que hacerlo cuando termina el ciclo del actual
+// y antes de que empieze el ciclo de planificador
+// (esto y lo de encolar al nuevo)
+		if(hay_alguien_en_ejecucion()){
+			encolar(planificador->entrenador_en_exec);
+			sacar_de_ejecucion();
+			debo_planificar = 0;
+		}
+
+		//Yo aca solo tengo que sacarlo de ejecucion.
+		//Lo que logro con esto es que el entrenador actual va a terminar de ejecutar
+		//su ciclo, y luego como va a ser el turno del planificador, se va a fijar
+		//si hay alguien ejecutando y va a re-planificar
+
+		//Por esto mismo es que si yo desalojo a alguien, debo evitar la
+		//llamada a planificar() que se hace mas abajo, ya que voy a replanificar
+		//a traves del hilo de ejecucion del entrenador.
+		//Sino, estaria planificando dos veces
+	}
+
+//TODO: DUDA, en caso de SJF cd, cual encolo primero, el nuevo o el de EXEC ?
+// la resolucion seria mover esta linea antes del if si es asi.
+// (asi como esta primero encolo el de EXEC)
+
 	//Agrego entrenador a la cola del planificador
 	encolar(entrenador_mas_cercano);
 
 	//En caso de que no haya nadie ejecutando en este instante, nadie me va a poder mandar
 	// a ejecutar a mi que estoy en la cola, por eso es que tengo que comprobar esto.
 	//Entonces si no hay nadie en ejecucion, planifico al proximo en la cola
-	if(!hay_alguien_en_ejecucion()/* || planificador->algoritmo_planificacion == SJF_CD*/){
+	if(debo_planificar){
     	planificar();
     }
 }

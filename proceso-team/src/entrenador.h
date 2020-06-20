@@ -39,6 +39,9 @@ typedef enum{
 typedef struct{
 	uint32_t ultima_rafaga;
 	double ultima_estimacion;
+	int empezo_a_ejecutar;
+	//Representa el hecho de si un entrenador empezo a ejecutar y no termino todavia
+	//ya sea porque debo replanificar en el medio, o porque fue desalojado
 } estado_sjf;
 
 typedef struct{

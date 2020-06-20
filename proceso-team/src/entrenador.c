@@ -155,6 +155,7 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 	entrenador->estado_sjf = malloc(sizeof(estado_sjf));
 	entrenador->estado_sjf->ultima_rafaga = 0;
 	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
+	entrenador->estado_sjf->empezo_a_ejecutar = 0;
 
 	char* id_entrenador = string_itoa(entrenador->identificador);
 	dictionary_put(diccionario_ciclos_entrenador, id_entrenador, 0);
