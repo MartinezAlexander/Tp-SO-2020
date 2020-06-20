@@ -28,12 +28,21 @@ void procesar_pokemon(t_pokemon* pokemon){
 
 		entrenador_entrar_a_planificacion(pokemon);
 	}else{
-		//TODO: Antes de descartar me tengo que fijar si alguien ya esta
+		//Antes de descartar me tengo que fijar si alguien ya esta
 		//yendo a buscar uno de la misma especie. En ese caso, este me lo voy
 		//a guardar por si ese falla.
 
 		//Entonces me fijo si algun entrenador lo tiene asignado como
 		//objetivo actual
+		for(int i = 0 ; i < list_size(entrenadores) ; i++){
+			t_entrenador* entrenador = list_get(entrenadores, i);
+			//En caso de que este asignado, lo agrego a la cola de pendientes
+			if(entrenador_tiene_objetivo(entrenador, pokemon->especie)){
+				queue_push(cola_pokemones_en_espera, pokemon);
+				printf("[Pokemon] Pokemon puesto en espera, motivo: repuesto\n");
+				return;
+			}
+		}
 
 		//Lo pongo en Cola de pokemones en espera
 		descartar_pokemon(pokemon);

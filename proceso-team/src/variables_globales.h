@@ -15,6 +15,7 @@
 #include<commons/config.h>
 #include<commons/collections/list.h>
 #include<commons/collections/dictionary.h>
+#include<commons/collections/queue.h>
 #include<commons/log.h>
 #include<commons/string.h>
 #include<semaphore.h>
@@ -39,6 +40,8 @@ t_log* logger;
 
 t_dictionary* diccionario_especies_recibidas;
 pthread_mutex_t mutex_diccionario_especies;
+
+t_queue* cola_pokemones_en_espera;
 
 //Estadisticas
 t_dictionary* diccionario_ciclos_entrenador;

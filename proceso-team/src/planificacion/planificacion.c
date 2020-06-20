@@ -34,9 +34,14 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Filtro entrenadores disponibles
 	t_list* entrenadores_disponibles = list_filter(entrenadores, (void*)entrenador_disponible);
-	//TODO catchear error de que no haya disponibles - en ese caso:
-	//Si no hay entrenadores tengo que guardarme los pokemones en
-	//la cola de espera
+	//Puede pasar que todos mis entrenadores esten ocupados, en ese caso
+	//voy a guardar el pokemon en la cola de espera
+	if(list_size(entrenadores_disponibles) == 0){
+		queue_push(cola_pokemones_en_espera, pokemon);
+		printf("[Pokemon] Pokemon puesto en espera, motivo: sin entrenadores disponibles\n");
+		return;
+		//Ademas no voy a seguir con el procedimiento normal
+	}
 
 	//Obtengo entrenador mas cercano al pokemon a atrapar
 	t_entrenador *entrenador_mas_cercano = obtener_entrenador_mas_cercano(entrenadores_disponibles, pokemon->posicion);

@@ -94,6 +94,13 @@ void resolver_caught_negativo(t_entrenador* entrenador){
 	entrenador->estado = BLOCKED;
 }
 
+int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie){
+	if(entrenador->objetivo_actual != NULL){
+		return string_equals_ignore_case(entrenador->objetivo_actual->especie, especie);
+	}else
+		return 0;
+}
+
 void agregar_a_objetivos_globales(char* especie){
 	list_add(objetivo_global, especie);
 	list_sort(objetivo_global, strcmp);

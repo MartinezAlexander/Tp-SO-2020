@@ -17,15 +17,15 @@ int main(void) {
 
 
 	iniciar_hilos_planificacion();
-/*
+
 	//Me suscribo a las colas y abro hilos para recibir mensajes
 	iniciar_conexion_broker();
 	//Envio mensaje GET al broker segun objetivos globales
 	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
 	iniciar_puerto_de_escucha();
-*/
-	test_sjf_con_desalojo();
+
+	//test_sjf_con_desalojo();
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)
@@ -71,6 +71,8 @@ void inicializar_variables(){
 
 	diccionario_especies_recibidas = inicializar_diccionario_especies();
 	pthread_mutex_init(&mutex_diccionario_especies, NULL);
+
+	cola_pokemones_en_espera = queue_create();
 
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");

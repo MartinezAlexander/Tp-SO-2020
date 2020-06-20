@@ -87,6 +87,8 @@ void asignar_pokemones(t_entrenador* entrenador, char* pokemones);
 t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial);
 t_list* leer_entrenadores(t_config* config, double estimacion_inicial);
 
+int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie);
+
 void entrenador_resetear_objetivo(t_entrenador* entrenador);
 void entrenador_atrapar_objetivo(t_entrenador* entrenador);
 
