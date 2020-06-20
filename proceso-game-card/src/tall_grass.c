@@ -9,7 +9,7 @@ pokemon_file* obtener_pokemon(char* especie){
 	}
 }
 
-//TODO agregar pokemon: TENEMOS DUDAS - PREGUNTAR!
+
 void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad){
 	//Esto no nos quedo claro como se hace
 	//Nosotros tenemos en el metadata, todos los bloques en los que hay datos
@@ -30,6 +30,9 @@ pokemon_file* existe_pokemon(char* especie){
 	return NULL;
 }
 
+//TODO: sacar el valor open de cada archivo y leer del archivo ese valor
+//Ademas, no tenemos que dejar el archivo abierto al final, sino que lo abro y lo cierro
+//cuando necesite (me refiero a hacer fopen() )
 void abrir_archivo(pokemon_file* archivo){
 	//En caso que ya este abiero espero x segundos
 	while(archivo->open == 1){
@@ -49,7 +52,7 @@ void abrir_archivo(pokemon_file* archivo){
 	config_save(config_metadata);
 	config_destroy(config_metadata);
 	//Dejamos el archivo abierto
-	txt_open_for_append(archivo->path);
+	txt_open_for_append(archivo->path);								//ACA   <=
 }
 
 void cerrar_archivo(pokemon_file* archivo){

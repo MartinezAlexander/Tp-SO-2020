@@ -21,7 +21,7 @@ void ejecutar_new(t_new_pokemon* new_pokemon, int id){
 		recibir_id(socket);
 		liberar_conexion(socket);
 	}else{
-		//loggeo error
+		//TODO loggeo error
 	}
 }
 

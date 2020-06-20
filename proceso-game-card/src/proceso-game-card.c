@@ -35,7 +35,22 @@ void inicializar_variables_globales(){
 }
 
 void inicializar_filesystem(){
+	//Primero levantamos las variables de Metadata/Metadata.bin
+	//Lo mismo con el Bitmap, es ir al path, leer el archivo y listo
 
+	//Caso raro: En caso de que no nos den bitmap, tendriamos que armarlo nosotros
+	//Depues de levantar los poke
+	//Vamos por cada metadata, vemos que bloques tiene, nos armamos los bloques
+	//y ahi ya podemos armar el bitmap
+
+	//Caso raro: no nos dan bloques => no importa
+	//Los bloques una vez que sabemos el numero de bloques y tenemos el bitmap
+	// vamos a Blocks/x.bin, segun esten en el bitmap
+
+	//Levantamos pokemones:
+	//Entramos a /Files, de alguna manera deberiamos obtener que directorios tiene
+	//adentro.
+	//Por cada directorio entro a /Files/Dir/Metadata.bin y levanto
 }
 
 t_log* iniciar_logger(char* path){
