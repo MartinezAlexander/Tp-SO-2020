@@ -50,8 +50,6 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	//Le doy el objetivo actual al entrenador
 	entrenador_mas_cercano->objetivo_actual = pokemon;
 
-	//Me voy a guardar el valor de si no hay alguien ejecutando,
-	//ya que podra ser modificado en caso de que use desalojo
 	int debo_planificar = !hay_alguien_en_ejecucion();
 
 	//En caso de que este usando planificacion SJF con desalojo
@@ -59,15 +57,34 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	//y encolarlo de nuevo
 	if(planificador->algoritmo_planificacion == SJF_CD){
 
-		//>>>>MUTEX
+		//La idea es que yo debo desalojar al actual y volver a encolarlo,
+		//pero para eso tengo que esperar a que termine la ejecucion
+		//del ciclo actual. Por eso es que tengo un mutex compartido
+		//para esta seccion con la del hilo de ejecucion, y lo unico que
+		//hago aca es marcar que se tiene que desalojar, y al final del
+		//ciclo voy a chequear si debo ser desalojado y hacerlo si corresponde
+
+		pthread_mutex_lock(&(planificador->mutex_desalojo));
+
 		if(hay_alguien_en_ejecucion()){
-			//TODO
-			//Aca solamente tengo que marcar una variable que sea 'me deben desalojar'
-			encolar(planificador->entrenador_en_exec);
-			sacar_de_ejecucion();
+			planificador->debo_desalojar_al_fin_de_ciclo = 1;
+
+			pthread_mutex_unlock(&(planificador->mutex_desalojo));
+			//Aviso que no voy a planificar ya que lo hace el entrenador
 			debo_planificar = 0;
+			//Luego de marcar el desalojo, espero a que me habilite el entrenador de nuevo
+			sem_wait(&planificador->semaforo_desalojo);
+			//Encolo
+			encolar(entrenador_mas_cercano);
+			//Signal
+			sem_post(&planificador->semaforo_post_desalojo);
+			//debo desalojar pasa a 0
+			planificador->debo_desalojar_al_fin_de_ciclo = 0;
+		}else{
+			pthread_mutex_unlock(&(planificador->mutex_desalojo));
+			encolar(entrenador_mas_cercano);
 		}
-		//>>>>FIN MUTEX
+
 
 		//Yo aca solo tengo que sacarlo de ejecucion.
 		//Lo que logro con esto es que el entrenador actual va a terminar de ejecutar
@@ -78,12 +95,12 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 		//llamada a planificar() que se hace mas abajo, ya que voy a replanificar
 		//a traves del hilo de ejecucion del entrenador.
 		//Sino, estaria planificando dos veces
+
+	}else{
+		encolar(entrenador_mas_cercano);
 	}
 
-	//TODO
-	//hago un wait de un semaforo para esperar que termine el ciclo y
-	//se encole el de exec
-	encolar(entrenador_mas_cercano);
+	//TODO: resolver los ifs horribles que repiten a lo pavo
 
 	//En caso de que no haya nadie ejecutando en este instante, nadie me va a poder mandar
 	// a ejecutar a mi que estoy en la cola, por eso es que tengo que comprobar esto.
@@ -142,12 +159,19 @@ void ejecutar_hilo(t_entrenador* entrenador){
 
 		int termino_ejecucion = ejecutar_entrenador(entrenador);
 
-		//TODO
-		//>>>> MUTEX
 		//Aca me fijo si me deben desalojar
 		//En ese caso, me encolo y me saco de exec
 		//y le doy signal al semaforo para que encole al nuevo
-		//>>>>FIN MUTEX
+		pthread_mutex_lock(&(planificador->mutex_desalojo));
+		if(planificador->debo_desalojar_al_fin_de_ciclo){
+			sacar_de_ejecucion();
+			encolar(entrenador);
+			sem_post(&planificador->semaforo_desalojo);
+			//WAIT antes de seguir a que se encole el nuevo,
+			//asi no entro a re-planificar antes
+			sem_wait(&planificador->semaforo_post_desalojo);
+		}
+		pthread_mutex_unlock(&(planificador->mutex_desalojo));
 
 		//Ahora tengo que habilitar el semaforo del
 		//planificador para que vea que hacer,

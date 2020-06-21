@@ -34,6 +34,10 @@ typedef struct{
 	double alpha;
 
 	t_entrenador* entrenador_en_exec;
+	int debo_desalojar_al_fin_de_ciclo;
+	pthread_mutex_t mutex_desalojo;
+	sem_t semaforo_desalojo;
+	sem_t semaforo_post_desalojo;
 
 	//sem_t semaforo;
 	pthread_t hilo_planificacion;
