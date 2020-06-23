@@ -15,6 +15,7 @@
 #include <commons/collections/list.h>
 #include "../entrenador.h"
 #include "../planificacion/planificacion.h"
+#include "../mensajes/procesamiento_appeared.h"
 
 void test_fifo();
 void test_round_robin();

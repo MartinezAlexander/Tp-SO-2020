@@ -39,7 +39,7 @@ void procesar_pokemon(t_pokemon* pokemon){
 			//En caso de que este asignado, lo agrego a la cola de pendientes
 			if(entrenador_tiene_objetivo(entrenador, pokemon->especie)){
 				queue_push(cola_pokemones_en_espera, pokemon);
-				printf("[Pokemon] Pokemon puesto en espera, motivo: repuesto\n");
+				puts("[Pokemon] Pokemon puesto en espera, motivo: repuesto\n");
 				return;
 			}
 		}
@@ -49,4 +49,12 @@ void procesar_pokemon(t_pokemon* pokemon){
 	}
 
 
+}
+
+void procesar_pokemon_en_espera(){
+	if(!queue_is_empty(cola_pokemones_en_espera)){
+		t_pokemon* pokemon = queue_pop(cola_pokemones_en_espera);
+		puts("[Pokemon] Procesamiento pokemon en espera, motivo: se libero un entrenador\n");
+		procesar_pokemon(pokemon);
+	}
 }

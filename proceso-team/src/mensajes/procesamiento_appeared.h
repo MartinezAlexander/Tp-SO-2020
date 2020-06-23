@@ -16,11 +16,13 @@
 #include<commons/collections/queue.h>
 #include "../objetivos.h"
 #include "../variables_globales.h"
-#include "../planificacion/planificacion.h"
 #include "../entrenador.h"
+#include "../planificacion/planificacion.h"
 
 void descartar_pokemon(t_pokemon* pokemon);
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon);
 void procesar_pokemon(t_pokemon* pokemon);
+
+void procesar_pokemon_en_espera();
 
 #endif /* PROCESAMIENTO_APPEARED_H_ */

@@ -17,14 +17,14 @@ int main(void) {
 
 	iniciar_hilos_planificacion();
 
-	//Me suscribo a las colas y abro hilos para recibir mensajes
+	/*//Me suscribo a las colas y abro hilos para recibir mensajes
 	iniciar_conexion_broker();
 	//Envio mensaje GET al broker segun objetivos globales
 	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
-	iniciar_puerto_de_escucha();
+	iniciar_puerto_de_escucha();*/
 
-	//test_sjf_con_desalojo();
+	test_sjf_con_desalojo();
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)
@@ -66,6 +66,7 @@ void inicializar_variables(){
 	planificador = planificador_create(algoritmo_planificacion, quantum, estimacion_inicial, alpha);
 
 	entrenadores = leer_entrenadores(config, estimacion_inicial);
+
 	objetivo_global = obtener_objetivo_global(entrenadores);
 
 	diccionario_especies_recibidas = inicializar_diccionario_especies();
@@ -102,7 +103,7 @@ t_log* iniciar_logger(char* path)
 t_config* leer_config(void)
 {
 	t_config *config;
-	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
+	if((config = config_create("src/team.config")) == NULL)//Nota: para correr desde Debug
 	{														//hay que agregar ../ al path
 		printf("No pude leer la config\n");
 		exit(2);

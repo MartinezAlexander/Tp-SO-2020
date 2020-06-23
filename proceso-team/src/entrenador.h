@@ -22,6 +22,7 @@
 #include "utils/array_utils.h"
 #include "utils/posicion_utils.h"
 #include "utils/log_utils.h"
+#include "mensajes/procesamiento_appeared.h"
 
 
 
@@ -96,6 +97,5 @@ int entrenador_estado_deadlock(t_entrenador* entrenador);
 int cumplio_objetivo_entrenador(t_entrenador* entrenador);
 
 t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion posicion);
-
 
 #endif

@@ -77,12 +77,14 @@ void resolver_caught_positivo(t_entrenador* entrenador){
 	}else{
 		if(entrenador_estado_deadlock(entrenador))
 			entrenador->estado = BLOCKED_DEADLOCK;
-		else
+		else{
 			entrenador->estado = BLOCKED;
+			procesar_pokemon_en_espera();
 			//Si puedo seguir atrapando, el entrenador
 			//queda en estado bloqueado, asi la proxima
 			//vez que aparezca un pokemon, este entrenador
 			//este en los candidatos a ir a buscarlo
+		}
 	}
 }
 
@@ -92,11 +94,17 @@ void resolver_caught_negativo(t_entrenador* entrenador){
 	agregar_a_objetivos_globales(entrenador->objetivo_actual->especie);
 	entrenador_resetear_objetivo(entrenador);
 	entrenador->estado = BLOCKED;
+	procesar_pokemon_en_espera();
 }
 
 int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie){
 	if(entrenador->objetivo_actual != NULL){
-		return string_equals_ignore_case(entrenador->objetivo_actual->especie, especie);
+		int resultado = string_equals_ignore_case(entrenador->objetivo_actual->especie, especie);
+		if(resultado == 0){
+			return 1;
+		}else{
+			return 0;
+		}
 	}else
 		return 0;
 }
@@ -107,13 +115,16 @@ void agregar_a_objetivos_globales(char* especie){
 }
 
 void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
-	for(int i = 0 ; i < list_size(objetivos) ; i++){
-		char* p = list_get(objetivos, i);
-
-		if(string_equals_ignore_case(especie, p)){
-			list_remove(objetivos, i);
-			break;
+	if(!list_is_empty(objetivos)){
+		for(int i = 0 ; i < list_size(objetivos) ; i++){
+			char* p = list_get(objetivos, i);
+			if(string_equals_ignore_case(especie, p)){
+				list_remove(objetivos, i);
+				break;
+			}
 		}
+	}else{
+		puts("Se intento sacar un Poke de la Lista de objetivos globales pero estaba vacia");
 	}
 }
 
@@ -244,7 +255,6 @@ void entrenador_atrapar_objetivo(t_entrenador* entrenador){
 	char* nuevo_pokemon = entrenador->objetivo_actual->especie;
 	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
 
-	sacar_de_objetivos_globales(nuevo_pokemon, objetivo_global);
 	entrenador_resetear_objetivo(entrenador);
 }
 

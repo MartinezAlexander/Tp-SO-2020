@@ -27,11 +27,11 @@ void test_sjf_sin_desalojo(){
 	((t_entrenador*)list_get(entrenadores, 2))->estado_sjf->ultima_rafaga = 4;
 
 	t_pokemon* pikachu = pokemon_create("pikachu", posicion_create(3, 10));
-	entrenador_entrar_a_planificacion(pikachu);
+	procesar_pokemon(pikachu);
 	t_pokemon* squirtle = pokemon_create("squirtle", posicion_create(9, 6));
-	entrenador_entrar_a_planificacion(squirtle);
+	procesar_pokemon(squirtle);
 	t_pokemon* gengar = pokemon_create("gengar", posicion_create(2, 4));
-	entrenador_entrar_a_planificacion(gengar);
+	procesar_pokemon(gengar);
 
 	//Entrenadores en [2,3], [6,5], [9,9]
 	//Pikachu en [3,10] => mas cercano es entrenador 3
@@ -72,17 +72,21 @@ void test_sjf_con_desalojo(){
 	((t_entrenador*)list_get(entrenadores, 2))->estado_sjf->ultima_rafaga = 4;
 
 	t_pokemon* pikachu = pokemon_create("pikachu", posicion_create(4, 15));
-	entrenador_entrar_a_planificacion(pikachu);
+	procesar_pokemon(pikachu);
 
 	sleep(3);
 
 	t_pokemon* squirtle = pokemon_create("squirtle", posicion_create(9, 6));
-	entrenador_entrar_a_planificacion(squirtle);
+	procesar_pokemon(squirtle);
 
 	sleep(3);
 
 	t_pokemon* gengar = pokemon_create("gengar", posicion_create(2, 4));
-	entrenador_entrar_a_planificacion(gengar);
+	procesar_pokemon(gengar);
+
+	sleep(3);
+	t_pokemon* gengar2 = pokemon_create("gengar", posicion_create(5, 4));
+	procesar_pokemon(gengar2);
 
 	//Entrenadores en [2,3], [6,5], [9,9]
 	//Pikachu en [4,15] => mas cercano es entrenador 3

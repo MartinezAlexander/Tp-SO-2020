@@ -26,8 +26,6 @@ void esperar_hilos_planificacion(){
 //ya que no tengo que tocar los planificadores y siempre parece llamarse cuando
 //saco a uno porque termino de ejecutar
 
-//El tema es que para ver que estemos en lo correcto tendriamos
-//que terminar de hacer sjf con desalojo
 
 //TODO: Agregar mutex compartido entre esta funcion y la de arriba
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
@@ -37,6 +35,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	//Puede pasar que todos mis entrenadores esten ocupados, en ese caso
 	//voy a guardar el pokemon en la cola de espera
 	if(list_is_empty(entrenadores_disponibles)){
+		puts("ENTRO2");
 		queue_push(cola_pokemones_en_espera, pokemon);
 		printf("[Pokemon] Pokemon puesto en espera, motivo: sin entrenadores disponibles\n");
 		return;
