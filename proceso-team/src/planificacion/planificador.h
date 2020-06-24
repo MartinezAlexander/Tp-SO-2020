@@ -19,6 +19,9 @@
 #include"../variables_globales.h"
 #include"../entrenador.h"
 
+struct t_entrenador;
+typedef struct unEntrenador t_entrenador;
+
 typedef enum{
 	FIFO, RR, SJF_CD, SJF_SD
 }tipo_planificacion;

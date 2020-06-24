@@ -15,6 +15,9 @@
 #include "../entrenador.h"
 #include "planificador.h"
 
+struct t_entrenador;
+typedef struct unEntrenador t_entrenador;
+
 void planificar_sjf_sd();
 void planificar_sjf_cd();
 

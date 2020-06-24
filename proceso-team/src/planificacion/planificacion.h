@@ -20,6 +20,9 @@
 #include "planificacion_sjf.h"
 #include "planificador.h"
 
+struct t_entrenador;
+typedef struct unEntrenador t_entrenador;
+
 int entrenador_disponible(t_entrenador *entrenador);
 
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon);

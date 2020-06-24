@@ -45,7 +45,7 @@ typedef struct{
 	//ya sea porque debo replanificar en el medio, o porque fue desalojado
 } estado_sjf;
 
-typedef struct{
+typedef struct unEntrenador{
 	int identificador;
 	t_posicion posicion;
 
