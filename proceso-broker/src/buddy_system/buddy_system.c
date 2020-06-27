@@ -22,6 +22,15 @@ void recolectar_hojas_ocupadas(t_buddy* raiz, t_list* hojas){
 	}
 }
 
+void recolectar_hojas(t_buddy* raiz, t_list* hojas){
+	if(buddy_es_hoja(raiz)){
+		list_add(hojas, raiz);
+	}else{
+		recolectar_hojas(raiz->izq,hojas);
+		recolectar_hojas(raiz->der,hojas);
+	}
+}
+
 bool menor_a_mayor(void* buddy1, void* buddy2){
 	return ((t_buddy*)buddy1)->tamanio <= ((t_buddy*)buddy2)->tamanio;
 }
@@ -170,6 +179,7 @@ void buddy_mostrar(t_buddy* buddy){
 	puts("-------------------------------");
 
 }
+
 
 void destruir_hijo_izquierdo(t_buddy* padre){
 	free(padre->izq);

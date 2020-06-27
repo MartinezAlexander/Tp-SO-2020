@@ -23,7 +23,7 @@ int ff(t_mensaje* mensaje);
 int bf(t_mensaje* mensaje);
 void proc_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algoritmo)(t_mensaje* mensaje), void(*eliminar)(void));
 void cachear_mensaje_bs(t_mensaje* mensaje);
-
+char* buddy_to_string(t_buddy* buddy);
 //int es_hora_de_compactar(int tamanio_a_guardar);
 
 

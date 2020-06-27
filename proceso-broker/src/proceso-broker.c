@@ -10,7 +10,11 @@
 
 #include "proceso-broker.h"
 
+
 int main(void){
+
+	signal(SIGUSR1, controlador_de_seniales);
+
 	iniciar_config();
 
 	obtener_info_del_config();

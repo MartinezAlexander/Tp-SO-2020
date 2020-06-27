@@ -269,3 +269,37 @@ t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola){
 
 	return mensajes;
 }
+
+char* particion_to_string(t_particion* particion) {
+	void* base = memoria_cache->cache + particion->base;
+	void* limite = base + particion->limite;
+	int size = particion->limite - particion->base;
+	char* libre = "[L]";
+	char* ocupado = "[X]";
+	char* string;
+	if (particion_esta_libre(particion)) {
+		string = string_from_format("%p - %p. %s Size:%d b", base, limite,
+				libre, size);
+	} else {
+		char* cola = op_code_to_string(particion->cola);
+		int id = particion->id;
+		if (string_equals_ignore_case(algoritmo_reemplazo, "LRU")) {
+			int lru;
+			for (int i = 0; i < list_size(particiones_victimas_lru); i++) {
+				t_particion* victima = list_get(particiones_victimas_lru, i);
+				if (victima == particion) {
+					lru = i;
+					i = list_size(particiones_victimas_lru);
+				}
+			}
+			string = string_from_format(
+					"%p - %p. %s Size:%d b LRU:%d COLA:%s ID:%d", base,
+					limite, ocupado, size, lru, cola, id);
+		} else {
+			string = string_from_format(
+					"%p - %p. %s Size:%d b LRU:NO COLA:%s ID:%d", base,
+					limite, ocupado, size, cola, id);
+		}
+	}
+	return string;
+}

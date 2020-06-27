@@ -169,3 +169,41 @@ void cachear_mensaje_bs(t_mensaje* mensaje){
 	}
 }
 
+char* buddy_to_string(t_buddy* buddy){
+	void* base = memoria_cache->cache + buddy->base;
+	int size = buddy_get_real_size(buddy);
+	void* limite = base + size;
+	char* estado;
+	char* libre = "[L]";
+	char* ocupado = "[X]";
+	char* cola_string;
+	int32_t id;
+	if(buddy_esta_libre(buddy)){
+		estado = libre;
+		id = -1;
+	}else{
+		estado = ocupado;
+		cola_string = op_code_to_string(buddy->cola);
+		id = buddy->id;
+	}
+
+	int estado_lru;
+	if(!buddy_esta_libre(buddy)){
+		if(string_equals_ignore_case(algoritmo_reemplazo,"LRU")){
+			for(int i = 0; i < list_size(buddies_victimas_lru); i++){
+				if(buddy == list_get(buddies_victimas_lru,i)){
+					estado_lru = i;
+					i = list_size(buddies_victimas_lru);
+				}
+			}
+			return string_from_format("%p - %p.	%s	Size:%d b LRU:%d Cola:%s ID:%d", base, limite, estado, size, estado_lru, cola_string, id);
+		}else{
+			return string_from_format("%p - %p.	%s	Size:%d b LRU:NO Cola:%s ID:%d", base, limite, estado, size, cola_string, id);
+		}
+	}else{
+		return string_from_format("%p - %p.	%s Size:%d b", base, limite, estado, size);
+	}
+
+
+}
+

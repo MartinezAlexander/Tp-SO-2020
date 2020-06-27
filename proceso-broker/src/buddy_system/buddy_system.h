@@ -32,6 +32,7 @@ t_list* buddies_victimas_lru;
 //recorrido en pre orden del arbol binario, le mando la lista de hojas VACIA
 void recolectar_hojas_libres(t_buddy* raiz, t_list* hojas);
 void recolectar_hojas_ocupadas(t_buddy* raiz, t_list* hojas);
+void recolectar_hojas(t_buddy* raiz, t_list* hojas);
 //comparador para ordenar
 bool menor_a_mayor(void* buddy1, void* buddy2);
 
