@@ -19,9 +19,16 @@ void loggear_info(char* info) {
 	log_info(logger, info);
 }
 
-void loggear_conexion(t_proceso id_proceso) {
-	char* log = string_from_format("El proceso se conecto al proceso %s", proceso_to_string(id_proceso));
+void loggear_conexion(t_proceso id_proceso,int socket) {
+	if(socket>=0){
+	char* log = string_from_format("El gameboy se conecto al proceso %s", proceso_to_string(id_proceso));
 	log_info(logger, log);
+	}
+}
+
+void loggear_desconexion(t_proceso id_proceso){
+	char* log = string_from_format("El gameboy se desconecto del proceso %s", proceso_to_string(id_proceso));
+	log_info(logger,log);
 }
 
 void loggear_suscripcion(op_code id_cola) {
@@ -30,8 +37,8 @@ void loggear_suscripcion(op_code id_cola) {
 	log_info(logger, log);
 }
 
-void loggear_nuevo_mensaje(op_code id_cola) {
-	char* log = string_from_format("Llego un nuevo mensaje a la cola %s",op_code_to_string(id_cola));
+void loggear_nuevo_mensaje(op_code id_cola,char* mensaje) {
+	char* log = string_from_format("Llego un nuevo mensaje: %s a la cola %s",mensaje,op_code_to_string(id_cola));
 	log_info(logger, log);
 }
 

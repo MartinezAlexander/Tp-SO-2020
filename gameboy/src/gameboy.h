@@ -32,6 +32,7 @@ char* puerto_broker;
 char* puerto_team;
 char* puerto_gamecard;
 char* path_logger;
+int32_t gameboy_id;
 
 int32_t tiempo_conexion;
 int32_t hay_tiempo = 1;

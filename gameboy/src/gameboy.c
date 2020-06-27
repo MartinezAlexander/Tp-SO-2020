@@ -66,6 +66,19 @@ void desconectar_suscriptor() {
 	exit(0);
 }
 
+char* nombre_pokemon(char* mensaje){
+
+	if(string_ends_with(mensaje,"\n")){
+		char* pokemon = string_substring(mensaje,0,(string_length(mensaje)-2));
+		printf("Nombre pokemon [%s]",pokemon);
+		return pokemon;
+	}
+	else{
+		printf("Nombre pokemon [%s]",mensaje);
+		return mensaje;
+	}
+}
+
 t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 	void* mensaje_creado = NULL;
 	t_mensaje* mensaje_procesado = NULL;
@@ -74,22 +87,24 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		uint32_t x = (uint32_t) atoi(mensaje[4]);
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
 		uint32_t cantidad = (uint32_t) atoi(mensaje[6]);
-		mensaje_creado = (void*) new_pokemon_create(mensaje[3], x, y, cantidad);
+		mensaje_creado = (void*) new_pokemon_create(nombre_pokemon(mensaje[3]), x, y, cantidad);
+
 		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
+
 	}
 
 	if (id == BROKER && codigo == APPEARED_POKEMON) {
 		uint32_t x = (uint32_t) atoi(mensaje[4]);
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
 		int32_t id_c = atoi(mensaje[6]);
-		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
+		mensaje_creado = (void*) appeared_pokemon_create(nombre_pokemon(mensaje[3]), x, y);
 		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,codigo, id_c);
 	}
 
 	if (id == BROKER && codigo == CATCH_POKEMON) {
 		uint32_t x = (uint32_t) atoi(mensaje[4]);
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
-		mensaje_creado = (void*) catch_pokemon_create(mensaje[3], x, y);
+		mensaje_creado = (void*) catch_pokemon_create(nombre_pokemon(mensaje[3]), x, y);
 		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
 	}
 
@@ -97,19 +112,18 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		int32_t id_c = atoi(mensaje[3]);
 		uint32_t situacion = atrapo_pokemon(mensaje[4]);
 		mensaje_creado = (void*) caught_pokemon_create(situacion);
-		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,
-				codigo, id_c);
+		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,codigo, id_c);
 	}
 
 	if (id == BROKER && codigo == GET_POKEMON) {
-		mensaje_creado = (void*) get_pokemon_create(mensaje[3]);
+		mensaje_creado = (void*) get_pokemon_create(nombre_pokemon(mensaje[3]));
 		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
 	}
 
 	if (id == TEAM && codigo == APPEARED_POKEMON) {
 		uint32_t x = (uint32_t) atoi(mensaje[4]);
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
-		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
+		mensaje_creado = (void*) appeared_pokemon_create(nombre_pokemon(mensaje[3]), x, y);
 		mensaje_procesado = mensaje_simple_create(mensaje_creado, codigo);
 	}
 
@@ -118,7 +132,7 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
 		uint32_t cantidad = (uint32_t) atoi(mensaje[6]);
 		int32_t id_m = atoi(mensaje[7]);
-		mensaje_creado = (void*) new_pokemon_create(mensaje[3], x, y, cantidad);
+		mensaje_creado = (void*) new_pokemon_create(nombre_pokemon(mensaje[3]), x, y, cantidad);
 		mensaje_procesado = mensaje_con_id_create(mensaje_creado, codigo, id_m);
 	}
 
@@ -126,17 +140,17 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 		uint32_t x = (uint32_t) atoi(mensaje[4]);
 		uint32_t y = (uint32_t) atoi(mensaje[5]);
 		int32_t id_m = atoi(mensaje[6]);
-		mensaje_creado = (void*) catch_pokemon_create(mensaje[3], x, y);
+		mensaje_creado = (void*) catch_pokemon_create(nombre_pokemon(mensaje[3]), x, y);
 		mensaje_procesado = mensaje_con_id_create(mensaje_creado, codigo, id_m);
 	}
 
 	if (id == GAMECARD && codigo == GET_POKEMON) {
 		int32_t id_m = atoi(mensaje[4]);
-		mensaje_creado = (void*) get_pokemon_create(mensaje[3]);
+		mensaje_creado = (void*) get_pokemon_create(nombre_pokemon(mensaje[3]));
 		mensaje_procesado = mensaje_con_id_create(mensaje_creado, codigo, id_m);
 	}
 	if (id == SUSCRIPTOR) {
-		t_suscripcion* mensaje_suscripcion = suscripcion_proceso_create(id,getpid(), codigo);
+		t_suscripcion* mensaje_suscripcion = suscripcion_proceso_create(id,gameboy_id, codigo);
 		mensaje_procesado = mensaje_simple_create((void*) mensaje_suscripcion,SUSCRIPCION);
 	}
 	return mensaje_procesado;
@@ -147,7 +161,7 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	switch (id) {
 	case BROKER:
 		socket = crear_conexion(ip_broker, puerto_broker);
-		loggear_conexion(id);
+		loggear_conexion(id,socket);
 		enviar_mensaje(mensaje, socket);
 		recibir_id(socket);
 		liberar_conexion(socket);
@@ -155,13 +169,13 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	case TEAM:
 		socket = crear_conexion(ip_team, puerto_team);
 		enviar_mensaje(mensaje, socket);
-		loggear_conexion(id);
+		loggear_conexion(id,socket);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
 	case GAMECARD:
 		socket = crear_conexion(ip_gamecard, puerto_gamecard);
-		loggear_conexion(id);
+		loggear_conexion(id,socket);
 		enviar_mensaje(mensaje, socket);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
@@ -181,6 +195,8 @@ void inicializar_variables() {
 
 	path_logger = config_get_string_value(config, "LOG_FILE");
 
+	gameboy_id = config_get_int_value(config,"GAMEBOY_ID");
+
 }
 int main(int arg, char** args) {
 
@@ -196,7 +212,7 @@ int main(int arg, char** args) {
 
 		tiempo_conexion = atoi(args[3]);
 		int socket = crear_conexion(ip_broker, puerto_broker);
-		loggear_conexion(id_proceso);
+		loggear_conexion(id_proceso,socket);
 		enviar_mensaje(mensaje_procesado, socket);
 		int estoy_suscripto = recibir_confirmacion_suscripcion(socket);
 
@@ -209,9 +225,16 @@ int main(int arg, char** args) {
 
 			while (1) {
 				t_mensaje* mensaje = recibir_mensaje(socket);
+				if (mensaje==NULL){
+					loggear_desconexion(id_proceso);
+					tiempo_conexion = 0 ;
+					desconectar_suscriptor();
+				}
+				else{
 				enviar_ACK(socket);
-				loggear_nuevo_mensaje(tipo_mensaje);
+				loggear_nuevo_mensaje(tipo_mensaje,mensaje_to_string(mensaje));
 				mensaje_mostrar(mensaje);
+				}
 			}
 		}
 
@@ -224,7 +247,7 @@ int main(int arg, char** args) {
 
 t_config* leer_config(void) {
 
-	t_config* config = config_create("src/gameboy.config");
+	t_config* config = config_create("../src/gameboy.config");
 
 	if (config == NULL) {
 		exit(2);

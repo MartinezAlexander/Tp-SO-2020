@@ -18,9 +18,10 @@ t_log* logger;
 
 void iniciar_logger(char* path);
 void loggear_info(char* info);
-void loggear_conexion(t_proceso id_proceso);
+void loggear_conexion(t_proceso id_proceso,int socket);
+void loggear_desconexion(t_proceso id_proceso);
 void loggear_suscripcion(op_code id_cola);
-void loggear_nuevo_mensaje(op_code id_cola);
+void loggear_nuevo_mensaje(op_code id_cola,char* mensaje);
 
 char* proceso_to_string(t_proceso id_proceso);
 #endif /* LOGGER_H_ */
