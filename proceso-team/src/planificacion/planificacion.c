@@ -17,26 +17,21 @@ void esperar_hilos_planificacion(){
 	pthread_join(planificador->hilo_planificacion, NULL);
 }
 
-//TODO: funcion para chequear entrenadores disponoibles,
-//si hay alguin pokemones en espera, y si hay, planificarlos
-//Idea: lo importante es encontrar donde podemos llamar a esta funcion
-//tiene que ser cuando un entrenador termina de ejecutar.
-//Estabamos viendo opciones y la que aparecia mejor
-//era llamarla en sacar_de_ejecucion() (funcion de planificador)
-//ya que no tengo que tocar los planificadores y siempre parece llamarse cuando
-//saco a uno porque termino de ejecutar
 
 
-//TODO: Agregar mutex compartido entre esta funcion y la de arriba
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Filtro entrenadores disponibles
 	t_list* entrenadores_disponibles = list_filter(entrenadores, (void*)entrenador_disponible);
+
 	//Puede pasar que todos mis entrenadores esten ocupados, en ese caso
 	//voy a guardar el pokemon en la cola de espera
 	if(list_is_empty(entrenadores_disponibles)){
-		puts("ENTRO2");
+
+		pthread_mutex_lock(&mutex_cola_espera);
 		queue_push(cola_pokemones_en_espera, pokemon);
+		pthread_mutex_unlock(&mutex_cola_espera);
+
 		printf("[Pokemon] Pokemon puesto en espera, motivo: sin entrenadores disponibles\n");
 		return;
 		//Ademas no voy a seguir con el procedimiento normal
@@ -98,8 +93,6 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	}else{
 		encolar(entrenador_mas_cercano);
 	}
-
-	//TODO: resolver los ifs horribles que repiten a lo pavo
 
 	//En caso de que no haya nadie ejecutando en este instante, nadie me va a poder mandar
 	// a ejecutar a mi que estoy en la cola, por eso es que tengo que comprobar esto.

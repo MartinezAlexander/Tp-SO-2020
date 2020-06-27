@@ -73,6 +73,9 @@ void inicializar_variables(){
 	pthread_mutex_init(&mutex_diccionario_especies, NULL);
 
 	cola_pokemones_en_espera = queue_create();
+	pthread_mutex_init(&mutex_cola_espera, NULL);
+
+	pthread_mutex_init(&mutex_procesamiento_pokemon, NULL);
 
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");

@@ -57,12 +57,16 @@ typedef struct unEntrenador{
 	estado_planificacion estado;
 	estado_sjf* estado_sjf;
 
-	pthread_t hilo;
-	sem_t semaforo;
+	pthread_t hilo; //Hilo de ejecucion
+	sem_t semaforo; //Para controlar su hilo de ejecucion
 } t_entrenador;
 
-
+//Aca se guardan todos los ids de catch que enviamos junto con el entrenador
+//que lo envio, asi cuando me llega un caught puedo realizar la operacion
+//para el mensaje y entrenador correspondiente
 t_dictionary* mensajes_catch_pendientes;
+
+
 void iniciarlizar_diccionario_catch();
 
 int mover_proxima_posicion(t_entrenador* entrenador);
@@ -76,6 +80,8 @@ int ejecutar_entrenador(t_entrenador* entrenador);
 
 void resolver_caught_positivo(t_entrenador* entrenador);
 void resolver_caught_negativo(t_entrenador* entrenador);
+
+void bloquear_entrenador(t_entrenador* entrenador);
 
 void agregar_a_objetivos_globales(char* especie);
 void sacar_de_objetivos_globales(char* especie, t_list* objetivos);

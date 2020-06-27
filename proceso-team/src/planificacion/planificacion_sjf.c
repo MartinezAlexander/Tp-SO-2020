@@ -84,7 +84,7 @@ void planificar_sjf_cd(){
 //ejecutar, su ultima rafaga no va a cambiar entonces si actualizara su estimacion,
 //la proxima vez que calcule voy a estar calculando con valores incorrectos
 t_entrenador* shortest_job(){
-printf("[Replanificacion] Empieza el calculo de estimaciones\n");
+	printf("[Replanificacion] Empieza el calculo de estimaciones\n");
 	t_list* entrenadores_en_ready = planificador->cola->elements;
 
 	int index_mas_corto = 0;
@@ -93,7 +93,7 @@ printf("[Replanificacion] Empieza el calculo de estimaciones\n");
 	for(int i = 0 ; i < list_size(entrenadores_en_ready) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores_en_ready, i);
 		double estimacion = calcular_estimacion(entrenador);
-printf("[Calculo Estimacion] Entrenador %d => Estimacion: %f\n", entrenador->identificador, estimacion);
+		printf("[Calculo Estimacion] Entrenador %d => Estimacion: %f\n", entrenador->identificador, estimacion);
 		if(estimacion < estimacion_mas_corta){
 			index_mas_corto = i;
 			estimacion_mas_corta = estimacion;
@@ -111,7 +111,7 @@ printf("[Calculo Estimacion] Entrenador %d => Estimacion: %f\n", entrenador->ide
 
 //TODO: ver forma de no repetir codigo
 t_entrenador* shortest_job_con_desalojo(){
-printf("[Replanificacion] Empieza el calculo de estimaciones\n");
+	printf("[Replanificacion] Empieza el calculo de estimaciones\n");
 
 	t_list* entrenadores_en_ready = planificador->cola->elements;
 
@@ -121,7 +121,7 @@ printf("[Replanificacion] Empieza el calculo de estimaciones\n");
 	for(int i = 0 ; i < list_size(entrenadores_en_ready) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores_en_ready, i);
 		double estimacion = calcular_estimacion_con_desalojo(entrenador);
-printf("[Calculo Estimacion] Entrenador %d => Estimacion: %f\n", entrenador->identificador, estimacion);
+		printf("[Calculo Estimacion] Entrenador %d => Estimacion: %f\n", entrenador->identificador, estimacion);
 		if(estimacion < estimacion_mas_corta){
 			index_mas_corto = i;
 			estimacion_mas_corta = estimacion;

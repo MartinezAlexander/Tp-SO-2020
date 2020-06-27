@@ -11,6 +11,10 @@ void actualizar_estadistica_entrenador(int id_entrenador){
 	free(id);
 }
 
+/**
+ * Esta es la funcion que me representa ejecutar un ciclo de un entrenador.
+ * Se encarga de moverse hacia su objetivo, o realizar el envio de CATCH una vez que llego
+ */
 int ejecutar_entrenador(t_entrenador* entrenador){
 	actualizar_estadistica_entrenador(entrenador->identificador);
 
@@ -26,6 +30,7 @@ int ejecutar_entrenador(t_entrenador* entrenador){
 
 void enviar_catch(t_entrenador* entrenador){
 	sleep(retardo_cpu);
+
 	actualizar_estadistica_entrenador(entrenador->identificador);
 	entrenador->estado = BLOCKED_BY_CATCH;
 	//Cambie de estado, entonces habilito el semaforo
@@ -78,12 +83,7 @@ void resolver_caught_positivo(t_entrenador* entrenador){
 		if(entrenador_estado_deadlock(entrenador))
 			entrenador->estado = BLOCKED_DEADLOCK;
 		else{
-			entrenador->estado = BLOCKED;
-			procesar_pokemon_en_espera();
-			//Si puedo seguir atrapando, el entrenador
-			//queda en estado bloqueado, asi la proxima
-			//vez que aparezca un pokemon, este entrenador
-			//este en los candidatos a ir a buscarlo
+			bloquear_entrenador(entrenador);
 		}
 	}
 }
@@ -93,10 +93,29 @@ void resolver_caught_negativo(t_entrenador* entrenador){
 
 	agregar_a_objetivos_globales(entrenador->objetivo_actual->especie);
 	entrenador_resetear_objetivo(entrenador);
-	entrenador->estado = BLOCKED;
-	procesar_pokemon_en_espera();
+	bloquear_entrenador(entrenador);
 }
 
+void bloquear_entrenador(t_entrenador* entrenador){
+	//Si puedo seguir atrapando, el entrenador
+	//queda en estado bloqueado, asi la proxima
+	//vez que aparezca un pokemon, este entrenador
+	//este en los candidatos a ir a buscarlo
+	entrenador->estado = BLOCKED;
+	//Tambien al liberar el entrenador debo fijarme si tengo algun pokemon
+	//en cola de espera y planificarlo o descartarlo segun corresponda.
+
+	//Para esto debo chequear tambien que el pokemon en espera que procese no sea descartado
+	//ya que en ese caso deberia tratar de procesar el proximo en la cola hasta que
+	//pueda planificar a alguien o hasta que descarte todos los de la cola.
+	while(entrenador->objetivo_actual != NULL || !queue_is_empty(cola_pokemones_en_espera)){
+		procesar_pokemon_en_espera();
+	}
+}
+
+/**
+ * Comprueba si un entrenador tiene asignado un pokemon a atrapar (especie)
+ */
 int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie){
 	if(entrenador->objetivo_actual != NULL){
 		int resultado = string_equals_ignore_case(entrenador->objetivo_actual->especie, especie);
@@ -181,6 +200,12 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 
 	return entrenador;
 }
+
+//Esta funcion fue necesaria ya que la funcion que nos daba las commons para
+//leer un array del config, no nos indicaba si alguna posicion tenia NULL entre sus
+//tokens. Nosotros necesitabamos saber esto para cuando leemos los pokemones
+//obtenidos, ya que el config puede venir sin pokemones obtenidos.
+//Tuvimos que hacer esta funcion manualmente entonces
 
 //Toma un string del formato "Token,Token,Token"
 //y devuelve una list con cada item.
@@ -281,6 +306,14 @@ int cumplio_objetivo_entrenador(t_entrenador* entrenador){
 	return 1;
 }
 
+//En realidad esta funcion no chequea si el entrenador esta en deadlock,
+//pero en el contexto en el que se usa si logra decirme el estado.
+//Basicamente cuando llamo a esta funcion, primero me fijo si
+//el entrenador necesita seguir atrapando pokemones,
+//en caso de que no necesite mas llamo a esta funcion que se fija
+//el tamaño de las listas. Si tengo la misma cantidad de adquiridos que
+//de pokemones que necesito (sumado a que anteriormente me fije si habia cumplido
+//los objetivos o no) puedo decir que estoy en deadlock
 int entrenador_estado_deadlock(t_entrenador* entrenador){
 	return list_size(entrenador->objetivos) == list_size(entrenador->pokemones_adquiridos);
 }
