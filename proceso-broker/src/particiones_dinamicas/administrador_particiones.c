@@ -202,7 +202,7 @@ void compactar_particiones(){
 void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algoritmo)(t_mensaje* mensaje), void(*eliminar)(void)){
 	int pudo_cachear = algoritmo(mensaje);
 	while (!pudo_cachear) {
-		busquedas_fallidas++;
+		//busquedas_fallidas++;
 		if (es_hora_de_compactar()) {
 			compactar_particiones();
 			pudo_cachear = algoritmo(mensaje);
@@ -210,6 +210,7 @@ void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algorit
 		}
 		if (!pudo_cachear) {
 			eliminar();
+			busquedas_fallidas++;
 			pudo_cachear = algoritmo(mensaje);
 		}
 	}
