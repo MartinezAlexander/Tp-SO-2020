@@ -17,6 +17,16 @@ int main(void) {
 	//iniciar_conexion_broker();
 	//iniciar_puerto_escucha();
 
+	/*FILE* fd = fopen("/home/utnso/Escritorio/tall-grass/Metadata/Bitmap.bin","a");
+	char x = '0';
+	if (fd != NULL) {
+		for (int i = 0; i < 5193; i++) {
+			fputc(x, fd);
+		}
+	}
+
+	fclose(fd);
+*/
 	terminar_programa();
 }
 
@@ -62,19 +72,17 @@ void inicializar_filesystem(){
 	t_bitarray* bitarray = bitarray_create(puntero_a_bits,bitarray_size);
 
 	int index = 0;
-	char buffer;
+	char buffer = fgetc(bitmap);
 
-
-	fread(&buffer, 1, 1, bitmap);
 	while(buffer != EOF){
-		if(buffer == '1'){
+		if (buffer == '1') {
 			bitarray_set_bit(bitarray, index);
-		}else{
+		} else {
 			bitarray_clean_bit(bitarray, index);
 		}
+		printf("Index: %d, bit = %c\n", index, buffer);
 		index++;
-		fread(&buffer, 1, 1, bitmap);
-		printf("Index: %d \n", index);
+		buffer = fgetc(bitmap);
 	}
 
 	//Caso raro: En caso de que no nos den bitmap, tendriamos que armarlo nosotros
