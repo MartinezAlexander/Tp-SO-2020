@@ -13,6 +13,8 @@
 #include <commons/log.h>
 #include <commons/string.h>
 #include <commons/config.h>
+#include <commons/txt.h>
+#include <commons/bitarray.h>
 
 #include "variables_globales.h"
 #include "conexion_broker.h"

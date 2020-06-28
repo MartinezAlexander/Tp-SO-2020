@@ -45,6 +45,7 @@ t_list* pokemons;
 t_list* bloques;
 bitmap* estado_bloques;
 int blocks;
+int block_size;
 
 pokemon_file* pokemon_file_create(char* especie);
 void crear_block(int numero);
