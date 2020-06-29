@@ -14,7 +14,6 @@
 
 int main(void) {
 	inicializar_variables();
-
 	iniciar_hilos_planificacion();
 
 	/*//Me suscribo a las colas y abro hilos para recibir mensajes

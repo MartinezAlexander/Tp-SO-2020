@@ -108,7 +108,7 @@ void bloquear_entrenador(t_entrenador* entrenador){
 	//Para esto debo chequear tambien que el pokemon en espera que procese no sea descartado
 	//ya que en ese caso deberia tratar de procesar el proximo en la cola hasta que
 	//pueda planificar a alguien o hasta que descarte todos los de la cola.
-	while(entrenador->objetivo_actual != NULL || !queue_is_empty(cola_pokemones_en_espera)){
+	while(entrenador->objetivo_actual == NULL && !queue_is_empty(cola_pokemones_en_espera)){
 		procesar_pokemon_en_espera();
 	}
 }
@@ -176,8 +176,9 @@ void asignar_pokemones(t_entrenador* entrenador, char* pokemones){
 t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial ){
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
+	//TODO Nos tira leak pero tres lineas abajo no y hacemos lo mismo..?
 	char** posiciones_separadas = string_split(posicion, "|");
-	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
+	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]), atoi(posiciones_separadas[1]));
 	free(posiciones_separadas);
 
 	char** objetivos_array = string_split(objetivos, "|");
@@ -189,6 +190,7 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 
 	entrenador->objetivo_actual = NULL;
 
+	//TODO Free cuando terminamos los entrenadores?
 	entrenador->estado_sjf = malloc(sizeof(estado_sjf));
 	entrenador->estado_sjf->ultima_rafaga = 0;
 	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
@@ -233,6 +235,7 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
 	char* listado_pokemones_adquiridos = config_get_string_value(config, "POKEMON_ENTRENADORES");
 	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
+	//TODO Memory Leak de las commons??
 
 	int numero_posiciones = array_cantidad_de_elementos(posiciones_entrenadores);
 	int numero_obj_entrenadores = array_cantidad_de_elementos(objetivos_entrenadores);
@@ -266,6 +269,7 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	free(posiciones_entrenadores);
 	free(listado_pokemones_adquiridos);
 	free(objetivos_entrenadores);
+	list_destroy(pokemones_entrenadores);
 
 	return entrenadores;
 }
