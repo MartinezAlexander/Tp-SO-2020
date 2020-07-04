@@ -280,6 +280,11 @@ int entrenador_en_ejecucion(t_entrenador *entrenador)
 	return(entrenador->estado == EXEC);
 }
 
+int entrenador_en_deadlock(t_entrenador *entrenador)
+{
+	return(entrenador->estado == BLOCKED_DEADLOCK);
+}
+
 void entrenador_atrapar_objetivo(t_entrenador* entrenador){
 	char* nuevo_pokemon = entrenador->objetivo_actual->especie;
 	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
