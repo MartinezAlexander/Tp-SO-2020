@@ -13,14 +13,16 @@
 
 int main(void) {
 	inicializar_variables_globales();
+
 	inicializar_filesystem();
+
 	//iniciar_conexion_broker();
 	//iniciar_puerto_escucha();
-
-	/*FILE* fd = fopen("/home/utnso/Escritorio/tall-grass/Metadata/Bitmap.bin","a");
+/*
+	FILE* fd = fopen("/home/utnso/Escritorio/tall-grass/Metadata/Bitmap.bin","a");
 	char x = '0';
 	if (fd != NULL) {
-		for (int i = 0; i < 5193; i++) {
+		for (int i = 0; i < 5192; i++) {
 			fputc(x, fd);
 		}
 	}
@@ -55,7 +57,9 @@ void inicializar_filesystem(){
 	if(config == NULL) puts("Error al leer Metadata/Metadata.bin");
 
 	block_size = config_get_int_value(config, "BLOCK_SIZE");
+
 	blocks = config_get_int_value(config, "BLOCKS");
+
 	config_destroy(config);
 
 	fclose(metadata);

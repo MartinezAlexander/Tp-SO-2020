@@ -16,6 +16,8 @@
 #include <mensajes/catch_pokemon.h>
 #include <mensajes/get_pokemon.h>
 #include <mensajes/appeared_pokemon.h>
+#include <mensajes/caught_pokemon.h>
+#include <mensajes/localized_pokemon.h>
 
 #include "tall_grass.h"
 #include "variables_globales.h"

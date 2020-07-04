@@ -53,6 +53,7 @@ void crear_block(int numero);
 void ocupar_bloque(int nuevo_bloque);
 int obtener_bloque_disponible();
 
+uint32_t* existe_posicion(t_posicion pos);
 pokemon_file* existe_pokemon(char* especie);
 pokemon_file* obtener_pokemon(char* especie);
 void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad);
