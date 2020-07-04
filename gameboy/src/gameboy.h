@@ -36,6 +36,7 @@ int32_t gameboy_id;
 
 int32_t tiempo_conexion;
 int32_t hay_tiempo = 1;
+int32_t id_gameboy;
 
 t_config* config;
 t_proceso obtener_id_proceso(char* id);

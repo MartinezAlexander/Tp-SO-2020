@@ -10,6 +10,9 @@
 #include "../memoria_cache.h"
 #include "../suscriptor.h"
 #include "../logger.h"
+#include <pthread.h>
+
+pthread_mutex_t mutex_cacheo;
 
 t_list* particiones;
 
@@ -42,5 +45,7 @@ void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algorim
 void administrador_cachear_mensaje(t_mensaje* mensaje);
 
 t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola);
+
+char* particion_to_string(t_particion* particion);
 
 #endif

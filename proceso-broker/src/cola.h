@@ -21,7 +21,9 @@ typedef struct{
 	t_list* suscriptores;
 	pthread_t hilo;
 	sem_t semaforoMensajes;
-	sem_t semaforoSuscriptores;
+	//sem_t semaforoSuscriptores;
+	pthread_mutex_t semaforoSuscriptores;
+	pthread_mutex_t mutex_cola_mensaje;
 }t_cola_mensajeria;
 
 t_cola_mensajeria* cola_mensajeria_new;
@@ -33,10 +35,12 @@ t_cola_mensajeria* cola_mensajeria_caught;
 
 int32_t ultimo_id;
 
+pthread_mutex_t mutex_id;
+
 void inicializar_colas_mensajeria(void (*procesar_pokemon)(t_cola_mensajeria* cola));
 t_cola_mensajeria* cola_mensajeria_create();
 t_cola_mensajeria* cola_mensajeria_obtener(op_code codigo);
-void cola_mensajeria_recibir_mensaje(t_cola_mensajeria* cola, t_mensaje* mensaje, int* ultimo_id);
+void cola_mensajeria_recibir_mensaje(t_cola_mensajeria* cola, t_mensaje* mensaje, int* ultimo_id, int* socket);
 
 void inicializar_ids_mensajes();
 

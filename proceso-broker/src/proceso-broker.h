@@ -19,5 +19,6 @@
 #include "procesar.h"
 #include "administrador_mensajes.h"
 #include "config.h"
+#include "dump.h"
 
 #endif

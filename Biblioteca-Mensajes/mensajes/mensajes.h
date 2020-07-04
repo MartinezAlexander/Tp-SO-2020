@@ -192,17 +192,18 @@ si lo es devuelve un 1
 int recibir_confirmacion_suscripcion(int socket);
 
 /*
-mensaje_size te devuelve el tamaño en bytes de un mensaje contando los dos ids (id
-creado por el broker y id correlativo), el codigo de operacion y el contenido del
-mensaje pokemon (new,get,appeared,caught,catch,localized)
+mensaje_size_contenido te devuelve el tamaño en bytes del contenido del mensaje, es
+decir solo el tamaño del mensaje pokemon (new,get,appeared,caught,catch,localized)
+
 */
 int mensaje_size(t_mensaje* mensaje);
 
 /*
-mensaje_size_contenido te devuelve el tamaño en bytes del contenido del mensaje, es
-decir solo el tamaño del mensaje pokemon (new,get,appeared,caught,catch,localized)
+mensaje_size_total te devuelve el tamaño en bytes de un mensaje contando los dos ids (id
+creado por el broker y id correlativo), el codigo de operacion y el contenido del
+mensaje pokemon (new,get,appeared,caught,catch,localized)
 */
-int mensaje_size_contenido(t_mensaje* mensaje);
+int mensaje_size_total(t_mensaje* mensaje);
 
 /*
 mensaje_to_stream crea un stream con el contenido de un mensaje
@@ -212,7 +213,7 @@ void* mensaje_to_stream(t_mensaje* mensaje);
 /*
 mensaje_from_stream convierte un stream en un mensaje
 */
-t_mensaje* mensaje_from_stream(void* stream, int tamanio_stream);
+t_mensaje* mensaje_from_stream(void* stream, op_code codigo);
 
 /*
 mensaje_stream_obtener_codigo te devuelve el tipo de mensaje que esta

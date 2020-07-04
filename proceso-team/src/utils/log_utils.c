@@ -9,12 +9,12 @@ void loggear_planificacion(){
 }
 //2. Movimiento de un entrenador (indicando la ubicacion a la que se movio)
 void loggear_movimiento_entrenador(int identificador_entrenador, t_posicion posicion){
-	log_info(logger, "Entrenador de id: %d se movio a la posicion [%d,%d]",
+	log_info(logger, "[Ejecucion] Entrenador de id: %d se movio a la posicion [%d,%d]",
 			identificador_entrenador, posicion.posicionX, posicion.posicionY);
 }
 //3. Operacion de atrapar (indicando la ubicacion y el pokemon a atrapar)
 void loggear_operacion_atrapar(t_pokemon* pokemon){
-	log_info(logger, "Inicio operacion CATCH de un: %s, ubicado en: [%d,%d]",
+	log_info(logger, "[Ejecucion] Inicio operacion CATCH de un: %s, ubicado en: [%d,%d]",
 			pokemon->especie, pokemon->posicion.posicionX, pokemon->posicion.posicionY);
 }
 //TODO log: 4. Operacion de intercambio (indicando entrenadores involucrados)
@@ -40,18 +40,18 @@ void loggear_resultado_team(){
 }
 
 void loggear_error_broker(char* tipo_operacion){
-	log_info(logger, "Error de comunicacion con el proceso Broker en %s: se realizara el comportamiento default", tipo_operacion);
+	log_info(logger, "[Conexion] Error de comunicacion con el proceso Broker en %s: se realizara el comportamiento default", tipo_operacion);
 }
 
 void loggear_inicio_reintento_broker(){
-	log_info(logger, "Iniciando reintento de conexion con el proceso Broker");
+	log_info(logger, "[Conexion] Iniciando reintento de conexion con el proceso Broker");
 }
 
 void loggear_resultado_reintento_broker(int resultado){
 	if(resultado){
-		log_info(logger, "Finalizo el reintento de conexion con el proceso Broker: conexion exitosa");
+		log_info(logger, "[Conexion] Finalizo el reintento de conexion con el proceso Broker: conexion exitosa");
 	}else{
-		log_info(logger, "Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar");
+		log_info(logger, "[Conexion] Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar");
 	}
 
 }

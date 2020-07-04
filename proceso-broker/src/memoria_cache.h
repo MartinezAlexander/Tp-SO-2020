@@ -18,7 +18,7 @@ void memoria_cache_create();
 
 void memoria_cache_agregar_mensaje(t_mensaje* mensaje, int donde_agregar);
 
-t_mensaje* memoria_cache_leer_mensaje(int desde_donde, int cuanto_leer);
+t_mensaje* memoria_cache_leer_mensaje(int desde_donde, int cuanto_leer, op_code que_leer);
 
 int memoria_cache_es_un_mensaje_tipo(int desde_donde, int cuanto_leer, op_code cola);
 

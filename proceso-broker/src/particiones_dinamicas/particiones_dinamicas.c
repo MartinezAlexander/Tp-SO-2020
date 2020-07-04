@@ -7,11 +7,12 @@ t_particion* particion_create(int base, int limite, int libre){
 	nueva_particion->libre = libre;
 	time_t tiempo = time(NULL);
 	nueva_particion->lru = localtime(&tiempo);
+	nueva_particion->tamanio_real = limite - base;
 	return nueva_particion;
 }
 
 int particion_tamanio(t_particion* particion){
-	return particion->limite - particion->base;
+	return particion->tamanio_real;
 }
 
 int particion_esta_libre(t_particion* particion){
@@ -23,14 +24,33 @@ void particion_combinar(t_particion* particionIzq, t_particion* particionDer){
 }
 
 int particion_puede_guardarlo(t_particion* particion, int tamanio_a_guardar){
-	return tamanio_a_guardar <= particion_tamanio(particion);
+	int puede_guardarlo = 0;
+
+	if(tamanio_a_guardar < tamano_minimo_particion){
+		if(tamano_minimo_particion <= particion_tamanio(particion)){
+			puede_guardarlo = 1;
+		}
+	}else{
+		if (tamanio_a_guardar <= particion_tamanio(particion)) {
+			puede_guardarlo = 1;
+		}
+	}
+
+	return puede_guardarlo;
 }
 
 int particion_justa(t_particion* particion, int tamanio_a_guardar){
 	return particion_tamanio(particion) == tamanio_a_guardar;
 }
 
-t_particion* particion_ocuparla(t_particion* particion_libre, int tamanio_a_ocupar){
+t_particion* particion_ocuparla(t_particion* particion_libre, int tamanio_a_ocupar_real){
+
+	int tamanio_a_ocupar = tamanio_a_ocupar_real;
+
+	if(tamanio_a_ocupar_real < tamano_minimo_particion){
+		tamanio_a_ocupar = tamano_minimo_particion;
+	}
+
 	t_particion* nueva_particion_libre;
 	if(particion_justa(particion_libre,tamanio_a_ocupar)){
 		nueva_particion_libre = NULL;
@@ -50,6 +70,7 @@ t_particion* particion_ocuparla(t_particion* particion_libre, int tamanio_a_ocup
 
 void particion_liberar(t_particion* particion){
 	particion->libre = 1;
+	particion->tamanio_real = particion->limite - particion->base;
 }
 
 int particion_son_iguales(t_particion* particion1, t_particion* particion2){

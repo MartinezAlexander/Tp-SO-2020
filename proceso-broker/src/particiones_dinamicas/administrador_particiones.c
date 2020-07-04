@@ -14,6 +14,8 @@ void iniciar_administrador_pd(){
 		es_fifo = 0;
 		particiones_victimas_lru = list_create();
 	}
+
+	pthread_mutex_init(&mutex_cacheo,NULL);
 }
 
 int first_fit(t_mensaje* mensaje){
@@ -29,12 +31,21 @@ int first_fit(t_mensaje* mensaje){
 		if(particion_esta_libre(particion) && particion_puede_guardarlo(particion,tamanio_mensaje)){
 			t_particion* particion_libre = particion_ocuparla(particion,tamanio_mensaje);
 
+			particion->cola = mensaje->codigo;
+			particion->id = mensaje->id;
+			particion->id_c = mensaje->id_correlativo;
+
+			if(tamanio_mensaje < particion_tamanio(particion)){
+				particion->tamanio_real = tamanio_mensaje;
+			}
+
 			if(particion_libre != NULL){
 				//TODO Chequear si ubicacion_mejor_particion + 1 supera el list_size
 				list_add_in_index(particiones,i+1,particion_libre);
 			}
 
 			memoria_cache_agregar_mensaje(mensaje,particion->base);
+			loggear_mensaje_cacheado(mensaje_to_string(mensaje),particion->base);
 
 			if(es_fifo){
 				queue_push(particiones_victimas,particion);
@@ -74,6 +85,14 @@ int best_fit(t_mensaje* mensaje){
 
 	if(mejor_particion != NULL){
 		t_particion* particion_libre = particion_ocuparla(mejor_particion,tamanio_mensaje);
+
+		mejor_particion->cola = mensaje->codigo;
+		mejor_particion->id = mensaje->id;
+		mejor_particion->id_c = mensaje->id_correlativo;
+
+		if (tamanio_mensaje < particion_tamanio(mejor_particion)) {
+			mejor_particion->tamanio_real = tamanio_mensaje;
+		}
 
 		if (particion_libre != NULL) {
 			//TODO Chequear si ubicacion_mejor_particion + 1 supera el list_size
@@ -183,7 +202,7 @@ void compactar_particiones(){
 void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algoritmo)(t_mensaje* mensaje), void(*eliminar)(void)){
 	int pudo_cachear = algoritmo(mensaje);
 	while (!pudo_cachear) {
-		busquedas_fallidas++;
+		//busquedas_fallidas++;
 		if (es_hora_de_compactar()) {
 			compactar_particiones();
 			pudo_cachear = algoritmo(mensaje);
@@ -191,6 +210,7 @@ void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algorit
 		}
 		if (!pudo_cachear) {
 			eliminar();
+			busquedas_fallidas++;
 			pudo_cachear = algoritmo(mensaje);
 		}
 	}
@@ -200,18 +220,27 @@ void administrador_cachear_mensaje(t_mensaje* mensaje){
 
 	//primer ajuste
 	if(string_equals_ignore_case(algoritmo_particion_libre,"FF") &&  string_equals_ignore_case(algoritmo_reemplazo,"FIFO") ){
+		pthread_mutex_lock(&mutex_cacheo);
 		procedimiento_para_almacenamiento_de_datos(mensaje,first_fit, fifo_eliminar);
+		pthread_mutex_unlock(&mutex_cacheo);
 	}
 	if (string_equals_ignore_case(algoritmo_particion_libre, "FF") &&  string_equals_ignore_case(algoritmo_reemplazo,"LRU")) {
+		pthread_mutex_lock(&mutex_cacheo);
 		procedimiento_para_almacenamiento_de_datos(mensaje, first_fit, lru_eliminar);
+		pthread_mutex_unlock(&mutex_cacheo);
 	}
 	if (string_equals_ignore_case(algoritmo_particion_libre, "BF") && string_equals_ignore_case(algoritmo_reemplazo, "FIFO")) {
+		pthread_mutex_lock(&mutex_cacheo);
 		procedimiento_para_almacenamiento_de_datos(mensaje, best_fit, fifo_eliminar);
+		pthread_mutex_unlock(&mutex_cacheo);
 	}
 	if (string_equals_ignore_case(algoritmo_particion_libre, "BF") && string_equals_ignore_case(algoritmo_reemplazo, "LRU")) {
+		pthread_mutex_lock(&mutex_cacheo);
 		procedimiento_para_almacenamiento_de_datos(mensaje, best_fit, lru_eliminar);
+		pthread_mutex_unlock(&mutex_cacheo);
 	}
 }
+
 t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola){
 	t_list* mensajes = list_create();
 	int hay_mensajes_de_esa_cola = 0;
@@ -219,12 +248,15 @@ t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola){
 	for (int i = 0; i < list_size(particiones); i++) {
 		t_particion* particion = list_get(particiones, i);
 		if (!particion_esta_libre(particion)) {
-			if (memoria_cache_es_un_mensaje_tipo(particion->base,particion_tamanio(particion), cola)) {
-				time_t tiempo = time(NULL);
-				particion->lru = localtime(&tiempo);
-				t_mensaje* mensaje_c = memoria_cache_leer_mensaje(particion->base, particion_tamanio(particion));
+			if (particion->cola == cola) {
+				t_mensaje* mensaje_c = memoria_cache_leer_mensaje(particion->base, particion_tamanio(particion), cola);
+				mensaje_c->codigo = particion->cola;
+				mensaje_c->id = particion->id;
+				mensaje_c->id_correlativo = particion->id_c;
 				list_add(mensajes,mensaje_c);
-				actualizar_lru(particion);
+				if(!es_fifo){
+					actualizar_lru(particion);
+				}
 				hay_mensajes_de_esa_cola = 1;
 			}
 		}
@@ -236,4 +268,38 @@ t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola){
 	}
 
 	return mensajes;
+}
+
+char* particion_to_string(t_particion* particion) {
+	void* base = memoria_cache->cache + particion->base;
+	void* limite = base + particion->limite;
+	int size = particion->limite - particion->base;
+	char* libre = "[L]";
+	char* ocupado = "[X]";
+	char* string;
+	if (particion_esta_libre(particion)) {
+		string = string_from_format("%p - %p. %s Size:%d b", base, limite,
+				libre, size);
+	} else {
+		char* cola = op_code_to_string(particion->cola);
+		int id = particion->id;
+		if (string_equals_ignore_case(algoritmo_reemplazo, "LRU")) {
+			int lru;
+			for (int i = 0; i < list_size(particiones_victimas_lru); i++) {
+				t_particion* victima = list_get(particiones_victimas_lru, i);
+				if (victima == particion) {
+					lru = i;
+					i = list_size(particiones_victimas_lru);
+				}
+			}
+			string = string_from_format(
+					"%p - %p. %s Size:%d b LRU:%d COLA:%s ID:%d", base,
+					limite, ocupado, size, lru, cola, id);
+		} else {
+			string = string_from_format(
+					"%p - %p. %s Size:%d b LRU:NO COLA:%s ID:%d", base,
+					limite, ocupado, size, cola, id);
+		}
+	}
+	return string;
 }
