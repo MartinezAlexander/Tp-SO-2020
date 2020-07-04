@@ -46,4 +46,6 @@ void administrador_cachear_mensaje(t_mensaje* mensaje);
 
 t_list* obtener_mensajes_cacheados_por_cola_pd(op_code cola);
 
+char* particion_to_string(t_particion* particion);
+
 #endif
