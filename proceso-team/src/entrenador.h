@@ -22,6 +22,7 @@
 #include "utils/array_utils.h"
 #include "utils/posicion_utils.h"
 #include "utils/log_utils.h"
+#include "mensajes/procesamiento_appeared.h"
 
 
 
@@ -39,9 +40,12 @@ typedef enum{
 typedef struct{
 	uint32_t ultima_rafaga;
 	double ultima_estimacion;
+	int empezo_a_ejecutar;
+	//Representa el hecho de si un entrenador empezo a ejecutar y no termino todavia
+	//ya sea porque debo replanificar en el medio, o porque fue desalojado
 } estado_sjf;
 
-typedef struct{
+typedef struct unEntrenador{
 	int identificador;
 	t_posicion posicion;
 
@@ -53,12 +57,16 @@ typedef struct{
 	estado_planificacion estado;
 	estado_sjf* estado_sjf;
 
-	pthread_t hilo;
-	sem_t semaforo;
+	pthread_t hilo; //Hilo de ejecucion
+	sem_t semaforo; //Para controlar su hilo de ejecucion
 } t_entrenador;
 
-
+//Aca se guardan todos los ids de catch que enviamos junto con el entrenador
+//que lo envio, asi cuando me llega un caught puedo realizar la operacion
+//para el mensaje y entrenador correspondiente
 t_dictionary* mensajes_catch_pendientes;
+
+
 void iniciarlizar_diccionario_catch();
 
 int mover_proxima_posicion(t_entrenador* entrenador);
@@ -73,6 +81,8 @@ int ejecutar_entrenador(t_entrenador* entrenador);
 void resolver_caught_positivo(t_entrenador* entrenador);
 void resolver_caught_negativo(t_entrenador* entrenador);
 
+void bloquear_entrenador(t_entrenador* entrenador);
+
 void agregar_a_objetivos_globales(char* especie);
 void sacar_de_objetivos_globales(char* especie, t_list* objetivos);
 
@@ -84,6 +94,8 @@ void asignar_pokemones(t_entrenador* entrenador, char* pokemones);
 t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial);
 t_list* leer_entrenadores(t_config* config, double estimacion_inicial);
 
+int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie);
+
 void entrenador_resetear_objetivo(t_entrenador* entrenador);
 void entrenador_atrapar_objetivo(t_entrenador* entrenador);
 
@@ -91,6 +103,5 @@ int entrenador_estado_deadlock(t_entrenador* entrenador);
 int cumplio_objetivo_entrenador(t_entrenador* entrenador);
 
 t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion posicion);
-
 
 #endif

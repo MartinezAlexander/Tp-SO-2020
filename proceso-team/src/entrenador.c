@@ -11,6 +11,10 @@ void actualizar_estadistica_entrenador(int id_entrenador){
 	free(id);
 }
 
+/**
+ * Esta es la funcion que me representa ejecutar un ciclo de un entrenador.
+ * Se encarga de moverse hacia su objetivo, o realizar el envio de CATCH una vez que llego
+ */
 int ejecutar_entrenador(t_entrenador* entrenador){
 	actualizar_estadistica_entrenador(entrenador->identificador);
 
@@ -26,6 +30,7 @@ int ejecutar_entrenador(t_entrenador* entrenador){
 
 void enviar_catch(t_entrenador* entrenador){
 	sleep(retardo_cpu);
+
 	actualizar_estadistica_entrenador(entrenador->identificador);
 	entrenador->estado = BLOCKED_BY_CATCH;
 	//Cambie de estado, entonces habilito el semaforo
@@ -77,12 +82,9 @@ void resolver_caught_positivo(t_entrenador* entrenador){
 	}else{
 		if(entrenador_estado_deadlock(entrenador))
 			entrenador->estado = BLOCKED_DEADLOCK;
-		else
-			entrenador->estado = BLOCKED;
-			//Si puedo seguir atrapando, el entrenador
-			//queda en estado bloqueado, asi la proxima
-			//vez que aparezca un pokemon, este entrenador
-			//este en los candidatos a ir a buscarlo
+		else{
+			bloquear_entrenador(entrenador);
+		}
 	}
 }
 
@@ -91,7 +93,39 @@ void resolver_caught_negativo(t_entrenador* entrenador){
 
 	agregar_a_objetivos_globales(entrenador->objetivo_actual->especie);
 	entrenador_resetear_objetivo(entrenador);
+	bloquear_entrenador(entrenador);
+}
+
+void bloquear_entrenador(t_entrenador* entrenador){
+	//Si puedo seguir atrapando, el entrenador
+	//queda en estado bloqueado, asi la proxima
+	//vez que aparezca un pokemon, este entrenador
+	//este en los candidatos a ir a buscarlo
 	entrenador->estado = BLOCKED;
+	//Tambien al liberar el entrenador debo fijarme si tengo algun pokemon
+	//en cola de espera y planificarlo o descartarlo segun corresponda.
+
+	//Para esto debo chequear tambien que el pokemon en espera que procese no sea descartado
+	//ya que en ese caso deberia tratar de procesar el proximo en la cola hasta que
+	//pueda planificar a alguien o hasta que descarte todos los de la cola.
+	while(entrenador->objetivo_actual == NULL && !queue_is_empty(cola_pokemones_en_espera)){
+		procesar_pokemon_en_espera();
+	}
+}
+
+/**
+ * Comprueba si un entrenador tiene asignado un pokemon a atrapar (especie)
+ */
+int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie){
+	if(entrenador->objetivo_actual != NULL){
+		int resultado = string_equals_ignore_case(entrenador->objetivo_actual->especie, especie);
+		if(resultado == 0){
+			return 1;
+		}else{
+			return 0;
+		}
+	}else
+		return 0;
 }
 
 void agregar_a_objetivos_globales(char* especie){
@@ -100,13 +134,16 @@ void agregar_a_objetivos_globales(char* especie){
 }
 
 void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
-	for(int i = 0 ; i < list_size(objetivos) ; i++){
-		char* p = list_get(objetivos, i);
-
-		if(string_equals_ignore_case(especie, p)){
-			list_remove(objetivos, i);
-			break;
+	if(!list_is_empty(objetivos)){
+		for(int i = 0 ; i < list_size(objetivos) ; i++){
+			char* p = list_get(objetivos, i);
+			if(string_equals_ignore_case(especie, p)){
+				list_remove(objetivos, i);
+				break;
+			}
 		}
+	}else{
+		puts("Se intento sacar un Poke de la Lista de objetivos globales pero estaba vacia");
 	}
 }
 
@@ -139,8 +176,9 @@ void asignar_pokemones(t_entrenador* entrenador, char* pokemones){
 t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial ){
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
+	//TODO Nos tira leak pero tres lineas abajo no y hacemos lo mismo..?
 	char** posiciones_separadas = string_split(posicion, "|");
-	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]) , atoi(posiciones_separadas[1]) );
+	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]), atoi(posiciones_separadas[1]));
 	free(posiciones_separadas);
 
 	char** objetivos_array = string_split(objetivos, "|");
@@ -152,9 +190,11 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 
 	entrenador->objetivo_actual = NULL;
 
+	//TODO Free cuando terminamos los entrenadores?
 	entrenador->estado_sjf = malloc(sizeof(estado_sjf));
 	entrenador->estado_sjf->ultima_rafaga = 0;
 	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
+	entrenador->estado_sjf->empezo_a_ejecutar = 0;
 
 	char* id_entrenador = string_itoa(entrenador->identificador);
 	dictionary_put(diccionario_ciclos_entrenador, id_entrenador, 0);
@@ -162,6 +202,12 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 
 	return entrenador;
 }
+
+//Esta funcion fue necesaria ya que la funcion que nos daba las commons para
+//leer un array del config, no nos indicaba si alguna posicion tenia NULL entre sus
+//tokens. Nosotros necesitabamos saber esto para cuando leemos los pokemones
+//obtenidos, ya que el config puede venir sin pokemones obtenidos.
+//Tuvimos que hacer esta funcion manualmente entonces
 
 //Toma un string del formato "Token,Token,Token"
 //y devuelve una list con cada item.
@@ -189,6 +235,7 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
 	char* listado_pokemones_adquiridos = config_get_string_value(config, "POKEMON_ENTRENADORES");
 	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
+	//TODO Memory Leak de las commons??
 
 	int numero_posiciones = array_cantidad_de_elementos(posiciones_entrenadores);
 	int numero_obj_entrenadores = array_cantidad_de_elementos(objetivos_entrenadores);
@@ -222,6 +269,7 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	free(posiciones_entrenadores);
 	free(listado_pokemones_adquiridos);
 	free(objetivos_entrenadores);
+	list_destroy(pokemones_entrenadores);
 
 	return entrenadores;
 }
@@ -236,7 +284,6 @@ void entrenador_atrapar_objetivo(t_entrenador* entrenador){
 	char* nuevo_pokemon = entrenador->objetivo_actual->especie;
 	list_add(entrenador->pokemones_adquiridos, nuevo_pokemon);
 
-	sacar_de_objetivos_globales(nuevo_pokemon, objetivo_global);
 	entrenador_resetear_objetivo(entrenador);
 }
 
@@ -263,6 +310,14 @@ int cumplio_objetivo_entrenador(t_entrenador* entrenador){
 	return 1;
 }
 
+//En realidad esta funcion no chequea si el entrenador esta en deadlock,
+//pero en el contexto en el que se usa si logra decirme el estado.
+//Basicamente cuando llamo a esta funcion, primero me fijo si
+//el entrenador necesita seguir atrapando pokemones,
+//en caso de que no necesite mas llamo a esta funcion que se fija
+//el tamaño de las listas. Si tengo la misma cantidad de adquiridos que
+//de pokemones que necesito (sumado a que anteriormente me fije si habia cumplido
+//los objetivos o no) puedo decir que estoy en deadlock
 int entrenador_estado_deadlock(t_entrenador* entrenador){
 	return list_size(entrenador->objetivos) == list_size(entrenador->pokemones_adquiridos);
 }
