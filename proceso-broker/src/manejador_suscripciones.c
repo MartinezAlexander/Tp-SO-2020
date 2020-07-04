@@ -24,6 +24,7 @@ void cola_suscripciones_agregar_suscripcion(t_mensaje* mensaje, int* socket){
 
 	loggear_recepcion_mensaje(mensaje_to_string(mensaje));
 	//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
+	//TODO helgrind socket 1
 	confirmar_suscripcion(*socket);
 
 	pthread_mutex_lock(&cola_suscripciones->mutex_cola_suscripcion);

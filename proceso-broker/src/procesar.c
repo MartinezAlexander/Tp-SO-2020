@@ -17,6 +17,7 @@ void procesar_suscripcion(){
 		int posicion_suscriptor = suscriptor_esta_suscripto(cola->suscriptores,suscripcion->pid);
 
 		if (posicion_suscriptor < 0) {
+			//TODO helgrind socket 2
 			t_suscriptor* suscriptor = suscriptor_create(*info_suscripcion->socket,suscripcion->pid);
 			memoria_cache_enviar_mensajes_cacheados(*info_suscripcion->socket,suscriptor->mensajes_recibidos,suscriptor->pid,suscripcion->cola_suscripcion);
 			pthread_mutex_lock(&cola->semaforoSuscriptores);
@@ -28,6 +29,7 @@ void procesar_suscripcion(){
 		} else {
 			pthread_mutex_lock(&cola->semaforoSuscriptores);
 			t_suscriptor* suscriptor = list_get(cola->suscriptores,posicion_suscriptor);
+			//TODO helgrind socket 4
 			memoria_cache_enviar_mensajes_cacheados(*info_suscripcion->socket,suscriptor->mensajes_recibidos,suscriptor->pid,suscripcion->cola_suscripcion);
 			suscriptor_reconectar(cola->suscriptores, info_suscripcion->socket,posicion_suscriptor);
 			pthread_mutex_unlock(&cola->semaforoSuscriptores);
