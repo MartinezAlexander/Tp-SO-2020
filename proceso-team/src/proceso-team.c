@@ -59,7 +59,9 @@ void inicializar_variables(){
 
 	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
 	uint32_t quantum = config_get_int_value(config, "QUANTUM");
+
 	uint32_t estimacion_inicial = config_get_int_value(config, "ESTIMACION_INICIAL");
+
 	double alpha = config_get_double_value(config, "ALPHA");
 
 	planificador = planificador_create(algoritmo_planificacion, quantum, estimacion_inicial, alpha);
@@ -105,7 +107,7 @@ t_log* iniciar_logger(char* path)
 t_config* leer_config(void)
 {
 	t_config *config;
-	if((config = config_create("src/team.config")) == NULL)//Nota: para correr desde Debug
+	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
 	{														//hay que agregar ../ al path
 		printf("No pude leer la config\n");
 		exit(2);

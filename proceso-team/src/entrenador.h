@@ -89,6 +89,7 @@ void sacar_de_objetivos_globales(char* especie, t_list* objetivos);
 void actualizar_estadistica_entrenador(int id_entrenador);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);
+int entrenador_en_deadlock(t_entrenador *entrenador);
 
 void asignar_pokemones(t_entrenador* entrenador, char* pokemones);
 t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial);
