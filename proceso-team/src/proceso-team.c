@@ -14,6 +14,7 @@
 
 int main(void) {
 	inicializar_variables();
+
 	iniciar_hilos_planificacion();
 
 	/*//Me suscribo a las colas y abro hilos para recibir mensajes
@@ -23,7 +24,9 @@ int main(void) {
 	//Abro socket de escucha para el Gameboy
 	iniciar_puerto_de_escucha();*/
 
-	test_sjf_con_desalojo();
+	//test_sjf_con_desalojo();
+
+	test_deadlock();
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)

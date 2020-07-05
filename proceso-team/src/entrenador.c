@@ -118,12 +118,7 @@ void bloquear_entrenador(t_entrenador* entrenador){
  */
 int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie){
 	if(entrenador->objetivo_actual != NULL){
-		int resultado = string_equals_ignore_case(entrenador->objetivo_actual->especie, especie);
-		if(resultado == 0){
-			return 1;
-		}else{
-			return 0;
-		}
+		return string_equals_ignore_case(entrenador->objetivo_actual->especie, especie);
 	}else
 		return 0;
 }

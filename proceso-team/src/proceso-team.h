@@ -24,6 +24,7 @@
 #include<mensajes/mensajes.h>
 #include<mensajes/pokemon.h>
 #include"tests/test_planificacion.h"
+#include"tests/test_deadlock.h"
 
 void terminar_programa(t_log* logger, t_config* config);
 t_config* leer_config(void);

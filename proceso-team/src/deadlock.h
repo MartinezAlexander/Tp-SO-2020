@@ -66,6 +66,8 @@ typedef struct{
 }t_intercambio_copia;
 
 
+t_queue* cola_intercambios_deadlock;
+
 
 t_intercambio* intercambio_create(t_entrenador* entrenador, t_entrenador* entrenadorObjetivo, char* pokemonADar, char* pokemonARecibir);
 t_intercambio_copia* intercambio_copia_create(t_entrenador_copia* entrenador, t_entrenador_copia* entrenadorObjetivo, char* pokemonADar, char* pokemonARecibir);

@@ -1,7 +1,29 @@
 #include "deadlock.h"
 
 void resolver_deadlock(){
+	//Pasar entrenadores a ent_intercambio
+	t_list* entrenadores_copia = list_create();
 
+	for(int i = 0 ; i < list_size(entrenadores) ; i++){
+		t_entrenador* entrenador = list_get(entrenadores, i);
+		t_entrenador_copia* e = entrenador_copia_create(entrenador);
+		list_add(entrenadores_copia, e);
+	}
+
+	cola_intercambios_deadlock = queue_create();
+	while(!list_is_empty(entrenadores_copia)){
+		printf("Lista: %d\n", list_size(entrenadores_copia));
+		t_intercambio* intercambio = primer_intercambio(entrenadores_copia);
+
+		printf("[Deadlock] Nuevo intercambio programado entre entrenadores: %d y %d, para especies %s por %s\n",
+				intercambio->entrenador->identificador, intercambio->entrenadorObjetivo->identificador,
+				intercambio->pokemonADar, intercambio->pokemonARecibir);
+
+		queue_push(cola_intercambios_deadlock, intercambio);
+	}
+
+	//TODO
+	//Cuando salgo del while hay que arrancar a resolverlos
 }
 
 
@@ -9,8 +31,8 @@ t_intercambio* primer_intercambio(t_list* entrenadores_deadlock){
 	t_entrenador_copia* primer_entrenador = list_get(entrenadores_deadlock, 0);
 
 	char* pokemonARecibir = list_get(primer_entrenador->objetivos, 0);
-
 	t_list* entrenadores_posibles = filtrar_entrenadores_con_pokemon(1, entrenadores_deadlock, pokemonARecibir);
+
 	t_list* posibles_intercambios = obtener_posibles_intercambios(entrenadores_posibles, primer_entrenador, pokemonARecibir);
 
 	t_list* intercambios = filtrar_dobles_intercambios(posibles_intercambios);
@@ -27,13 +49,9 @@ t_intercambio* primer_intercambio(t_list* entrenadores_deadlock){
 	preparar_entrenadores(entrenadores_deadlock);
 
 	return convertir_a_intercambio_real(mejor_intercambio);
-	/* Nota/Idea:
-	 *
-	 * Habria que pensarlo bien, pero como guardamos la posicion en entrenador_copia,
-	 * podriamos modificarles la posicion a la que seria luego de hacer el intercambio
-	 * y de esa manera por ahi encontrariamos mejor para el proximo llamado.
-	 */
 }
+
+//TODO: Ver si la clase intercambio_copia me sirve realmente
 
 /*
  * Devuelve el intercambio cuyos movimientos necesarios para llevarse a cabo
@@ -41,6 +59,7 @@ t_intercambio* primer_intercambio(t_list* entrenadores_deadlock){
  */
 t_intercambio_copia* obtener_intercambio_mas_cercano(t_list* intercambios){
 	int cantidad_intercambios = list_size(intercambios);
+
 	t_intercambio_copia* primer_intercambio = list_get(intercambios, 0);
 
 	//De nuevo, si hay uno solo devuelvo ese
@@ -123,7 +142,7 @@ t_list* obtener_posibles_intercambios(t_list* candidatos, t_entrenador_copia* en
 		for(int j = 0 ; j < list_size(entrenador_intercambio->adquiridos) ; j++){
 			char* especieADar = list_get(entrenador_intercambio->adquiridos, j);
 
-			if(string_equals_ignore_case(especieAnterior, especieADar) != 0){
+			if(!string_equals_ignore_case(especieAnterior, especieADar)){
 				especieAnterior = especieADar;
 
 				t_intercambio_copia* nuevo_intercambio = intercambio_copia_create(entrenador_intercambio, entrenador_candidato, especieADar, especieARecibir);
@@ -140,6 +159,7 @@ t_list* filtrar_entrenadores_con_pokemon(int desde_index, t_list* entrenadores_d
 
 	for(int i = desde_index ; i < list_size(entrenadores_deadlock) ; i++){
 		t_entrenador_copia* entrenador = list_get(entrenadores_deadlock, i);
+
 		if(entrenador_tiene_adquirido(entrenador, especie)) list_add(filtrados, entrenador);
 	}
 
@@ -158,11 +178,21 @@ t_list* filtrar_entrenadores_con_pokemon(int desde_index, t_list* entrenadores_d
  */
 
 void preparar_entrenadores(t_list* entrenadoresDL){
+
+	/*
+	 * Nota: por si nos pasa de nuevo.
+	 * Estamos queriendo eliminar de un for andando, entonces para
+	 * evitar que al eliminar se me corra el indice y no lo itere, le hago i--
+	 */
 	for(int i = 0; i < list_size(entrenadoresDL); i++){
 		t_entrenador_copia* entrenador = list_get(entrenadoresDL, i);
 		int quedan_objetivos = preparar_entrenador(entrenador);
 
-		if(!quedan_objetivos) list_remove(entrenadoresDL, i);
+		if(!quedan_objetivos){
+			printf("Eliminado de deadlock entrenador %d\n", entrenador->entrenador->identificador);
+			list_remove(entrenadoresDL, i);
+			i--;
+		}
 	}
 }
 
@@ -177,7 +207,6 @@ void preparar_entrenadores(t_list* entrenadoresDL){
  */
 int preparar_entrenador(t_entrenador_copia* entrenador){
 	//Necesitamos que esten ordenadas para un toque mas adelante,
-	//pero, ya estan ordenadas y nunca se van a desordenar??? VER, en ese caso borrar esto
 	list_sort(entrenador->adquiridos, strcmp);
 	list_sort(entrenador->objetivos, strcmp);
 
@@ -187,7 +216,7 @@ int preparar_entrenador(t_entrenador_copia* entrenador){
 		for(int j = 0; j < list_size(entrenador->objetivos); j++){
 			char* pk2 = list_get(entrenador->objetivos, j);
 
-			if(string_equals_ignore_case(pk1,pk2) == 0){
+			if(string_equals_ignore_case(pk1,pk2)){
 				list_remove(entrenador->objetivos, j);
 				list_remove(entrenador->adquiridos, i);
 				break;
@@ -204,7 +233,9 @@ int preparar_entrenador(t_entrenador_copia* entrenador){
  */
 int entrenador_tiene_adquirido(t_entrenador_copia* entrenador, char* especie){
 	for(int i = 0; i < list_size(entrenador->adquiridos); i++){
-		if(string_equals_ignore_case(list_get(entrenador->adquiridos, i), especie) == 0){
+		char* poke = list_get(entrenador->adquiridos, i);
+
+		if(string_equals_ignore_case(poke, especie)){
 			return 1;
 		}
 	}return 0;
@@ -215,7 +246,7 @@ int entrenador_tiene_adquirido(t_entrenador_copia* entrenador, char* especie){
  */
 int entrenador_tiene_en_objetivo(t_entrenador_copia* entrenador, char* especie){
 	for(int i = 0; i < list_size(entrenador->objetivos); i++){
-		if(string_equals_ignore_case(list_get(entrenador->objetivos, i), especie) == 0){
+		if(string_equals_ignore_case(list_get(entrenador->objetivos, i), especie)){
 			return 1;
 		}
 	}return 0;
@@ -233,6 +264,7 @@ void realizar_intercambio_simbolico(t_intercambio_copia* intercambio){
 	cambiar_pokemon(intercambio->entrenador, intercambio->pokemonADar, intercambio->pokemonARecibir);
 	cambiar_pokemon(intercambio->entrenadorObjetivo, intercambio->pokemonARecibir, intercambio->pokemonADar);
 
+	intercambio->entrenador->posicion = intercambio->entrenadorObjetivo->posicion;
 }
 
 void cambiar_pokemon(t_entrenador_copia* entrenador, char* especieASacar, char* especieAMeter){
@@ -240,7 +272,7 @@ void cambiar_pokemon(t_entrenador_copia* entrenador, char* especieASacar, char* 
 	for(int i = 0 ; i < list_size(entrenador->adquiridos) ; i++){
 		char* pok = list_get(entrenador->adquiridos, i);
 
-		if(string_equals_ignore_case(pok, especieASacar) == 0){
+		if(string_equals_ignore_case(pok, especieASacar)){
 			list_remove(entrenador->adquiridos, i);
 			break;
 		}
