@@ -18,6 +18,14 @@ void iniciar_administrador_pd(){
 	pthread_mutex_init(&mutex_cacheo,NULL);
 }
 
+void mostrar_estado_particiones(){
+	for (int i = 0; i < list_size(particiones); i++) {
+		t_particion* particion = list_get(particiones, i);
+		puts("------------------------------------------------------");
+		printf("Base %d Limite: %d - libre: %d tamanio: %d\n", particion->base,particion->limite,particion->libre, particion_tamanio(particion));
+	}
+}
+
 int first_fit(t_mensaje* mensaje){
 
 	int pude_cachear = 0;
@@ -27,10 +35,8 @@ int first_fit(t_mensaje* mensaje){
 	for(i = 0; i < list_size(particiones);i++){
 
 		t_particion* particion = list_get(particiones,i);
-
 		if(particion_esta_libre(particion) && particion_puede_guardarlo(particion,tamanio_mensaje)){
 			t_particion* particion_libre = particion_ocuparla(particion,tamanio_mensaje);
-
 			particion->cola = mensaje->codigo;
 			particion->id = mensaje->id;
 			particion->id_c = mensaje->id_correlativo;
@@ -136,6 +142,7 @@ void actualizar_lru(t_particion* particion){
 }
 
 void lru_eliminar(){
+	//TODO Una sola linea
 	t_particion* particion_victima = list_get(particiones_victimas_lru,0);
 	list_remove(particiones_victimas_lru,0);
 	particion_liberar(particion_victima);

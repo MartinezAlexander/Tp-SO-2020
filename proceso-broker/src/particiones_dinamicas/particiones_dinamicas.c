@@ -21,6 +21,7 @@ int particion_esta_libre(t_particion* particion){
 
 void particion_combinar(t_particion* particionIzq, t_particion* particionDer){
 	particionIzq->limite = particionDer->limite;
+	particionIzq->tamanio_real = particionDer->limite - particionIzq->base;
 }
 
 int particion_puede_guardarlo(t_particion* particion, int tamanio_a_guardar){
