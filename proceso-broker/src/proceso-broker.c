@@ -19,6 +19,41 @@ void controlador_de_seniales(int num_senial){
 	}
 }
 
+void finalizar_procesador_suscripciones(){
+	pthread_cancel(procesador_suscripciones);
+	pthread_detach(procesador_suscripciones);
+}
+
+void finalizar_procesador_new(){
+	pthread_cancel(cola_mensajeria_new->hilo);
+	pthread_detach(cola_mensajeria_new->hilo);
+}
+
+void finalizar_procesador_appeared(){
+	pthread_cancel(cola_mensajeria_appeared->hilo);
+	pthread_detach(cola_mensajeria_appeared->hilo);
+}
+
+void finalizar_procesador_caught(){
+	pthread_cancel(cola_mensajeria_caught->hilo);
+	pthread_detach(cola_mensajeria_caught->hilo);
+}
+
+void finalizar_procesador_catch(){
+	pthread_cancel(cola_mensajeria_catch->hilo);
+	pthread_detach(cola_mensajeria_catch->hilo);
+}
+
+void finalizar_procesador_get(){
+	pthread_cancel(cola_mensajeria_get->hilo);
+	pthread_detach(cola_mensajeria_get->hilo);
+}
+
+void finalizar_procesador_localized(){
+	pthread_cancel(cola_mensajeria_localized->hilo);
+	pthread_detach(cola_mensajeria_localized->hilo);
+}
+
 int main(void){
 
 	signal(SIGUSR1, controlador_de_seniales);
@@ -46,6 +81,8 @@ int main(void){
 
 	inicializar_colas_mensajeria(procesar_pokemon);
 
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
+
 	iniciar_servidor(ip_broker,puerto_broker,administrar_mensajes);
 
 	return EXIT_SUCCESS;
@@ -59,20 +96,13 @@ void finalizar_programa(){
 }
 
 void finalizar_hilos(){
-
-	pthread_cancel(cola_mensajeria_new->hilo);
-	pthread_cancel(cola_mensajeria_appeared->hilo);
-	pthread_cancel(cola_mensajeria_caught->hilo);
-	pthread_cancel(cola_mensajeria_catch->hilo);
-	pthread_cancel(cola_mensajeria_get->hilo);
-	pthread_cancel(cola_mensajeria_localized->hilo);
-	pthread_cancel(procesador_suscripciones);
-
-	pthread_detach(procesador_suscripciones);
-	pthread_detach(cola_mensajeria_new->hilo);
-	pthread_detach(cola_mensajeria_appeared->hilo);
-	pthread_detach(cola_mensajeria_caught->hilo);
-	pthread_detach(cola_mensajeria_catch->hilo);
-	pthread_detach(cola_mensajeria_get->hilo);
-	pthread_detach(cola_mensajeria_localized->hilo);
+	finalizar_procesador_suscripciones();
+	finalizar_procesador_new();
+	finalizar_procesador_appeared();
+	finalizar_procesador_caught();
+	finalizar_procesador_catch();
+	finalizar_procesador_get();
+	finalizar_procesador_localized();
 }
+
+

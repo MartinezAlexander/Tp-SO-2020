@@ -37,7 +37,6 @@ void iniciar_procesador_suscripciones(void(*procesar_suscripcion)(void)){
 	cola_suscripciones_create();
 	pthread_create(&procesador_suscripciones,NULL,(void*)procesar_suscripcion,NULL);
 	//pthread_detach(procesador_suscripciones);
-	//pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 }
 
 void memoria_cache_enviar_mensajes_cacheados(int socket, t_list* mensajes_enviados,int32_t pid , op_code cola){

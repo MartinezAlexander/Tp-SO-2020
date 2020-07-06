@@ -3,7 +3,8 @@
 
 void procesar_suscripcion(){
 
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
 	while(1){
 		sem_wait(&cola_suscripciones->semaforoSuscripcion);
@@ -84,7 +85,8 @@ void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje){
 
 void procesar_pokemon(t_cola_mensajeria* cola){
 
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
 	while(1){
 
