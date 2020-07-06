@@ -1,6 +1,7 @@
 #include "deadlock.h"
 
 void resolver_deadlock(){
+
 	//Pasar entrenadores a ent_intercambio
 	t_list* entrenadores_copia = list_create();
 
@@ -10,9 +11,10 @@ void resolver_deadlock(){
 		list_add(entrenadores_copia, e);
 	}
 
+	preparar_entrenadores(entrenadores_copia);
+
 	cola_intercambios_deadlock = queue_create();
 	while(!list_is_empty(entrenadores_copia)){
-		printf("Lista: %d\n", list_size(entrenadores_copia));
 		t_intercambio* intercambio = primer_intercambio(entrenadores_copia);
 
 		printf("[Deadlock] Nuevo intercambio programado entre entrenadores: %d y %d, para especies %s por %s\n",
@@ -31,11 +33,13 @@ t_intercambio* primer_intercambio(t_list* entrenadores_deadlock){
 	t_entrenador_copia* primer_entrenador = list_get(entrenadores_deadlock, 0);
 
 	char* pokemonARecibir = list_get(primer_entrenador->objetivos, 0);
+
 	t_list* entrenadores_posibles = filtrar_entrenadores_con_pokemon(1, entrenadores_deadlock, pokemonARecibir);
 
 	t_list* posibles_intercambios = obtener_posibles_intercambios(entrenadores_posibles, primer_entrenador, pokemonARecibir);
 
 	t_list* intercambios = filtrar_dobles_intercambios(posibles_intercambios);
+
 	t_intercambio_copia* mejor_intercambio = obtener_intercambio_mas_cercano(intercambios);
 
 	//Antes de terminar tengo que realizar el cambio 'simbolicamente'
@@ -189,7 +193,6 @@ void preparar_entrenadores(t_list* entrenadoresDL){
 		int quedan_objetivos = preparar_entrenador(entrenador);
 
 		if(!quedan_objetivos){
-			printf("Eliminado de deadlock entrenador %d\n", entrenador->entrenador->identificador);
 			list_remove(entrenadoresDL, i);
 			i--;
 		}
@@ -206,9 +209,7 @@ void preparar_entrenadores(t_list* entrenadoresDL){
  *	0 en caso de que ya cumplio sus objetivos (en realidad va a cumplirlos)
  */
 int preparar_entrenador(t_entrenador_copia* entrenador){
-	//Necesitamos que esten ordenadas para un toque mas adelante,
-	list_sort(entrenador->adquiridos, strcmp);
-	list_sort(entrenador->objetivos, strcmp);
+
 
 	for(int i = 0 ; i < list_size(entrenador->adquiridos) ; i++){
 		char* pk1 = list_get(entrenador->adquiridos, i);
@@ -219,10 +220,16 @@ int preparar_entrenador(t_entrenador_copia* entrenador){
 			if(string_equals_ignore_case(pk1,pk2)){
 				list_remove(entrenador->objetivos, j);
 				list_remove(entrenador->adquiridos, i);
+				i--;
 				break;
 			}
 		}
 	}
+
+	//Necesitamos que esten ordenadas para un toque mas adelante,
+	//OJO, se ordena de Mayor a Menor por algun motivo
+	list_sort(entrenador->adquiridos, strcmp);
+	list_sort(entrenador->objetivos, strcmp);
 
 	return !list_is_empty(entrenador->objetivos);
 }
