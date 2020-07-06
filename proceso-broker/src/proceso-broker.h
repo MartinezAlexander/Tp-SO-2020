@@ -21,4 +21,6 @@
 #include "config.h"
 #include "dump.h"
 
+void finalizar_programa();
+void finalizar_hilos();
 #endif

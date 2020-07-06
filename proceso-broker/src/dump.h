@@ -14,6 +14,5 @@
 
 char* fecha_actual();
 void dump();
-void controlador_de_seniales(int num_senial);
 
 #endif /* DUMP_H_ */

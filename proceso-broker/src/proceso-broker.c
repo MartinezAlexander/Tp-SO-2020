@@ -10,10 +10,19 @@
 
 #include "proceso-broker.h"
 
+void controlador_de_seniales(int num_senial){
+	if(num_senial == SIGUSR1){
+		dump();
+	}
+	if(num_senial == SIGINT){
+		finalizar_programa();
+	}
+}
 
 int main(void){
 
 	signal(SIGUSR1, controlador_de_seniales);
+	signal(SIGINT, controlador_de_seniales);
 
 	iniciar_config();
 
@@ -40,4 +49,30 @@ int main(void){
 	iniciar_servidor(ip_broker,puerto_broker,administrar_mensajes);
 
 	return EXIT_SUCCESS;
+}
+
+void finalizar_programa(){
+	//procesador_suscripciones_liberar();
+	//colas_mensajeria_liberar();
+	finalizar_hilos();
+	exit(0);
+}
+
+void finalizar_hilos(){
+
+	pthread_cancel(cola_mensajeria_new->hilo);
+	pthread_cancel(cola_mensajeria_appeared->hilo);
+	pthread_cancel(cola_mensajeria_caught->hilo);
+	pthread_cancel(cola_mensajeria_catch->hilo);
+	pthread_cancel(cola_mensajeria_get->hilo);
+	pthread_cancel(cola_mensajeria_localized->hilo);
+	pthread_cancel(procesador_suscripciones);
+
+	pthread_detach(procesador_suscripciones);
+	pthread_detach(cola_mensajeria_new->hilo);
+	pthread_detach(cola_mensajeria_appeared->hilo);
+	pthread_detach(cola_mensajeria_caught->hilo);
+	pthread_detach(cola_mensajeria_catch->hilo);
+	pthread_detach(cola_mensajeria_get->hilo);
+	pthread_detach(cola_mensajeria_localized->hilo);
 }

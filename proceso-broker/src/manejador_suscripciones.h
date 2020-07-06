@@ -32,4 +32,5 @@ void memoria_cache_enviar_mensajes_cacheados(int socket, t_list* mensajes_enviad
 void cola_suscripciones_create();
 void iniciar_procesador_suscripciones(void(*procesa_suscripcion)(void));
 void cola_suscripciones_agregar_suscripcion(t_mensaje* mensaje, int* socket);
+void procesador_suscripciones_liberar();
 #endif

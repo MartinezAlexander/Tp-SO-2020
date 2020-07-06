@@ -43,8 +43,6 @@ int suscriptor_esta_suscripto(t_list* lista_suscriptores, int pid){
 char* suscriptor_to_string(t_suscriptor* suscriptor){
 	int socket = suscriptor->socket;
 	int32_t id = suscriptor->pid;
-	//TODO Conditional jump or move depends on uninitialised value(s)
-	//TODO Use of uninitialised value of size 4
 	return string_from_format("ID suscriptor: %d conectado a traves del socket %d ",id,socket);
 }
 
@@ -54,7 +52,6 @@ void suscriptor_suscribirse_a(t_list* lista_suscriptores, t_suscriptor* suscript
 
 void suscriptor_reconectar(t_list* lista_suscriptores, int* socket, int posicion){
 	t_suscriptor* suscriptor = list_get(lista_suscriptores,posicion);
-	//TODO helgrind socket 5
 	suscriptor->socket = *socket;
 }
 

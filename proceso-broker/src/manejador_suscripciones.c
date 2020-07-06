@@ -9,6 +9,7 @@ t_suscripciones* suscripciones_create(t_mensaje* mensaje, int* socket){
 
 void suscripciones_destroy(t_suscripciones* suscripciones){
 	mensaje_destroy(suscripciones->mensaje);
+	free(suscripciones->socket);
 	free(suscripciones);
 }
 
@@ -23,8 +24,6 @@ void cola_suscripciones_agregar_suscripcion(t_mensaje* mensaje, int* socket){
 	t_suscripciones* info_suscripcion = suscripciones_create(mensaje,socket);
 
 	loggear_recepcion_mensaje(mensaje_to_string(mensaje));
-	//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
-	//TODO helgrind socket 1
 	confirmar_suscripcion(*socket);
 
 	pthread_mutex_lock(&cola_suscripciones->mutex_cola_suscripcion);
@@ -37,7 +36,8 @@ void cola_suscripciones_agregar_suscripcion(t_mensaje* mensaje, int* socket){
 void iniciar_procesador_suscripciones(void(*procesar_suscripcion)(void)){
 	cola_suscripciones_create();
 	pthread_create(&procesador_suscripciones,NULL,(void*)procesar_suscripcion,NULL);
-	pthread_detach(procesador_suscripciones);
+	//pthread_detach(procesador_suscripciones);
+	//pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 }
 
 void memoria_cache_enviar_mensajes_cacheados(int socket, t_list* mensajes_enviados,int32_t pid , op_code cola){
@@ -64,15 +64,13 @@ void memoria_cache_enviar_mensajes_cacheados(int socket, t_list* mensajes_enviad
 			t_mensaje* mensaje = (t_mensaje*) list_get(mensajes, i);
 
 			if(!suscriptor_ya_recibio_mensaje(mensajes_enviados,mensaje->id)){
-
-				//TODO Syscall param socketcall.send(args) points to uninitialised byte(s)
 				int resultado_envio = enviar_mensaje(mensaje,socket);
 
 				if (resultado_envio > 0) {
 					loggear_envio_mensaje(mensaje_to_string(mensaje));
-					//TODO Syscall param socketcall.recv(args) points to uninitialised byte(s)
 					if(recibir_ACK(socket)){
-						loggear_recepcion_ACK(suscriptor_to_string(&suscriptor));
+						char* suscriptor_string = suscriptor_to_string(&suscriptor);
+						loggear_recepcion_ACK(suscriptor_string);
 						suscriptor_agregar_mensaje_recibido(mensajes_enviados,mensaje->id);
 					}else{
 						//TODO loguear que no se recibio el ack en el loguer personal
@@ -91,4 +89,9 @@ void memoria_cache_enviar_mensajes_cacheados(int socket, t_list* mensajes_enviad
 		//TODO pasar a logger personal
 		puts("NO HAY MENSAJES DE ESA COLA");
 	}
+}
+
+void procesador_suscripciones_liberar(){
+	queue_destroy_and_destroy_elements(cola_suscripciones->queue,(void*)suscripciones_destroy);
+	free(cola_suscripciones);
 }

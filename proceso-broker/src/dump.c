@@ -40,9 +40,3 @@ void dump(){
 
 	fclose(archivo_dump);
 }
-
-void controlador_de_seniales(int num_senial){
-	if(num_senial == SIGUSR1){
-		dump();
-	}
-}
