@@ -23,5 +23,5 @@ char* path_logger;
 
 void iniciar_config();
 void obtener_info_del_config();
-
+void finalizar_config();
 #endif

@@ -89,9 +89,13 @@ int main(void){
 }
 
 void finalizar_programa(){
-	//procesador_suscripciones_liberar();
-	//colas_mensajeria_liberar();
 	finalizar_hilos();
+	procesador_suscripciones_liberar();
+	colas_mensajeria_liberar();
+	memoria_cache_destroy();
+	finalizar_config();
+	logger_destroy();
+	log_personal_destroy();
 	exit(0);
 }
 
@@ -103,6 +107,11 @@ void finalizar_hilos(){
 	finalizar_procesador_catch();
 	finalizar_procesador_get();
 	finalizar_procesador_localized();
+	if(string_equals_ignore_case(algoritmo_memoria,"BS")){
+		finalizar_buddy_system();
+	}else{
+		//finalizar_particiones_dinamicas();
+	}
 }
 
 

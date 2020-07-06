@@ -61,7 +61,9 @@ void loggear_mensaje_cacheado(char* mensaje, int base_particion){
 }
 
 void logger_destroy(){
-	log_destroy(logger);
+	if(logger != NULL){
+		log_destroy(logger);
+	}
 }
 
 void iniciar_log_personal(char* path){
@@ -80,5 +82,7 @@ void log_personal_error_envio_a_suscriptor(char* suscriptor){
 }
 
 void log_personal_destroy(){
-	log_destroy(logger_personal);
+	if(logger_personal!=NULL){
+		log_destroy(logger_personal);
+	}
 }

@@ -191,11 +191,34 @@ void destruir_hijo_derecho(t_buddy* padre){
 	padre->der = NULL;
 }
 
+void destruir_hijo(t_buddy* padre, t_buddy* hijo){
+	if( (t_buddy*)padre->izq == hijo ){
+		padre->izq = NULL;
+	}else{
+		padre->der = NULL;
+	}
+}
+
 void buddy_destroy(t_buddy* buddy){
-	if(buddy_es_raiz(buddy)){
-		destruir_hijo_derecho(buddy);
-		destruir_hijo_izquierdo(buddy);
-		free(buddy);
+	if(buddy_es_hoja(buddy)){
+
+		if( !buddy_es_raiz(buddy)){
+			destruir_hijo((t_buddy*)buddy->padre,buddy);
+			free(buddy);
+		}else{
+			free(buddy);
+		}
+
+	}else{
+
+		buddy_destroy((t_buddy*)buddy->izq);
+		buddy_destroy((t_buddy*)buddy->der);
+
+		if( buddy_es_raiz(buddy) ){
+			free(buddy);
+		}else{
+			buddy_destroy(buddy);
+		}
 	}
 }
 

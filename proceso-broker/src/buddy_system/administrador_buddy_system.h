@@ -26,5 +26,6 @@ void cachear_mensaje_bs(t_mensaje* mensaje);
 char* buddy_to_string(t_buddy* buddy);
 //int es_hora_de_compactar(int tamanio_a_guardar);
 
+void finalizar_buddy_system();
 
 #endif /* BUDDY_SYSTEM_ADMINISTRADOR_BUDDY_SYSTEM_H_ */

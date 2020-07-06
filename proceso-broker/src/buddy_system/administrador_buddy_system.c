@@ -207,3 +207,12 @@ char* buddy_to_string(t_buddy* buddy){
 
 }
 
+void finalizar_buddy_system(){
+	if(string_equals_ignore_case(algoritmo_reemplazo,"FIFO")){
+		queue_destroy(buddies_victimas_fifo);
+	}else{
+		list_destroy(buddies_victimas_lru);
+	}
+	//TODO Liberar buddy system
+	buddy_destroy(buddy_principal);
+}

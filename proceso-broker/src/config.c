@@ -23,3 +23,9 @@ void obtener_info_del_config(){
 
 	path_logger = config_get_string_value(config, "LOG_FILE");
 }
+
+void finalizar_config(){
+	if(config != NULL){
+		config_destroy(config);
+	}
+}
