@@ -310,3 +310,12 @@ char* particion_to_string(t_particion* particion) {
 	}
 	return string;
 }
+
+void finalizar_particiones_dinamicas(){
+	if(string_equals_ignore_case(algoritmo_reemplazo,"FIFO")){
+		queue_destroy(particiones_victimas);
+	}else{
+		list_destroy(particiones_victimas_lru);
+	}
+	list_destroy_and_destroy_elements(particiones,(void*)particion_destroy);
+}

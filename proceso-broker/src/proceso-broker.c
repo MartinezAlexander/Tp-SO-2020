@@ -110,7 +110,7 @@ void finalizar_hilos(){
 	if(string_equals_ignore_case(algoritmo_memoria,"BS")){
 		finalizar_buddy_system();
 	}else{
-		//finalizar_particiones_dinamicas();
+		finalizar_particiones_dinamicas();
 	}
 }
 

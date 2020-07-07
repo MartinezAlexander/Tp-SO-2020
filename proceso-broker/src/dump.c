@@ -16,23 +16,26 @@ void dump(){
 
 		fprintf(archivo_dump,"------------------------------------------------------------------------------------------\n");
 		fprintf(archivo_dump,"%s",fecha_y_hora_dump);
+		free(fecha_y_hora_dump);
 
 		if(string_equals_ignore_case(algoritmo_memoria,"BS")){
 			t_list* buddies = list_create();
 			recolectar_hojas(buddy_principal,buddies);
-
+			char* string_buddy;
 			for(int i = 0; i < list_size(buddies); i++){
 				t_buddy* buddy = list_get(buddies,i);
-				char* string_buddy = buddy_to_string(buddy);
+				string_buddy = buddy_to_string(buddy);
 				fprintf(archivo_dump,"Particion %d: %s\n", i, string_buddy);
+				free(string_buddy);
 			}
 			list_destroy(buddies);
 		}else{
-
+			char* string_part;
 			for(int i = 0; i < list_size(particiones); i++){
 				t_particion* particion = list_get(particiones, i);
-				char* string_part = particion_to_string(particion);
+				string_part= particion_to_string(particion);
 				fprintf(archivo_dump,"Particion %d: %s\n", i, string_part);
+				free(string_part);
 			}
 		}
 
