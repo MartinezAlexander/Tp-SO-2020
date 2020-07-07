@@ -21,20 +21,18 @@ void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad){
 	//Como se cuanto lugar ocupa, literalmente el peso los caracteres??
 }
 
-void incrementar_cantidad(t_posicion posicion){
+void incrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
 	/*
 	 * Si hay un pokemon debo eliminar la linea
 	 * si no hay ninguno o hay mas incremento?
 	 */
 }
+
 //TODO HACER LA FUNCION. ESTA ES MAQUETA
-uint32_t* existe_posicion(t_posicion pos){
-if(pos.posicionX ==0 && pos.posicionY==0){
-	return 1;
-}else{
-	return 0;
+int existe_posicion(pokemon_file* archivo, t_posicion pos){
+
 }
-}
+
 pokemon_file* existe_pokemon(char* especie){
 	for(int i = 0 ; i < list_size(pokemons) ; i++){
 		pokemon_file* p = list_get(pokemons, i);
