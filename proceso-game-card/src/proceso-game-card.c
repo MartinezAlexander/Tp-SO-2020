@@ -52,6 +52,30 @@ void inicializar_filesystem(){
 	//Lo mismo con el Bitmap, es ir al path, leer el archivo y listo
 	bitmap_cargar();
 
+	/*puts("Bitmap antes de crear bloque 2");
+	for(int i=0 ; i<5; i++){
+		printf("Bloque %d - cero = libre - uno = ocupado - %c \n",i,estado_bloques->bitarray[i]);
+	}*/
+
+	/* Creo el bloque 2.bin
+	t_config* bloque_dos = crear_block(2);
+	// guardo 20 pokemones en la posicion 8,9
+	config_set_value(bloque_dos,"8-9","20");
+	config_set_value(bloque_dos,"1-2","3");
+	config_set_value(bloque_dos,"4-4","1");
+	config_save(bloque_dos);*/
+
+	/*
+	puts("Bitmap despues de crear bloque 2");
+	for(int i=0 ; i<5; i++){
+		printf("Bloque %d - cero = libre - uno = ocupado - %c \n",i,estado_bloques->bitarray[i]);
+	}*/
+
+	/*int tamanio = obtener_tamanio_ocupado_por_bloque(2);
+
+	printf("Tamanio de bloque %d\n",tamanio);
+	printf("Tamanio disponible: %d\n",bytes_libres_bloque(2));*/
+
 	//Caso raro: En caso de que no nos den bitmap, tendriamos que armarlo nosotros
 	//Depues de levantar los poke
 	//Vamos por cada metadata, vemos que bloques tiene, nos armamos los bloques
