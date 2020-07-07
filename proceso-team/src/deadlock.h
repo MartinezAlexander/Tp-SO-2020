@@ -26,7 +26,7 @@ typedef struct unEntrenador t_entrenador;
  * Aca esta toda la info necesaria para poder llevar a cabo un
  * intercambio por deadlock
  */
-typedef struct{
+typedef struct unIntercambio{
 	t_entrenador* entrenador;
 	t_entrenador* entrenadorObjetivo;
 	char* pokemonADar;
