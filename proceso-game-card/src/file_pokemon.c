@@ -35,7 +35,12 @@ void incrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
 	 */
 }
 
-//TODO HACER LA FUNCION. ESTA ES MAQUETA
+//TODO Me dan un pokemon y tengo que hacer una lista con las posiciones que existen
+t_list* obtener_posiciones(char* pokemon){
+	t_list* posiciones;
+	return posiciones;
+}
+//TODO HACER LA FUNCION.
 int existe_posicion(pokemon_file* archivo, t_posicion pos){
 return 0;
 }

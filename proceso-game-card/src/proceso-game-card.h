@@ -21,7 +21,7 @@
 #include "tall_grass.h"
 
 void inicializar_variables_globales();
-t_log* iniciar_logger(char* path);
+
 t_config* leer_config(void);
 
 void inicializar_filesystem();

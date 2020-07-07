@@ -20,13 +20,13 @@ void ejecutar_new(t_new_pokemon* new_pokemon, int id) {
 				new_pokemon->pokemon->especie,
 				new_pokemon->pokemon->posicion.posicionX,
 				new_pokemon->pokemon->posicion.posicionY);
-		t_mensaje* mensaje = mensaje_con_id_correlativo_create(appeared,
-				APPEARED_POKEMON, id);
+		t_mensaje* mensaje = mensaje_con_id_correlativo_create(appeared,APPEARED_POKEMON, id);
 		enviar_mensaje(mensaje, socket);
 		recibir_id(socket);
 		liberar_conexion(socket);
 	} else {
-		//TODO loggeo error
+		//loggeo error
+		loggear_conexion(socket);
 	}
 }
 
@@ -39,9 +39,9 @@ void ejecutar_catch(t_catch_pokemon* pokemon, int id) {
 
 	t_caught_pokemon* caught_respuesta;
 
-	if (archivo_pokemon == NULL){
+	if (archivo_pokemon == NULL) {
 		caught_respuesta = caught_pokemon_create(0);
-	}else{
+	} else {
 		//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
 		abrir_archivo(archivo_pokemon);
 
@@ -61,25 +61,52 @@ void ejecutar_catch(t_catch_pokemon* pokemon, int id) {
 	//7. Conectarse y enviar al broker el resultado (ID recibido, resultado)
 	int socket = crear_conexion(ip_broker, puerto_broker);
 	if (socket >= 0) {
-		t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*)caught_respuesta,CAUGHT_POKEMON, id);
+		t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*) caught_respuesta, CAUGHT_POKEMON, id);
 		enviar_mensaje(mensaje, socket);
 		recibir_id(socket);
 		liberar_conexion(socket);
 	} else {
-		// TODO Si no se puede conectar, se loggea y continua la ejecucion
+		// loggeao que no se pudo conectar
+		loggear_conexion(socket);
 	}
 
 }
 
 void ejecutar_get(t_get_pokemon* pokemon, int id) {
-	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem (Si no existe->se
-	//informa el mensaje sin posiciones ni cantidades (???)
-	//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
-	//3. Obtener todas las posiciones y cantidades del Pokemon requerido
-	//4. Esperar la cantidad de segundos definidos por archivo de configuracion
-	//5. Cerrar el archivo
-	//6. Si se encontro al menos 1 posicion, conectarse y enviar al broker
-	// LOCALIZED_POKEMON (ID recibido, poke, lista de posiciones y cant. por posicion)
+	t_localized_pokemon* localized_respuesta;
+	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem
+	pokemon_file* archivo_pokemon = existe_pokemon(pokemon->nombre);
 
-	// Si no se puede conectar, se loggea y continua la ejecucion
+	if (archivo_pokemon == NULL) {
+		//(Si no existe->se informa el mensaje sin posiciones ni cantidades (???)
+		localized_respuesta = localized_pokemon_create(pokemon->nombre, 0);
+	} else {
+		//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
+		abrir_archivo(archivo_pokemon);
+
+		//3. TODO Obtener todas las posiciones del Pokemon requerido
+		t_list* pokemon_posiciones = obtener_posiciones(pokemon->nombre);
+		localized_respuesta = localized_pokemon_create(pokemon->nombre,pokemon_posiciones);
+
+		//4. Esperar la cantidad de segundos definidos por archivo de configuracion
+		sleep(tiempo_retardo_operacion);
+
+		//5. Cerrar el archivo
+		cerrar_archivo(archivo_pokemon);
+	}
+
+	//6. Si se encontro al menos 1 posicion, conectarse y enviar al broker
+	//  [no hay que enviar las cantidades esta mal el enunciado])
+
+	int socket = crear_conexion(ip_broker, puerto_broker);
+	if (socket >= 0) {
+		t_mensaje* mensaje = mensaje_con_id_correlativo_create(
+				(void*) localized_respuesta, LOCALIZED_POKEMON, id);
+		enviar_mensaje(mensaje, socket);
+		recibir_id(socket);
+		liberar_conexion(socket);
+	} else {
+		// loggeo que no se pudo conectar
+		loggear_conexion(socket);
+	}
 }

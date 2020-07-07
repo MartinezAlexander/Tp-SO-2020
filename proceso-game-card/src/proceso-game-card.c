@@ -67,15 +67,6 @@ void inicializar_filesystem(){
 	//Por cada directorio entro a /Files/Dir/Metadata.bin y levanto
 }
 
-t_log* iniciar_logger(char* path){
-	t_log* logger;
-	if((logger = log_create(path,"gamecard",true,LOG_LEVEL_INFO)) == NULL)
-	{
-		printf("No se pudo crear el log\n");
-		exit(1);
-	}
-	return logger;
-}
 
 t_config* leer_config(void){
 	t_config *config;
