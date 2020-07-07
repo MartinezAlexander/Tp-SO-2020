@@ -15,7 +15,6 @@ typedef struct{
 	char* path;
 	char* especie;
 	FILE* metadata;
-	int open;
 }pokemon_file;
 
 t_list* pokemons;

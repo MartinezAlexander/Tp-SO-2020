@@ -3,31 +3,20 @@
 //TODO Todas las ejecuciones
 void ejecutar_new(t_new_pokemon* new_pokemon, int id) {
 	//Obtengo el archivo del pokemon que necesito. Si no existe se crea.
-	pokemon_file* archivo_pokemon = obtener_pokemon(
-			new_pokemon->pokemon->especie);
-	abrir_archivo(archivo_pokemon);
-	agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion,
-			new_pokemon->cantidad);
+	pokemon_file* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
 
-	//Espero x segundos para simular el acceso al disco
-	sleep(tiempo_retardo_operacion);
+	abrir_archivo(archivo_pokemon);
+
+	agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
+	sleep(tiempo_retardo_operacion);//Espero x segundos para simular el acceso al disco
+
 	cerrar_archivo(archivo_pokemon);
 
-	//Envio mensaje APPEARED al broker
-	int socket = crear_conexion(ip_broker, puerto_broker);
-	if (socket >= 0) {
-		t_appeared_pokemon* appeared = appeared_pokemon_create(
-				new_pokemon->pokemon->especie,
-				new_pokemon->pokemon->posicion.posicionX,
-				new_pokemon->pokemon->posicion.posicionY);
-		t_mensaje* mensaje = mensaje_con_id_correlativo_create(appeared,
-				APPEARED_POKEMON, id);
-		enviar_mensaje(mensaje, socket);
-		recibir_id(socket);
-		liberar_conexion(socket);
-	} else {
-		//TODO loggeo error
-	}
+	t_appeared_pokemon* appeared = appeared_pokemon_create(new_pokemon->pokemon->especie,
+					new_pokemon->pokemon->posicion.posicionX,
+					new_pokemon->pokemon->posicion.posicionY);
+	t_mensaje* mensaje = mensaje_con_id_correlativo_create(appeared, APPEARED_POKEMON, id);
+	enviar_mensaje_al_broker(mensaje);
 }
 
 void ejecutar_catch(t_catch_pokemon* pokemon, int id) {
@@ -59,15 +48,8 @@ void ejecutar_catch(t_catch_pokemon* pokemon, int id) {
 	}
 
 	//7. Conectarse y enviar al broker el resultado (ID recibido, resultado)
-	int socket = crear_conexion(ip_broker, puerto_broker);
-	if (socket >= 0) {
-		t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*)caught_respuesta,CAUGHT_POKEMON, id);
-		enviar_mensaje(mensaje, socket);
-		recibir_id(socket);
-		liberar_conexion(socket);
-	} else {
-		// TODO Si no se puede conectar, se loggea y continua la ejecucion
-	}
+	t_mensaje* mensaje = mensaje_con_id_correlativo_create(caught_respuesta,CAUGHT_POKEMON, id);
+	enviar_mensaje_al_broker(mensaje);
 
 }
 
@@ -82,4 +64,15 @@ void ejecutar_get(t_get_pokemon* pokemon, int id) {
 	// LOCALIZED_POKEMON (ID recibido, poke, lista de posiciones y cant. por posicion)
 
 	// Si no se puede conectar, se loggea y continua la ejecucion
+}
+
+void enviar_mensaje_al_broker(t_mensaje* mensaje){
+	int socket = crear_conexion(ip_broker, puerto_broker);
+	if (socket >= 0) {
+		enviar_mensaje(mensaje, socket);
+		recibir_id(socket);
+		liberar_conexion(socket);
+	} else {
+		//TODO loggeo error
+	}
 }

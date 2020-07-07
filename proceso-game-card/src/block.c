@@ -7,6 +7,7 @@
 
 #include "block.h"
 
+//TODO: Refactor -> Borrar lista de bloques, los bloques los accedo directamente a partir del indice.
 void crear_block(int numero){
 	block* bloque = malloc(sizeof(block));
 
