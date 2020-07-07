@@ -18,54 +18,42 @@ pokemon_file* obtener_pokemon(char* especie){
 
 
 void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad){
-	char* posicion_string = string_from_format("%d-%d", posicion.posicionX, posicion.posicionY);
 
 	t_config* config_metadata = config_create(archivo->path);
 	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
 
-	char** bloques = config_get_array_value(config_metadata, "BLOCKS");
+	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
 
-	int index = 0;
-	while(bloques[index] != NULL){
+	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, cantidad);
 
-		//FILE* bloque = obtener_bloque_por_indice(atoi(bloques[index]));
-		char* bloque_archivo = string_from_format("%s.bin", bloques[index]);
-		char* path_bloque = path(path(punto_de_montaje_tallgrass, "Blocks"), bloque_archivo);
+	if(bloque > -1){
+		//Algun bloque ya tiene la posicion y tiene lugar para sumarle la cantidad
+		agregar_pokemon_a_bloque(bloque, posicion, cantidad);
+	}else{
+		//No hay bloques que tengan la posicion con lugar para sumarle
+		bloque = obtener_primer_bloque_con_espacio(bloques_array, posicion, cantidad);
+		if(bloque < 0){
+			bloque = obtener_bloque_disponible();
+			//TODO: catchear caso extremo de que devuelva -1 (no hay bloques libres)
+			crear_block(bloque);
 
-		t_config* config_bloque = config_create(path_bloque);
-		if(config_bloque == NULL) printf("Error al crear config de bloque\n");
+			//Actualizo los bloques en el metadata
+			char* bloques_string = config_get_string_value(config_metadata, "BLOCKS");
+			bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - 1);
+			char* bloques_actualizados = string_from_format("%s,%d]", bloques_string, bloque);
 
-		if(config_has_property(config_bloque, posicion_string)){
-			int cantidad_en_posicion = config_get_int_value(config_bloque, posicion_string);
-			//TODO: chequear que al agregar no se pase el tamaño?
-			config_set_value(config_bloque, posicion_string, string_itoa(cantidad_en_posicion + cantidad));
-			config_save(config_bloque);
-			config_destroy(config_bloque);
-
-			break;
+			config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
+			config_save(config_metadata);
+			free(bloques_actualizados);
+			free(bloques_string);
 		}
 
-		//int obtener_tamanio_ocupado_por_bloque(numero)
-
-		//TODO: DUDA -> los bloques se llenan a medida que hay lugar o en cualquiera?
-		//osea si mi archivo usa 4 bloques y yo quiero meter algo nuevo, voy
-		//a tener que ir al ultimo bloque (o a lo sumo crear uno nuevo) o puede
-		//que haya lugar en alguno de los bloques del medio???
-
-		config_save(config_bloque);
-		config_destroy(config_bloque);
-
-		index++;
+		agregar_nuevo_pokemon_a_bloque(bloque, posicion, cantidad);
 	}
 
-	//busco la posicion. Si encuentro sumo cantidad
-	//actualizo tamaños
-	//Si no hay posicion creo posicion en el primer bloque que haya lugar? o en el ultimo?
-	//Si no hay lugar en ninguno, creo un bloque nuevo
-
-	config_save(config_metadata);
 	config_destroy(config_metadata);
 }
+
 
 void incrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
 	/*
@@ -76,7 +64,7 @@ void incrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
 
 //TODO HACER LA FUNCION. ESTA ES MAQUETA
 int existe_posicion(pokemon_file* archivo, t_posicion pos){
-return 0;
+	return 0;
 }
 
 pokemon_file* existe_pokemon(char* especie){

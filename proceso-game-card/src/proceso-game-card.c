@@ -47,46 +47,10 @@ void inicializar_variables_globales(){
 
 void inicializar_filesystem(){
 	//Primero levantamos las variables de Metadata/Metadata.bin
-	char* metadata_dir = path(punto_de_montaje_tallgrass, "Metadata");
-	char* metadata_path = path(metadata_dir, "Metadata.bin");
-
-	FILE* metadata = fopen(metadata_path, "r");
-
-	t_config* config = config_create(metadata_path);
-	if(config == NULL) puts("Error al leer Metadata/Metadata.bin");
-
-	block_size = config_get_int_value(config, "BLOCK_SIZE");
-
-	blocks = config_get_int_value(config, "BLOCKS");
-
-	config_destroy(config);
-
-	fclose(metadata);
-
-	printf("[Inicializacion] Block_Size leido: %d\n", block_size);
-	printf("[Inicializacion] Blocks leidos: %d\n", blocks);
+	metadata_cargar();
 
 	//Lo mismo con el Bitmap, es ir al path, leer el archivo y listo
-	char* bitmap_path = path(metadata_dir, "Bitmap.bin");
-	FILE* bitmap = fopen(bitmap_path, "r");
-
-	int bitarray_size = blocks / 8;
-	void* puntero_a_bits = malloc(bitarray_size);
-	t_bitarray* bitarray = bitarray_create(puntero_a_bits,bitarray_size);
-
-	int index = 0;
-	char buffer = fgetc(bitmap);
-
-	while(buffer != EOF){
-		if (buffer == '1') {
-			bitarray_set_bit(bitarray, index);
-		} else {
-			bitarray_clean_bit(bitarray, index);
-		}
-		printf("Index: %d, bit = %c\n", index, buffer);
-		index++;
-		buffer = fgetc(bitmap);
-	}
+	bitmap_cargar();
 
 	//Caso raro: En caso de que no nos den bitmap, tendriamos que armarlo nosotros
 	//Depues de levantar los poke

@@ -11,14 +11,21 @@
 #include <stdio.h>
 #include <commons/bitarray.h>
 #include "variables_globales.h"
+#include "tall_grass.h"
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 typedef struct{
-	t_bitarray* bitarray;
-	FILE* file;
+	char* bitarray;
+	char* path;
 }bitmap;
 
 bitmap* estado_bloques;
 
+void bitmap_cargar();
 void ocupar_bloque(int nuevo_bloque);
 int obtener_bloque_disponible();
 
