@@ -1,10 +1,3 @@
-/*
- * variables_globales.h
- *
- *  Created on: 6 jun. 2020
- *      Author: utnso
- */
-
 #ifndef VARIABLES_GLOBALES_H_
 #define VARIABLES_GLOBALES_H_
 
@@ -13,6 +6,7 @@
 #include <commons/log.h>
 #include <commons/string.h>
 #include <commons/config.h>
+#include "bitmap.h"
 
 t_log* logger;
 t_config* config;
@@ -26,4 +20,6 @@ char* puerto_broker;
 
 int card_id;
 
-#endif /* VARIABLES_GLOBALES_H_ */
+int blocks;
+int block_size;
+#endif

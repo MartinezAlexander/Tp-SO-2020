@@ -42,8 +42,7 @@ void inicializar_variables_globales(){
 	ip_broker = config_get_string_value(config, "IP_BROKER");
 	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
 	iniciar_logger(config_get_string_value(config, "LOG_FILE"));
-	//TODO inicializar correctamente (es el sustituto del process id, como haciamos en team)
-	card_id = 1;
+	card_id = config_get_int_value(config,"ID_GAMECARD");
 }
 
 void inicializar_filesystem(){
