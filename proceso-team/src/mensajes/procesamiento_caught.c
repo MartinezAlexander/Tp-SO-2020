@@ -15,7 +15,7 @@ void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo){
 		t_entrenador* entrenador = dictionary_get(mensajes_catch_pendientes, key_id);
 
 		if(caught_pokemon->atrapado)//Valido resultado del caught
-			resolver_caught_positivo(entrenador, 1);
+			resolver_caught_positivo(entrenador);
 		else
 			resolver_caught_negativo(entrenador);
 

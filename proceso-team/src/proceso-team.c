@@ -13,10 +13,7 @@
 
 
 int main(void) {
-	//TODO: [DL] podriamos chequear si nos dan un entrenador de entrada con DEADLOCK, en ese
-	// caso habria que chequear en todos cuando leemos y actualizar el estado
 	inicializar_variables();
-	//TODO probar mem leak de leer entrenadores si destruimos el config aca, total no lo usamos mas
 
 	iniciar_hilos_planificacion();
 
@@ -30,17 +27,6 @@ int main(void) {
 	//test_sjf_con_desalojo();
 
 	//test_deadlock2();
-
-	//TODO: [DL] Aca deberia chequear si todos mis entrenadores estan o en EXIT
-	//o en DEADLOCK. Si es asi, puedo comenzar a resolver los intercambios
-
-	//Opciones:
-	//			Un semaforo, y cada vez que actualizo estados, veo si se cumple esto
-	//				y mando el signal si es asi
-
-
-
-	//resolver_deadlock();
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)

@@ -24,7 +24,7 @@
 #include "utils/log_utils.h"
 #include "mensajes/procesamiento_appeared.h"
 
-#include "deadlock.h"
+
 
 
 uint32_t retardo_cpu;
@@ -53,7 +53,6 @@ typedef struct unEntrenador{
 	t_list* pokemones_adquiridos;
 
 	t_pokemon* objetivo_actual;
-	t_intercambio* intercambio_actual;
 
 	estado_planificacion estado;
 	estado_sjf* estado_sjf;
@@ -70,7 +69,7 @@ t_dictionary* mensajes_catch_pendientes;
 
 void iniciarlizar_diccionario_catch();
 
-int mover_proxima_posicion(t_entrenador* entrenador, t_posicion objetivo);
+int mover_proxima_posicion(t_entrenador* entrenador);
 void enviar_catch(t_entrenador* entrenador);
 /*
  * Realiza el proximo ciclo de ejecucion del entrenador,
@@ -78,9 +77,8 @@ void enviar_catch(t_entrenador* entrenador);
  * de lo contrario retorna 0
  */
 int ejecutar_entrenador(t_entrenador* entrenador);
-int ejecutar_entrenador_intercambio_deadlock(t_entrenador* entrenador);
 
-void resolver_caught_positivo(t_entrenador* entrenador, int asincronico);
+void resolver_caught_positivo(t_entrenador* entrenador);
 void resolver_caught_negativo(t_entrenador* entrenador);
 
 void bloquear_entrenador(t_entrenador* entrenador);

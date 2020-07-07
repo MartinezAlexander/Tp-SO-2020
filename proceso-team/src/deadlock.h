@@ -9,14 +9,8 @@
 #include<commons/collections/dictionary.h>
 #include<commons/collections/queue.h>
 
-
-#include "utils/posicion_utils.h"
-
 #include "entrenador.h"
-#include "planificacion/planificacion.h"
-
-struct t_entrenador;
-typedef struct unEntrenador t_entrenador;
+#include "utils/posicion_utils.h"
 
 /*
  * Con esta estructura manejamos los intercambios.
@@ -93,9 +87,9 @@ int entrenador_tiene_adquirido(t_entrenador_copia* entrenador, char* especie);
 int entrenador_tiene_en_objetivo(t_entrenador_copia* entrenador, char* especie);
 t_intercambio* convertir_a_intercambio_real(t_intercambio_copia* intercambio_copia);
 void realizar_intercambio_simbolico(t_intercambio_copia* intercambio);
-void cambiar_pokemon(t_list* listado_pokemon, char* especieASacar, char* especieAMeter);
+void cambiar_pokemon(t_entrenador_copia* entrenador, char* especieASacar, char* especieAMeter);
 
-void encolar_proximo_intercambio(int primer_intercambio);
+
 
 
 

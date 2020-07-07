@@ -18,7 +18,7 @@ void actualizar_estadistica_entrenador(int id_entrenador){
 int ejecutar_entrenador(t_entrenador* entrenador){
 	actualizar_estadistica_entrenador(entrenador->identificador);
 
-	int termine = mover_proxima_posicion(entrenador, entrenador->objetivo_actual->posicion);
+	int termine = mover_proxima_posicion(entrenador);
 	loggear_movimiento_entrenador(entrenador->identificador, entrenador->posicion);
 
 	if(termine){
@@ -27,42 +27,6 @@ int ejecutar_entrenador(t_entrenador* entrenador){
 
 	return termine;
 }
-
-/*
- * Ejecuta un ciclo de entrenador para realizar el intercambio de deadlock actual
- */
-int ejecutar_entrenador_intercambio_deadlock(t_entrenador* entrenador){
-	//TODO: Actualizar estadistica?? VER
-
-	int termine = mover_proxima_posicion(entrenador, entrenador->intercambio_actual->entrenadorObjetivo->posicion);
-	//TODO: log?
-
-	if(termine){
-		char* pokemon_a_recibir = entrenador->intercambio_actual->pokemonARecibir;
-		char* pokemon_a_dar = entrenador->intercambio_actual->pokemonADar;
-		cambiar_pokemon(entrenador->pokemones_adquiridos, pokemon_a_dar, pokemon_a_recibir);
-		cambiar_pokemon(entrenador->intercambio_actual->entrenadorObjetivo->pokemones_adquiridos,
-				pokemon_a_recibir, pokemon_a_dar);
-		//TODO: sleep por cuanto?
-
-		entrenador->intercambio_actual = NULL;
-
-		//Actualizar estado
-		if(cumplio_objetivo_entrenador(entrenador)){
-				entrenador->estado = EXIT;
-		}else if(entrenador_estado_deadlock(entrenador)){
-			entrenador->estado = BLOCKED_DEADLOCK;
-		}else{
-			printf("[Estado] Entrenador %d, estado inconsistente?\n", entrenador->identificador);
-		}
-
-		encolar_proximo_intercambio(0);
-	}
-
-	return termine;
-}
-
-
 
 void enviar_catch(t_entrenador* entrenador){
 	sleep(retardo_cpu);
@@ -81,7 +45,7 @@ void enviar_catch(t_entrenador* entrenador){
 	if(socket < 0){
 		loggear_error_broker("envio de mensaje catch");
 		//Comportamiento default: CATCH positivo
-		resolver_caught_positivo(entrenador, 0);
+		resolver_caught_positivo(entrenador);
 	}else{
 		//Envio mensaje
 		t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
@@ -92,7 +56,7 @@ void enviar_catch(t_entrenador* entrenador){
 		if(envio < 0){
 			loggear_error_broker("envio de mensaje catch");
 			//Comportamiento default: CATCH positivo
-			resolver_caught_positivo(entrenador, 0);
+			resolver_caught_positivo(entrenador);
 		}else{
 			int id = recibir_id(socket);
 			printf("-Enviado el catch, y recibido id de mensaje: %d -\n", id);
@@ -104,7 +68,7 @@ void enviar_catch(t_entrenador* entrenador){
 	}
 }
 
-void resolver_caught_positivo(t_entrenador* entrenador, int asincronico){
+void resolver_caught_positivo(t_entrenador* entrenador){
 
 	printf("Entrenador %d atrapo exitosamente al %s en [%d,%d]\n", entrenador->identificador,
 			entrenador->objetivo_actual->especie, entrenador->objetivo_actual->posicion.posicionX,
@@ -115,17 +79,9 @@ void resolver_caught_positivo(t_entrenador* entrenador, int asincronico){
 	//Actualizo el estado del entrenador
 	if(cumplio_objetivo_entrenador(entrenador)){
 		entrenador->estado = EXIT;
-		//Puede darse el caso de que el entrenador entre en EXIT o DEADLOCK asincronicamente,
-		//osea, cuando me llega la respuesta del CAUGHT (sin hacer comp. default)
-		//Y cuando eso pase, el entrenador no podra salir del loop de ejecucion porque se
-		//bloqueo anteriormente. Entonces debo mandar un signal para que el entrenador pueda
-		//salir del while, sin ejecutar.
-		if(asincronico) sem_post(&entrenador->semaforo);
 	}else{
 		if(entrenador_estado_deadlock(entrenador))
 			entrenador->estado = BLOCKED_DEADLOCK;
-
-			if(asincronico) sem_post(&entrenador->semaforo);
 		else{
 			bloquear_entrenador(entrenador);
 		}
@@ -191,18 +147,18 @@ void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
  * (primero mueve en x, luego en y), devolviendo 1 en caso de que haya alcanzado
  * el mismo, y 0 si debe seguir moviendose
  */
-int mover_proxima_posicion(t_entrenador* entrenador, t_posicion objetivo){
-	int dirX = direccion_en_x(entrenador->posicion, objetivo);
+int mover_proxima_posicion(t_entrenador* entrenador){
+	int dirX = direccion_en_x(entrenador->posicion, entrenador->objetivo_actual->posicion);
 
 	if(dirX == 0){
-		int dirY = direccion_en_y(entrenador->posicion, objetivo);
+		int dirY = direccion_en_y(entrenador->posicion, entrenador->objetivo_actual->posicion);
 		entrenador->posicion.posicionY += dirY;
 	}else{
 		entrenador->posicion.posicionX += dirX;
 	}
 	sleep(retardo_cpu);
 
-	return movimientos_entre_posiciones(entrenador->posicion, objetivo) == 0;
+	return movimientos_entre_posiciones(entrenador->posicion, entrenador->objetivo_actual->posicion) == 0;
 }
 
 //Recibe pokemones en un string separados por pipes y los asigna al entrenador
@@ -228,7 +184,6 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 	entrenador->identificador = identificador;
 
 	entrenador->objetivo_actual = NULL;
-	entrenador->intercambio_actual = NULL;
 
 	//TODO Free cuando terminamos los entrenadores?
 	entrenador->estado_sjf = malloc(sizeof(estado_sjf));
