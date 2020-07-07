@@ -17,16 +17,16 @@ int main(void) {
 
 	iniciar_hilos_planificacion();
 
-	/*//Me suscribo a las colas y abro hilos para recibir mensajes
+	//Me suscribo a las colas y abro hilos para recibir mensajes
 	iniciar_conexion_broker();
 	//Envio mensaje GET al broker segun objetivos globales
 	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
-	iniciar_puerto_de_escucha();*/
+	iniciar_puerto_de_escucha();
 
 	//test_sjf_con_desalojo();
 
-	test_deadlock();
+	//test_deadlock2();
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)

@@ -18,5 +18,6 @@
 #include "../deadlock.h"
 
 void test_deadlock();
+void test_deadlock2();
 
 #endif /* TESTS_TEST_DEADLOCK_H_ */
