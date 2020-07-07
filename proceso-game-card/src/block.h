@@ -12,6 +12,9 @@
 #include "variables_globales.h"
 #include <stdint.h>
 #include <commons/collections/list.h>
+#include <commons/config.h>
+#include <mensajes/posiciones.h>
+#include <commons/string.h>
 
 typedef struct{
 	char* path;
@@ -21,7 +24,14 @@ typedef struct{
 
 t_list* bloques;
 
-void crear_block(int numero);
+char* crear_nombre_bloque_numero(int numero);
+char* crear_directorio_bloque();
+t_config* crear_block(int numero);
+t_config* obtener_bloque_por_indice(int numero_bloque);
+int bloque_esta_libre(int numero_bloque);
+int obtener_tamanio_ocupado_por_bloque(int numero_bloque);
+int bytes_libres_bloque(int numero_bloque);
+int entra_en_bloque(t_posicion posicion,int cantidad, int numero_bloque);
 
 void agregar_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad);
 void agregar_nuevo_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad);
