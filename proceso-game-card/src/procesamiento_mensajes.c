@@ -49,7 +49,7 @@ void ejecutar_catch(t_catch_pokemon* pokemon, int id) {
 		caught_respuesta = caught_pokemon_create(existe_posicion(archivo_pokemon, pokemon->pokemon->posicion));
 
 		//4. SI la cantidad = 1, se elimina la linea. Sino se decrementa la cantidad en 1
-		incrementar_cantidad(archivo_pokemon, pokemon->pokemon->posicion);
+		decrementar_cantidad(archivo_pokemon, pokemon->pokemon->posicion);
 
 		//5. Esperar la cantidad de segundos definidos por archivo de configuracion
 		sleep(tiempo_retardo_operacion);
