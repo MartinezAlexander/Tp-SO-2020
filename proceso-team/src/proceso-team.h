@@ -17,6 +17,7 @@
 #include "planificacion/planificador.h"
 #include "conexiones/conexion_gameboy.h"
 #include "conexiones/conexion_broker.h"
+#include "deadlock.h"
 //Includes necesarios para el test manual que hay
 
 #include "planificacion/planificacion.h"

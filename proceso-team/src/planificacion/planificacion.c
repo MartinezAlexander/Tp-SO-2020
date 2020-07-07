@@ -146,8 +146,17 @@ void ejecutar_hilo(t_entrenador* entrenador){
 	//Decimos que el entrenador ya termino de ejcutar
 	//cuando cumplio sus objetivos (y el del team)
 	//esto lo verificamos a traves de su estado
-	while(entrenador->estado != EXIT){
+	while(entrenador->estado != EXIT && entrenador->estado != BLOCKED_DEADLOCK){
 		sem_wait(&(entrenador->semaforo));
+
+		//Puede pasar que el entrenador pase a DEADLOCK, pero lo haga cuando reciba
+		//la respuesta del caught. En ese caso ya se habria bloqueado el entrenador,
+		//por lo que no saldria del while hasta el proximo ciclo.
+		//Decidimos entonces que cuando llega un caught y cambio el estado mando signal
+		//al semaforo de arriba para salir si corresponde
+		if(entrenador->estado == EXIT || entrenador->estado == BLOCKED_DEADLOCK){
+			break;
+		}
 
 		int termino_ejecucion = ejecutar_entrenador(entrenador);
 
@@ -173,6 +182,17 @@ void ejecutar_hilo(t_entrenador* entrenador){
 		if(!termino_ejecucion){
 			sem_post(&semaforo_planificacion);
 		}
+	}
+
+	//La idea es que primero ejecute normalmente, y cuando termine de ejecutar
+	//(por EXIT o DEADLOCK) se fijara aca si tiene deadlock, y en ese caso entra
+	//en este nuevo loop hsata que lo resuelva
+	while(entrenador->estado != EXIT){
+		sem_wait(&(entrenador->semaforo));
+
+		ejecutar_entrenador_intercambio_deadlock(entrenador);
+
+		sem_post(&semaforo_planificacion);
 	}
 }
 
