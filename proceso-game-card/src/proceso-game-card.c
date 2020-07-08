@@ -57,14 +57,14 @@ void inicializar_filesystem(){
 		printf("Bloque %d - cero = libre - uno = ocupado - %c \n",i,estado_bloques->bitarray[i]);
 	}*/
 
-	/* Creo el bloque 2.bin
-	t_config* bloque_dos = crear_block(2);
+	 //Creo el bloque 2.bin
+	/*t_config* bloque_dos = crear_block(2);
 	// guardo 20 pokemones en la posicion 8,9
 	config_set_value(bloque_dos,"8-9","20");
 	config_set_value(bloque_dos,"1-2","3");
 	config_set_value(bloque_dos,"4-4","1");
-	config_save(bloque_dos);*/
-
+	config_save(bloque_dos);
+	*/
 	/*
 	puts("Bitmap despues de crear bloque 2");
 	for(int i=0 ; i<5; i++){

@@ -15,7 +15,7 @@ typedef struct{
 	char* path;
 	char* especie;
 	FILE* metadata;
-	int open;
+	block* blokes;
 }pokemon_file;
 
 t_list* pokemons;
@@ -27,7 +27,7 @@ pokemon_file* obtener_pokemon(char* especie);
 void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad);
 
 t_list* obtener_posiciones(char* pokemon);
-void incrementar_cantidad(pokemon_file* archivo, t_posicion posicion);
+void decrementar_cantidad(pokemon_file* archivo, t_posicion posicion);
 int existe_posicion(pokemon_file* archivo, t_posicion pos);
 
 void abrir_archivo(pokemon_file* archivo);

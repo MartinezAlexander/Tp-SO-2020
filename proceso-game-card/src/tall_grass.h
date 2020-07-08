@@ -25,6 +25,7 @@
 FILE* crear_archivo(char* directorio, char* archivo);
 void crear_directorio(char* directorio);
 char* path(char* direccion, char* direccion2);
+
 void metadata_cargar();
 
 #endif /* TALL_GRASS_H_ */

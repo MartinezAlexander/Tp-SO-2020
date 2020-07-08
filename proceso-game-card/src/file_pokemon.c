@@ -18,31 +18,72 @@ pokemon_file* obtener_pokemon(char* especie){
 
 
 void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad){
-	//Esto no nos quedo claro como se hace
-	//Nosotros tenemos en el metadata, todos los bloques en los que hay datos
-	//Si algun bloque ya tiene mi posicion, me imagino que la sumamos ahi
-	//Lo que seria, recorrer cada bloque y ver si tiene mi posicion
-	//Ahora, si no esta en ningun bloque que hago:
-	//Creo uno nuevo y lo meto ahi??
-	//Me fijo en que bloque hay lugar y lo meto ahi??
-	//Como se cuanto lugar ocupa, literalmente el peso los caracteres??
+
+	t_config* config_metadata = config_create(archivo->path);
+	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
+
+	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
+
+	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, cantidad);
+
+	if(bloque > -1){
+		//Algun bloque ya tiene la posicion y tiene lugar para sumarle la cantidad
+		agregar_pokemon_a_bloque(bloque, posicion, cantidad);
+	}else{
+		//No hay bloques que tengan la posicion con lugar para sumarle
+		bloque = obtener_primer_bloque_con_espacio(bloques_array, posicion, cantidad);
+		if(bloque < 0){
+			bloque = obtener_bloque_disponible();
+			//TODO: catchear caso extremo de que devuelva -1 (no hay bloques libres)
+			crear_block(bloque);
+
+			//Actualizo los bloques en el metadata
+			char* bloques_string = config_get_string_value(config_metadata, "BLOCKS");
+			bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - 1);
+			char* bloques_actualizados = string_from_format("%s,%d]", bloques_string, bloque);
+
+			config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
+			config_save(config_metadata);
+			free(bloques_actualizados);
+			free(bloques_string);
+		}
+
+		agregar_nuevo_pokemon_a_bloque(bloque, posicion, cantidad);
+	}
+
+	config_destroy(config_metadata);
 }
 
-void incrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
+
+void decrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
+// Si no hay ninguno no deberia estar la linea
+	// Si hay un pokemon debo eliminar la linea
 	/*
-	 * Si hay un pokemon debo eliminar la linea
-	 * si no hay ninguno o hay mas incremento?
-	 */
+	t_config* bloque = obtener_bloque_por_indice(2);
+		int x = config_get_int_value(bloque,"4-4");
+		printf("el valor es %d",x);
+
+		if(x==1){
+			config_remove_key(bloque,"4-4");
+			config_save(bloque);
+			printf("el valor es %d",x);
+		}
+		*/
+	 // Si hay mas decremento en uno la cantidad
+
+
 }
 
 //TODO Me dan un pokemon y tengo que hacer una lista con las posiciones que existen
 t_list* obtener_posiciones(char* pokemon){
+
 	t_list* posiciones;
 	return posiciones;
 }
 //TODO HACER LA FUNCION.
 int existe_posicion(pokemon_file* archivo, t_posicion pos){
-return 0;
+
+	return 0;
 }
 
 pokemon_file* existe_pokemon(char* especie){
@@ -54,34 +95,35 @@ pokemon_file* existe_pokemon(char* especie){
 	return NULL;
 }
 
-//TODO: sacar el valor open de cada archivo y leer del archivo ese valor
-//Ademas, no tenemos que dejar el archivo abierto al final, sino que lo abro y lo cierro
-//cuando necesite (me refiero a hacer fopen() )
+//TODO: sincronizacion para abrir y cerrar archivos
 void abrir_archivo(pokemon_file* archivo){
-	//En caso que ya este abiero espero x segundos
-	while(archivo->open == 1){
-		sleep(tiempo_reintento_operacion);
-	}
-	//Finalmente, abro el archivo
-	archivo->open = 1;
-	//Bueno, aca tenemos dos alternativas:
-	//Usar seek y todas esas funciones primitivas de archivos
-	//para sobreescribir el OPEN.
-	//O usar de las commons el config. (medio turbio) -PREGUNTAR SI ES LEGAL!
 
-	//Cambiamos el valor de OPEN a Y
+	//Uso config para leer el archivo metadata
 	t_config* config_metadata = config_create(archivo->path);
 	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
+
+	char* valor_open = config_get_string_value(config_metadata, "OPEN");
+
+	//En caso que ya este abiero espero x segundos
+	while(string_equals_ignore_case(valor_open, "Y")){
+		sleep(tiempo_reintento_operacion);
+		valor_open = config_get_string_value(config_metadata, "OPEN");
+	}
+
+	//Cambiamos el valor de OPEN a Y
 	config_set_value(config_metadata, "OPEN", "Y");
 	config_save(config_metadata);
 	config_destroy(config_metadata);
-	//Dejamos el archivo abierto
-	txt_open_for_append(archivo->path);								//ACA   <=
+
 }
 
 void cerrar_archivo(pokemon_file* archivo){
-	txt_close_file(archivo->metadata);
-	archivo->open = 0;
+	//Uso config para leer el archivo metadata
+	t_config* config_metadata = config_create(archivo->path);
+	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
+	config_set_value(config_metadata, "OPEN", "N");
+	config_save(config_metadata);
+	config_destroy(config_metadata);
 }
 
 pokemon_file* pokemon_file_create(char* especie){
@@ -93,7 +135,6 @@ pokemon_file* pokemon_file_create(char* especie){
 	archivo->path = path(ruta_directorio, "Metadata.bin");
 	archivo->especie = especie;
 	archivo->metadata = crear_metadata(ruta_directorio);
-	archivo->open = 0;
 
 	list_add(pokemons, archivo);
 	return archivo;

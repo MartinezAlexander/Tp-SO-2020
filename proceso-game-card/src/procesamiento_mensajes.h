@@ -28,4 +28,6 @@ void ejecutar_new(t_new_pokemon* pokemon, int id);
 void ejecutar_catch(t_catch_pokemon* pokemon, int id);
 void ejecutar_get(t_get_pokemon* pokemon, int id);
 
+void enviar_mensaje_al_broker(t_mensaje* mensaje);
+
 #endif /* PROCESAMIENTO_MENSAJES_H_ */
