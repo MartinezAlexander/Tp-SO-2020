@@ -7,6 +7,7 @@
 
 #include "file_pokemon.h"
 
+//TODO no vamos a hacer asi
 pokemon_file* obtener_pokemon(char* especie){
 	pokemon_file* archivo = existe_pokemon(especie);
 	if(archivo != NULL){
@@ -26,14 +27,24 @@ void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad){
 
 	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, cantidad);
 
+	printf("[Insertar posicion] Bloque ya tiene posicion: %d\n", bloque);
+
 	if(bloque > -1){
 		//Algun bloque ya tiene la posicion y tiene lugar para sumarle la cantidad
 		agregar_pokemon_a_bloque(bloque, posicion, cantidad);
+
+		printf("[Insertar posicion] Modificada la cantidad de la posicion en ese bloque\n");
 	}else{
 		//No hay bloques que tengan la posicion con lugar para sumarle
 		bloque = obtener_primer_bloque_con_espacio(bloques_array, posicion, cantidad);
+
+		printf("[Insertar posicion] Bloque con lugar: %d\n", bloque);
+
 		if(bloque < 0){
 			bloque = obtener_bloque_disponible();
+
+			printf("[Insertar posicion] Nuevo bloque creado para posicion: %d\n", bloque);
+
 			//TODO: catchear caso extremo de que devuelva -1 (no hay bloques libres)
 			crear_block(bloque);
 
@@ -49,6 +60,8 @@ void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad){
 		}
 
 		agregar_nuevo_pokemon_a_bloque(bloque, posicion, cantidad);
+
+		printf("[Insertar posicion] Modificada la cantidad de la posicion en ese bloque\n");
 	}
 
 	config_destroy(config_metadata);
@@ -77,15 +90,16 @@ void decrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
 //TODO Me dan un pokemon y tengo que hacer una lista con las posiciones que existen
 t_list* obtener_posiciones(char* pokemon){
 
-	t_list* posiciones;
-	return posiciones;
+	return NULL;
 }
+
 //TODO HACER LA FUNCION.
 int existe_posicion(pokemon_file* archivo, t_posicion pos){
 
 	return 0;
 }
 
+//TODO no vamos a hacer asi. Hacer de nuevo
 pokemon_file* existe_pokemon(char* especie){
 	for(int i = 0 ; i < list_size(pokemons) ; i++){
 		pokemon_file* p = list_get(pokemons, i);
@@ -136,7 +150,7 @@ pokemon_file* pokemon_file_create(char* especie){
 	archivo->especie = especie;
 	archivo->metadata = crear_metadata(ruta_directorio);
 
-	list_add(pokemons, archivo);
+	//list_add(pokemons, archivo);
 	return archivo;
 }
 

@@ -16,6 +16,8 @@ int main(void) {
 
 	inicializar_filesystem();
 
+	//test_agregar_cantidad_a_archivo();
+
 	//iniciar_conexion_broker();
 	//iniciar_puerto_escucha();
 /*
