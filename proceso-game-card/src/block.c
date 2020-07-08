@@ -219,3 +219,40 @@ void agregar_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad){
 	free(nueva_cantidad);
 	free(posicion_string);
 }
+
+/*
+ * Decrementa en uno la cantidad de pokemon para la posicion dada.
+ * Devuelve 1 en caso de que haya eliminado la fila debido a que la cantidad quedo en 0.
+ */
+int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion){
+	char* posicion_string = posicion_to_key(posicion);
+
+	t_config* config_bloque = obtener_bloque_por_indice(bloque);
+	int cantidad_actual = config_get_int_value(config_bloque, posicion_string);
+
+	int eliminar_fila = cantidad_actual - 1 <= 0;
+
+	if(eliminar_fila){
+		config_remove_key(config_bloque, posicion_string);
+	}else{
+		char* nueva_cantidad = string_itoa(cantidad_actual - 1);
+		config_set_value(config_bloque, posicion_string, nueva_cantidad);
+		free(nueva_cantidad);
+	}
+
+	config_save(config_bloque);
+	config_destroy(config_bloque);
+	free(posicion_string);
+
+	return eliminar_fila;
+}
+
+/*
+ * Retorna un listado con todas las posiciones que posee un bloque
+ */
+t_list* obtener_posiciones_de_bloque(int bloque){
+	t_list* posiciones = list_create();
+
+
+	return posiciones;
+}

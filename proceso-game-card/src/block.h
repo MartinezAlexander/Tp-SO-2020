@@ -41,4 +41,7 @@ int obtener_primer_bloque_con_espacio(char** bloques, t_posicion posicion, int c
 int obtener_bloque_con_posicion(char** bloques, t_posicion posicion, int cantidad);
 char* posicion_to_key(t_posicion posicion);
 
+int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion);
+t_list* obtener_posiciones_de_bloque(int bloque);
+
 #endif /* BLOCK_H_ */
