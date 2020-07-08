@@ -67,36 +67,70 @@ void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad){
 	config_destroy(config_metadata);
 }
 
-
+/*
+ * Decrementa la cantidad de pokemones en la posicion dada para tal archivo pokemon.
+ * En caso de que no queden mas luego de decrementar, elimina la posicion del archivo.
+ */
 void decrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
-// Si no hay ninguno no deberia estar la linea
-	// Si hay un pokemon debo eliminar la linea
-	/*
-	t_config* bloque = obtener_bloque_por_indice(2);
-		int x = config_get_int_value(bloque,"4-4");
-		printf("el valor es %d",x);
+	t_config* config_metadata = config_create(archivo->path);
+	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
 
-		if(x==1){
-			config_remove_key(bloque,"4-4");
-			config_save(bloque);
-			printf("el valor es %d",x);
-		}
-		*/
-	 // Si hay mas decremento en uno la cantidad
+	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
 
+	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, 0);
+	free(bloques_array);
 
+	int elimino_fila = eliminar_pokemon_de_bloque(bloque, posicion);
+	if(elimino_fila){
+		//TODO: Si el bloque queda vacio se elimina??
+		//En ese caso habria que chequear si pasa esto
+		//Eliminarlo de bitmap y eliminar archivo
+		//Sacarlo del array de bloques dentro del metadata
+	}
+
+	config_destroy(config_metadata);
 }
 
-//TODO Me dan un pokemon y tengo que hacer una lista con las posiciones que existen
-t_list* obtener_posiciones(char* pokemon){
 
-	return NULL;
+/*
+ * Dado un archivo pokemon, devuelve una lista con todas
+ * las posiciones en las que se encuentra dicho pokemon
+ */
+t_list* obtener_posiciones_pokemon(pokemon_file* archivo){
+	t_list* posiciones = list_create();
+
+	t_config* config_metadata = config_create(archivo->path);
+	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
+
+	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
+
+	int index = 0;
+	while(bloques_array[index] != NULL){
+		int bloque = atoi(bloques_array[index]);
+
+		list_add_all(posiciones, obtener_posiciones_de_bloque(bloque));
+		index++;
+	}
+
+	free(bloques_array);
+	config_destroy(config_metadata);
+
+	return posiciones;
 }
 
-//TODO HACER LA FUNCION.
-int existe_posicion(pokemon_file* archivo, t_posicion pos){
+int existe_posicion(pokemon_file* archivo, t_posicion posicion){
 
-	return 0;
+	t_config* config_metadata = config_create(archivo->path);
+	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
+
+	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
+	config_destroy(config_metadata);
+
+	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, 0);
+
+	free(bloques_array);
+
+	return bloque > -1;
 }
 
 //TODO no vamos a hacer asi. Hacer de nuevo

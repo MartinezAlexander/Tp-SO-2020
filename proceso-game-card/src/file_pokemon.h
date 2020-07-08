@@ -26,9 +26,9 @@ pokemon_file* existe_pokemon(char* especie);
 pokemon_file* obtener_pokemon(char* especie);
 void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad);
 
-t_list* obtener_posiciones(char* pokemon);
+t_list* obtener_posiciones_pokemon(pokemon_file* archivo);
 void decrementar_cantidad(pokemon_file* archivo, t_posicion posicion);
-int existe_posicion(pokemon_file* archivo, t_posicion pos);
+int existe_posicion(pokemon_file* archivo, t_posicion posicion);
 
 void abrir_archivo(pokemon_file* archivo);
 void cerrar_archivo(pokemon_file* archivo);
