@@ -253,6 +253,55 @@ int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion){
 t_list* obtener_posiciones_de_bloque(int bloque){
 	t_list* posiciones = list_create();
 
+	char* path_bloque = path(crear_directorio_bloque(),crear_nombre_bloque_numero(bloque));
+	FILE* archivo_bloque = fopen(path_bloque, "r");
+
+	char caracter = 'x';
+
+	char* posicion_x = string_new();
+	char* posicion_y = string_new();
+
+	int estado_lectura = 1;
+
+	while(caracter != EOF){
+		caracter = fgetc(archivo_bloque);
+
+		if(caracter == '='){
+			estado_lectura = 3;
+			continue;
+		}
+
+		if(caracter == '-'){
+			estado_lectura = 2;
+			continue;
+		}
+
+		if(caracter == '\n'){
+			estado_lectura = 1;
+			posicion_x = string_new();
+			posicion_y = string_new();
+			continue;
+		}
+
+		if(estado_lectura == 1){
+			string_append_with_format(&posicion_x, "%c", caracter);
+		}
+
+		if(estado_lectura == 2){
+			string_append_with_format(&posicion_y, "%c", caracter);
+		}
+
+		if(estado_lectura == 3){
+			estado_lectura = 4;
+
+			t_posicion* posicion = malloc(sizeof(t_posicion));
+			posicion->posicionX = atoi(posicion_x);
+			posicion->posicionY = atoi(posicion_y);
+			list_add(posiciones, posicion);
+		}
+	}
+
+	fclose(archivo_bloque);
 
 	return posiciones;
 }

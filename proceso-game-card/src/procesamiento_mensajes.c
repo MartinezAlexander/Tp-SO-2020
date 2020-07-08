@@ -1,6 +1,6 @@
 #include "procesamiento_mensajes.h"
 
-//TODO Todas las ejecuciones
+
 void ejecutar_new(t_new_pokemon* new_pokemon, int id) {
 	//Obtengo el archivo del pokemon que necesito. Si no existe se crea.
 	pokemon_file* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);

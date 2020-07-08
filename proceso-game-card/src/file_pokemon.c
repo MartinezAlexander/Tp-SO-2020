@@ -7,7 +7,7 @@
 
 #include "file_pokemon.h"
 
-//TODO no vamos a hacer asi
+//TODO VUELA
 pokemon_file* obtener_pokemon(char* especie){
 	pokemon_file* archivo = existe_pokemon(especie);
 	if(archivo != NULL){
@@ -86,6 +86,8 @@ void decrementar_cantidad(pokemon_file* archivo, t_posicion posicion){
 		//En ese caso habria que chequear si pasa esto
 		//Eliminarlo de bitmap y eliminar archivo
 		//Sacarlo del array de bloques dentro del metadata
+
+		//En caso de que no se borre, habria que actualizar el bitmap
 	}
 
 	config_destroy(config_metadata);
@@ -133,7 +135,8 @@ int existe_posicion(pokemon_file* archivo, t_posicion posicion){
 	return bloque > -1;
 }
 
-//TODO no vamos a hacer asi. Hacer de nuevo
+//
+//TODO VUELA (usar existe_archivo_en())
 pokemon_file* existe_pokemon(char* especie){
 	for(int i = 0 ; i < list_size(pokemons) ; i++){
 		pokemon_file* p = list_get(pokemons, i);
