@@ -3,7 +3,7 @@
 
 void ejecutar_new(t_new_pokemon* new_pokemon, int id) {
 	//Obtengo el archivo del pokemon que necesito. Si no existe se crea.
-	pokemon_file* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
+	char* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
 
 	abrir_archivo(archivo_pokemon);
 
@@ -24,13 +24,12 @@ void ejecutar_catch(t_catch_pokemon* catch_pokemon, int id) {
 
 	//PREGUNTAR EL SABADO: 'Se informa error' si no existe se loggea o se manda cuaght negativo??
 
-	pokemon_file* archivo_pokemon = existe_pokemon(catch_pokemon->pokemon->especie);
-
 	t_caught_pokemon* caught_respuesta;
 
-	if (archivo_pokemon == NULL) {
+	if (existe_archivo_en(catch_pokemon->pokemon->especie, obtener_directorio_files())) {
 		caught_respuesta = caught_pokemon_create(0);
 	} else {
+		char* archivo_pokemon = obtener_pokemon(catch_pokemon->pokemon->especie);
 		//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
 		abrir_archivo(archivo_pokemon);
 
@@ -59,15 +58,16 @@ void ejecutar_catch(t_catch_pokemon* catch_pokemon, int id) {
 
 void ejecutar_get(t_get_pokemon* get_pokemon, int id) {
 	t_localized_pokemon* localized_respuesta;
-	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem
-	pokemon_file* archivo_pokemon = existe_pokemon(get_pokemon->nombre);
 
-	if (archivo_pokemon == NULL) {
+	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem
+	if (existe_archivo_en(get_pokemon->nombre, obtener_directorio_files())) {
 		//TODO: (Si no existe->se informa el mensaje sin posiciones ni cantidades (???)
 		//Me imagino (mas que nada por lo que dice al final) que si no hay pokemon
 		//no hago nada. A lo sumo algun log pero no mando nada al broker.
 		return;
 	}
+
+	char* archivo_pokemon = obtener_pokemon(get_pokemon->nombre);
 
 	//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
 	abrir_archivo(archivo_pokemon);

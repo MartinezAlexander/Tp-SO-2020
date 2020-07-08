@@ -4,11 +4,8 @@ void test_agregar_cantidad_a_archivo(){
 	//Creo archivo pikachu (solo primera vez)
 	//pokemon_file_create("Pikachu");
 
-	char* path = "/home/utnso/Escritorio/tall-grass/Files/Pikachu/Metadata.bin";
-	char* especie = "Pikachu";
-	pokemon_file* file = malloc(sizeof(pokemon_file));
-	file->path = path;
-	file->especie = especie;
+	char* file = "/home/utnso/Escritorio/tall-grass/Files/Pikachu/Metadata.bin";
+
 
 	//6 bytes
 	agregar_pokemon(file, posicion_create(3,3), 10);
