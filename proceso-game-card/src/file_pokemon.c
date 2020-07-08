@@ -180,12 +180,15 @@ void cerrar_archivo(pokemon_file* archivo){
 pokemon_file* pokemon_file_create(char* especie){
 	pokemon_file* archivo = malloc(sizeof(pokemon_file));
 
-	char* ruta_directorio = path(path(punto_de_montaje_tallgrass, "Files"), especie);
-	crear_directorio(ruta_directorio);
+	/*char* ruta_directorio = path(path(punto_de_montaje_tallgrass, "Files"), especie);
+	crear_directorio(ruta_directorio);*/
 
-	archivo->path = path(ruta_directorio, "Metadata.bin");
+	char* directorio_files = obtener_directorio_files();
+	crear_directorio(directorio_files,especie);
+
+	archivo->path = path(directorio_files, "Metadata.bin");
 	archivo->especie = especie;
-	archivo->metadata = crear_metadata(ruta_directorio);
+	archivo->metadata = crear_metadata(directorio_files);
 
 	//list_add(pokemons, archivo);
 	return archivo;
