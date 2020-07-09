@@ -11,6 +11,7 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include <time.h>
+#include "logger.h"
 
 char* fecha_actual();
 void dump();

@@ -3,7 +3,7 @@
 char* fecha_actual(){
 	time_t tiempo = time(NULL);
 	struct tm* time = localtime(&tiempo);
-	return string_from_format("Dump: %d/%d/%d %d:%d:%d\n",time->tm_mday, time->tm_mon + 1, time->tm_year, time->tm_hour, time->tm_min, time->tm_sec);
+	return string_from_format("Dump: %d/%d/%d %d:%d:%d\n",time->tm_mday, time->tm_mon + 1, time->tm_year+1900, time->tm_hour, time->tm_min, time->tm_sec);
 }
 
 void dump(){
@@ -38,7 +38,7 @@ void dump(){
 				free(string_part);
 			}
 		}
-
+		loggear_ejecucion_dump();
 	}
 
 	fclose(archivo_dump);

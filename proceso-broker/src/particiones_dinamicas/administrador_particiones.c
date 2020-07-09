@@ -106,6 +106,7 @@ int best_fit(t_mensaje* mensaje){
 		}
 
 		memoria_cache_agregar_mensaje(mensaje, mejor_particion->base);
+		loggear_mensaje_cacheado(mensaje_to_string(mensaje),mejor_particion->base);
 
 		if (es_fifo) {
 			queue_push(particiones_victimas, mejor_particion);
@@ -203,7 +204,7 @@ void compactar_particiones(){
 
 	t_particion* particion_compactada = particion_create(base,tamano_memoria,1);
 	list_add(particiones,particion_compactada);
-
+	loggear_compactacion(particion_tamanio(particion_compactada),particion_compactada->base);
 }
 
 void procedimiento_para_almacenamiento_de_datos(t_mensaje* mensaje, int(*algoritmo)(t_mensaje* mensaje), void(*eliminar)(void)){
