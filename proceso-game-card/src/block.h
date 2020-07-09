@@ -46,4 +46,6 @@ t_list* obtener_posiciones_de_bloque(int bloque);
 
 int obtener_tamanio_listado_de_bloques(char** bloques);
 
+char* obtener_string_bloques_sin(char** bloques_array, int bloque_a_sacar);
+
 #endif /* BLOCK_H_ */

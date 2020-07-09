@@ -330,3 +330,48 @@ t_list* obtener_posiciones_de_bloque(int bloque){
 
 	return posiciones;
 }
+
+
+/*
+ * Dado un array de strings que contiene cada bloque, y un bloque a sacar
+ * devuelve un string del tipo '[bloque,bloque,bloque]' que contenga todos los
+ * bloques dados menos el bloque a sacar
+ */
+char* obtener_string_bloques_sin(char** bloques_array, int bloque_a_sacar){
+	char* listado_bloques = string_new();
+	string_append(&listado_bloques, "[");
+	char* bloque_a_sacar_string = string_itoa(bloque_a_sacar);
+
+	int primer_append = 1;
+
+	int index = 0;
+	while(bloques_array[index] != NULL){
+		char* bloque_actual = bloques_array[index];
+
+		if(!string_equals_ignore_case(bloque_actual, bloque_a_sacar_string)){
+			if(primer_append){
+				string_append(&listado_bloques, bloque_actual);
+				primer_append = 0;
+			}else{
+				string_append_with_format(&listado_bloques, ",%s", bloque_actual);
+			}
+		}
+
+		index++;
+	}
+
+	free(bloque_a_sacar_string);
+
+	string_append(&listado_bloques, "]");
+
+	return listado_bloques;
+}
+
+
+
+
+
+
+
+
+

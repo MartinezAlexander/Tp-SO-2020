@@ -75,6 +75,14 @@ void decrementar_cantidad(char* archivo, t_posicion posicion){
 
 	int elimino_fila = eliminar_pokemon_de_bloque(bloque, posicion);
 	if(elimino_fila){
+		int tamanio_bloque = obtener_tamanio_ocupado_por_bloque(bloque);
+
+		if(tamanio_bloque == 0){
+			liberar_bloque(bloque);
+			char* bloques_actualizados = obtener_string_bloques_sin(bloques_array, bloque);
+			config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
+			free(bloques_actualizados);
+		}
 		//TODO: Si el bloque queda vacio se elimina??
 		//En ese caso habria que chequear si pasa esto
 		//Eliminarlo de bitmap y eliminar archivo
