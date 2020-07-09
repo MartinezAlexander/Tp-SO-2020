@@ -21,7 +21,13 @@ char* crear_nombre_bloque_numero(int numero){
 }
 
 char* crear_directorio_bloque(){
-	return path(punto_de_montaje_tallgrass, "Blocks");
+	char* directorio_bloque = obtener_directorio_blocks();
+
+	if(obtener_directorio_blocks()==NULL){
+		crear_directorio(punto_de_montaje_tallgrass,"Blocks");
+		directorio_bloque = obtener_directorio_blocks();
+	}
+	return directorio_bloque;
 }
 
 t_config* crear_block(int numero){
@@ -45,17 +51,21 @@ t_config* crear_block(int numero){
 }
 
 t_config* obtener_bloque_por_indice(int numero_bloque){
-	char* directorio_bloques = crear_directorio_bloque();
-	char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
 	t_config* bloque = NULL;
 
-	if(nombre_bloque != NULL){
-		//crear_archivo(directorio_bloques, nombre_bloque);
-		bloque = config_create(path(directorio_bloques,nombre_bloque));
-	}
+	if(obtener_directorio_blocks() != NULL){
 
-	free(nombre_bloque);
-	free(directorio_bloques);
+		char* directorio_bloques = crear_directorio_bloque();
+		char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
+		char* path_bloque = path(directorio_bloques, nombre_bloque);
+		if (bloque_esta_libre(numero_bloque)==0) {
+			bloque = config_create(path_bloque);
+		}
+
+		free(path_bloque);
+		free(nombre_bloque);
+		free(directorio_bloques);
+	}
 
 	return bloque;
 }

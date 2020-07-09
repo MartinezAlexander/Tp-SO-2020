@@ -9,39 +9,44 @@
 
 void bitmap_cargar(){
 	estado_bloques = malloc(sizeof(bitmap));
-	estado_bloques->path = path(punto_de_montaje_tallgrass, "Metadata/Bitmap.bin");
+
+	// TODO posibilidad de que el bitmap no este pero haya bloques creados
+	// TODO cargar bitmap en base a nombre de archivos de bloques
+	if (!existe_archivo_en("Bitmap.bin",obtener_directorio_metadata())) {
+		estado_bloques->path = obtener_directorio_bitmap();
+
+		FILE* fd = fopen(estado_bloques->path,"a");
+
+		char x = '0';
+
+		if (fd != NULL) {
+			for (int i = 0; i < blocks; i++) {
+				fputc(x, fd);
+			}
+		}
+
+		fclose(fd);
+
+	}else{
+		estado_bloques->path = obtener_directorio_bitmap();
+	}
 
 	int file_descriptor = open(estado_bloques->path, O_RDWR);
 	estado_bloques->bitarray = mmap(NULL,blocks,PROT_WRITE,MAP_SHARED,file_descriptor,0);
 
-	/*FILE* bitmap = fopen(estado_bloques->path, "r");
-
-	if(bitmap != NULL){
-		int bitarray_size = blocks / 8;
-		void* puntero_a_bits = malloc(bitarray_size);
-		estado_bloques->bitarray = bitarray_create(puntero_a_bits,bitarray_size);
-
-		int index = 0;
-		char buffer = fgetc(bitmap);
-
-		while(buffer != EOF){
-			if (buffer == '1') {
-				bitarray_set_bit(estado_bloques->bitarray, index);
-			} else {
-				bitarray_clean_bit(estado_bloques->bitarray, index);
-			}
-			printf("Index: %d, bit = %c\n", index, buffer);
-			index++;
-			buffer = fgetc(bitmap);
-		}
-
-		fclose(bitmap);
-	}*/
 }
 
 void ocupar_bloque(int nuevo_bloque){
 	if(nuevo_bloque >= 0 && nuevo_bloque < blocks){
 		estado_bloques->bitarray[nuevo_bloque] = '1';
+	}else{
+		//TODO Error bloque no existe
+	}
+}
+
+void liberar_bloque(int numero_bloque){
+	if(numero_bloque >= 0 && numero_bloque < blocks){
+		estado_bloques->bitarray[numero_bloque] = '0';
 	}else{
 		//TODO Error bloque no existe
 	}

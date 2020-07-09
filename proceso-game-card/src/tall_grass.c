@@ -94,20 +94,25 @@ char* obtener_directorio_files(){
 }
 
 char* obtener_directorio_metadata(){
-	char* path_metadata = NULL;
+	char* path_metadata = path(punto_de_montaje_tallgrass,"Metadata");
 
-	if(existe_archivo_en("Metadata",punto_de_montaje_tallgrass)){
-		path_metadata = path(punto_de_montaje_tallgrass,"Metadata");
+	if(!existe_archivo_en("Metadata",punto_de_montaje_tallgrass)){
+		crear_directorio(punto_de_montaje_tallgrass,"Metadata");
+		//TODO Crear archivo metadata propio y cargarlo con valores default?
+		//crear_archivo(punto_de_montaje_tallgrass,"Metadata.bin");
+		//cargar archivo metadata
 	}
 
 	return path_metadata;
 }
 
 char* obtener_directorio_bitmap(){
-	char* path_bitmap = NULL;
+	char* path_metadata = obtener_directorio_metadata();
+	char* path_bitmap = path(path_metadata,"Bitmap.bin");
 
-	if(existe_archivo_en("Metadata",punto_de_montaje_tallgrass)){
-		path_bitmap = path(punto_de_montaje_tallgrass,"Metadata");
+	if(!existe_archivo_en("Bitmap.bin",path_metadata)){
+		FILE* fd = crear_archivo(path_metadata,"Bitmap.bin");
+		fclose(fd);
 	}
 
 	return path_bitmap;
