@@ -16,15 +16,15 @@ int main(void) {
 
 	inicializar_filesystem();
 
-	t_config* bloque2 = crear_block(2);
+	/*t_config* bloque2 = crear_block(2);
 	config_set_value(bloque2,"8-8","2");
 	config_save(bloque2);
-	config_destroy(bloque2);
+	config_destroy(bloque2);*/
 
 	//test_agregar_cantidad_a_archivo();
 
 	//iniciar_conexion_broker();
-	//iniciar_puerto_escucha();
+	iniciar_puerto_de_escucha();
 /*
 	FILE* fd = fopen("/home/utnso/Escritorio/tall-grass/Metadata/Bitmap.bin","a");
 	char x = '0';

@@ -1,5 +1,6 @@
 #include "procesamiento_mensajes.h"
 
+//TODO cada llamado tiene que ser en un hilo nuevo
 
 void ejecutar_new(t_new_pokemon* new_pokemon, int id) {
 	//Obtengo el archivo del pokemon que necesito. Si no existe se crea.

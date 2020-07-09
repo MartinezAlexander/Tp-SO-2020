@@ -208,8 +208,8 @@ void enviar_a(t_proceso id, t_mensaje* mensaje) {
 		break;
 	case GAMECARD:
 		socket = crear_conexion(ip_gamecard, puerto_gamecard);
-		loggear_conexion(id,socket);
 		enviar_mensaje(mensaje, socket);
+		loggear_conexion(id,socket);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
@@ -221,7 +221,6 @@ void inicializar_variables() {
 	ip_broker = config_get_string_value(config, "IP_BROKER");
 	ip_team = config_get_string_value(config, "IP_TEAM");
 	ip_gamecard = config_get_string_value(config, "IP_GAMECARD");
-
 	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
 	puerto_team = config_get_string_value(config, "PUERTO_TEAM");
 	puerto_gamecard = config_get_string_value(config, "PUERTO_GAMECARD");
@@ -237,6 +236,7 @@ int main(int arg, char** args) {
 	iniciar_logger(path_logger);
 
 	t_proceso id_proceso = obtener_id_proceso(args[1]);
+
 	op_code tipo_mensaje = obtener_tipo_mensaje(args[2]);
 	t_mensaje* mensaje_procesado = procesar_mensaje(args, tipo_mensaje,id_proceso);
 
