@@ -10,6 +10,7 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include <pthread.h>
 #include<mensajes/mensajes.h>
 #include<mensajes/localized_pokemon.h>
 

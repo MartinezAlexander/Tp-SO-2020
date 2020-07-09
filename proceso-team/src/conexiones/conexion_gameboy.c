@@ -2,11 +2,17 @@
 
 void iniciar_puerto_de_escucha(){
 	iniciar_servidor(ip_team, puerto_team,(void*) procesar_mensajes_directos);
+	printf("[Gameboy] Iniciando puerto de escucha directo al gameboy\n");
 }
 
+//Para procesar los mensajes usamos las mismas funciones de procesamiento
+//que para el broker.
+//Supuestamente solo puedo recibir un APPEARED del gameboy, pero como ya
+//tenemos las funciones hechas dejamos los otros dos casos tambien, por las dudas
 void procesar_mensajes_directos(int* socket){
 	t_mensaje* mensaje = recibir_mensaje(*socket);
 	loggear_nuevo_mensaje(mensaje);
+	enviar_ACK(*socket);
 
 	switch(mensaje->codigo){
 		case APPEARED_POKEMON:

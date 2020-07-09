@@ -9,17 +9,12 @@
 #include <pthread.h>
 
 #include "logger.h"
-#include "memoria_cache.h"
+#include "manejador_suscripciones.h"
 
-typedef struct{
-	int32_t id_mensaje;
-	t_list* enviados;
-	t_list* fallidos;
-}t_estado_mensaje;
+void procesar_suscripcion();
 
-t_estado_mensaje* estado_mensaje_create(int32_t id);
-void procesar_suscripcion(t_mensaje* mensaje, int* socket,t_memoria_cache* memoria);
 void procesar_pokemon(t_cola_mensajeria* cola);
+
 void envio_a_suscriptores(t_list* suscriptores, t_mensaje* mensaje);
 
 #endif

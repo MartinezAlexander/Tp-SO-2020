@@ -52,4 +52,8 @@ suscripcion_proceso_destroy libera la memoria utilizada para crear el mensaje de
 */
 void suscripcion_proceso_destroy(t_suscripcion* id_proceso);
 
+void* suscripcion_proceso_to_stream(t_suscripcion* suscripcion);
+
+t_suscripcion* suscripcion_proceso_from_stream(void* stream);
+
 #endif

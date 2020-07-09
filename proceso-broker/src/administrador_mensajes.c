@@ -43,46 +43,42 @@ void esperar_cliente(int socket_servidor,void (*serve_client)(int *socket))
 
 	int tam_direccion = sizeof(struct sockaddr_in);
 
-	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
-	loggear_conexion_al_broker(socket_cliente);
+	int* socket_cliente = malloc(sizeof(int));
+	*socket_cliente = accept(socket_servidor, (void*) &dir_cliente, (void*)&tam_direccion);
+	loggear_conexion_al_broker(*socket_cliente);
 
-	pthread_create(&thread,NULL,(void*)serve_client,&socket_cliente);
+	pthread_create(&thread,NULL,(void*)serve_client,socket_cliente);
 	pthread_detach(thread);
 
 }
 
 void administrar_mensajes(int* socket){
 	t_mensaje* mensaje = recibir_mensaje(*socket);
-	switch(mensaje->codigo){
+	if(mensaje != NULL){
+		switch (mensaje->codigo) {
 		case SUSCRIPCION:
-			procesar_suscripcion(mensaje, socket, memoria_cache);
+			cola_suscripciones_agregar_suscripcion(mensaje,socket);
 			break;
 		case NEW_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_new,mensaje,&ultimo_id);
-			enviar_id(*socket,ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_new, mensaje, &ultimo_id, socket);
 			break;
 		case LOCALIZED_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized,mensaje,&ultimo_id);
-			enviar_id(*socket,ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_localized, mensaje, &ultimo_id, socket);
 			break;
 		case GET_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_get,mensaje,&ultimo_id);
-			enviar_id(*socket,ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_get, mensaje, &ultimo_id, socket);
 			break;
 		case APPEARED_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared,mensaje,&ultimo_id);
-			enviar_id(*socket,ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_appeared, mensaje, &ultimo_id, socket);
 			break;
 		case CATCH_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch,mensaje,&ultimo_id);
-			enviar_id(*socket,ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_catch, mensaje, &ultimo_id, socket);
 			break;
 		case CAUGHT_POKEMON:
-			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught,mensaje,&ultimo_id);
-			enviar_id(*socket,ultimo_id);
+			cola_mensajeria_recibir_mensaje(cola_mensajeria_caught, mensaje, &ultimo_id, socket);
 			break;
 		default:
 			printf("CODIGO DE MENSAJE NO VALIDO \n\n");
+		}
 	}
-	//TODO liberar memoria de suscripcion
 }

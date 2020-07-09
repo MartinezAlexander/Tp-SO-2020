@@ -1,13 +1,45 @@
-[INFO] 17:03:00:742 team/(8368:8381): h”„&¢Ë$No tiene id, No tiene id correlativo.
-[INFO] 17:16:42:535 team/(9133:9141): Mensaje - Appeared Pokemon: Nombre: pikachu, Posicion x: 1, Posicion y: 4, Su id es: 1, Su id correlativo es: 3.
-[INFO] 17:16:44:566 team/(9133:9138): Entrenador de id: 1 se movio a la posicion [1,3]
-[INFO] 17:16:46:566 team/(9133:9138): Entrenador de id: 1 se movio a la posicion [1,4]
-[INFO] 17:16:46:567 team/(9133:9138): Inicio operacion CATCH de un: pikachu, ubicado en: [1,4]
-[INFO] 17:20:48:614 team/(9279:9292): Mensaje - Appeared Pokemon: Nombre: pikachu, Posicion x: 1, Posicion y: 4, Su id es: 1, Su id correlativo es: 3.
-[INFO] 17:20:50:615 team/(9279:9289): Entrenador de id: 1 se movio a la posicion [1,3]
-[INFO] 17:20:52:617 team/(9279:9289): Entrenador de id: 1 se movio a la posicion [1,4]
-[INFO] 17:20:52:617 team/(9279:9289): Inicio operacion CATCH de un: pikachu, ubicado en: [1,4]
-[INFO] 17:21:02:56 team/(9279:9292): Å∆¥¨No tiene id, No tiene id correlativo.
-[INFO] 19:30:59:999 team/(12109:12109): finalizando programa...
-[INFO] 19:32:58:717 team/(12261:12261): finalizando programa...
-[INFO] 19:34:40:430 team/(12343:12343): finalizando programa...
+[INFO] 16:19:40:99 team/(5787:5792): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:19:41:98 team/(5787:5793): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:21:29:362 team/(5872:5884): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:21:29:369 team/(5872:5872): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:21:29:369 team/(5872:5884): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:21:59:370 team/(5872:5884): Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar
+[INFO] 16:21:59:370 team/(5872:5884): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:22:29:371 team/(5872:5884): Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar
+[INFO] 16:22:29:372 team/(5872:5884): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:22:59:372 team/(5872:5884): Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar
+[INFO] 16:22:59:373 team/(5872:5884): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:23:29:373 team/(5872:5884): Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar
+[INFO] 16:23:29:373 team/(5872:5884): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:23:59:376 team/(5872:5884): Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar
+[INFO] 16:23:59:377 team/(5872:5884): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:24:29:377 team/(5872:5884): Finalizo el reintento de conexion con el proceso Broker: no se pudo reconectar
+[INFO] 16:24:29:377 team/(5872:5884): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:51:55:556 team/(6420:6425): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:51:56:556 team/(6420:6426): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:51:57:556 team/(6420:6427): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:51:58:557 team/(6420:6420): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:51:58:557 team/(6420:6420): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:51:58:558 team/(6420:6420): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:51:58:558 team/(6420:6420): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:52:04:54 team/(6420:6430): Tipo = APPEARED_POKEMON | Contenido = Pokemon: pikachu | Posicion (x,y): (90,90) | No tiene id | No tiene id correlativo.
+[INFO] 16:52:05:74 team/(6420:6424): Entrenador de id: 3 se movio a la posicion [10,9]
+[INFO] 16:52:06:75 team/(6420:6424): Entrenador de id: 3 se movio a la posicion [11,9]
+[INFO] 16:52:07:75 team/(6420:6424): Entrenador de id: 3 se movio a la posicion [12,9]
+[INFO] 16:52:08:76 team/(6420:6424): Entrenador de id: 3 se movio a la posicion [13,9]
+[INFO] 16:52:09:76 team/(6420:6424): Entrenador de id: 3 se movio a la posicion [14,9]
+[INFO] 16:56:42:865 team/(6567:6572): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:56:43:866 team/(6567:6573): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:56:44:866 team/(6567:6574): Iniciando reintento de conexion con el proceso Broker
+[INFO] 16:56:45:867 team/(6567:6567): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:56:45:867 team/(6567:6567): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:56:45:868 team/(6567:6567): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:56:45:868 team/(6567:6567): Error de comunicacion con el proceso Broker en envio de mensaje get: se realizara el comportamiento default
+[INFO] 16:57:02:176 team/(6567:6589): Tipo = APPEARED_POKEMON | Contenido = Pokemon: Pikachu | Posicion (x,y): (1,1) | No tiene id | No tiene id correlativo.
+[INFO] 16:57:02:179 team/(6567:6591): Tipo = APPEARED_POKEMON | Contenido = Pokemon: Squirtle | Posicion (x,y): (9,7) | No tiene id | No tiene id correlativo.
+[INFO] 16:57:02:183 team/(6567:6593): Tipo = APPEARED_POKEMON | Contenido = Pokemon: Onix | Posicion (x,y): (2,2) | No tiene id | No tiene id correlativo.
+[INFO] 16:57:03:178 team/(6567:6569): Entrenador de id: 1 se movio a la posicion [1,3]
+[INFO] 16:57:04:179 team/(6567:6569): Entrenador de id: 1 se movio a la posicion [1,2]
+[INFO] 16:57:05:179 team/(6567:6569): Entrenador de id: 1 se movio a la posicion [1,1]
+[INFO] 16:57:06:180 team/(6567:6569): Inicio operacion CATCH de un: Pikachu, ubicado en: [1,1]
+[INFO] 16:57:06:181 team/(6567:6569): Error de comunicacion con el proceso Broker en envio de mensaje catch: se realizara el comportamiento default

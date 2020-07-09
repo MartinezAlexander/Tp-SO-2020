@@ -12,14 +12,23 @@ t_dictionary* inicializar_diccionario_especies(){
 
 t_list* obtener_objetivo_global(t_list* entrenadores){
 	t_list* objetivos_globales = list_create();
-
+	t_list* adquiridos_globales = list_create();
+	//Obtengo todos los objetivos y todos los adquiridos en dos listas
 	for(int i = 0; i < list_size(entrenadores); i++){
 		t_entrenador* entrenador = list_get(entrenadores, i);
 		list_add_all(objetivos_globales, entrenador->objetivos);
+		list_add_all(adquiridos_globales, entrenador->pokemones_adquiridos);
 	}
 
 	list_sort(objetivos_globales, strcmp);
 
+	//Por cada elemento de los adquiridos, lo borro de la lista de objetivos
+	for(int i = 0 ; i < list_size(adquiridos_globales) ; i++){
+		char* pokemon = list_get(adquiridos_globales, i);
+
+		sacar_de_objetivos_globales(pokemon, objetivos_globales);
+	}
+	list_destroy(adquiridos_globales);
 	return objetivos_globales;
 }
 
