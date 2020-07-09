@@ -84,10 +84,10 @@ char* obtener_directorio_blocks(){
 }
 
 char* obtener_directorio_files(){
-	char* path_files = NULL;
+	char* path_files = path(punto_de_montaje_tallgrass,"Files");
 
-	if(existe_archivo_en("Files",punto_de_montaje_tallgrass)){
-		path_files = path(punto_de_montaje_tallgrass,"Files");
+	if(!existe_archivo_en("Files",punto_de_montaje_tallgrass)){
+		crear_directorio(punto_de_montaje_tallgrass, "Files");
 	}
 
 	return path_files;

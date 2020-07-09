@@ -11,29 +11,19 @@
 #include "tall_grass.h"
 #include "block.h"
 
-typedef struct{
-	char* path;
-	char* especie;
-	FILE* metadata;
-	block* blokes;
-}pokemon_file;
+char* obtener_pokemon(char* especie);
+char* pokemon_file_create(char* especie);
 
-t_list* pokemons;
+void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad);
 
-pokemon_file* pokemon_file_create(char* especie);
+t_list* obtener_posiciones_pokemon(char* archivo);
+void decrementar_cantidad(char* archivo, t_posicion posicion);
+int existe_posicion(char* archivo, t_posicion posicion);
 
-pokemon_file* existe_pokemon(char* especie);
-pokemon_file* obtener_pokemon(char* especie);
-void agregar_pokemon(pokemon_file* archivo, t_posicion posicion, int cantidad);
-
-t_list* obtener_posiciones_pokemon(pokemon_file* archivo);
-void decrementar_cantidad(pokemon_file* archivo, t_posicion posicion);
-int existe_posicion(pokemon_file* archivo, t_posicion posicion);
-
-void abrir_archivo(pokemon_file* archivo);
-void cerrar_archivo(pokemon_file* archivo);
+void abrir_archivo(char* archivo);
+void cerrar_archivo(char* archivo);
 
 //TODO cuando creo un archivo, ya creo un bloque aunque este vacio
-FILE* crear_metadata(char* ruta);
+void crear_metadata(char* ruta);
 
 #endif /* FILE_POKEMON_H_ */
