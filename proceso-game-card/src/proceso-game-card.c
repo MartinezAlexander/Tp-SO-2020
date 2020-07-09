@@ -16,26 +16,11 @@ int main(void) {
 
 	inicializar_filesystem();
 
-	/*t_config* bloque2 = crear_block(2);
-	config_set_value(bloque2,"8-8","2");
-	config_save(bloque2);
-	config_destroy(bloque2);*/
-
 	//test_agregar_cantidad_a_archivo();
 
 	//iniciar_conexion_broker();
 	iniciar_puerto_de_escucha();
-/*
-	FILE* fd = fopen("/home/utnso/Escritorio/tall-grass/Metadata/Bitmap.bin","a");
-	char x = '0';
-	if (fd != NULL) {
-		for (int i = 0; i < 5192; i++) {
-			fputc(x, fd);
-		}
-	}
 
-	fclose(fd);
-*/
 	terminar_programa();
 }
 
@@ -53,26 +38,15 @@ void inicializar_variables_globales(){
 }
 
 void inicializar_filesystem(){
-	//Primero levantamos las variables de Metadata/Metadata.bin
-	//TODO el metadata si o si debe existir, sino deberiamos inventar blocks y blocks_size
+	//TODO PREGUNTAR el metadata si o si debe existir, sino deberiamos inventar blocks y blocks_size
 	metadata_cargar();
 
-	//Lo mismo con el Bitmap, es ir al path, leer el archivo y listo
 	bitmap_cargar();
 
-	//Caso raro: En caso de que no nos den bitmap, tendriamos que armarlo nosotros
-	//Depues de levantar los poke
-	//Vamos por cada metadata, vemos que bloques tiene, nos armamos los bloques
-	//y ahi ya podemos armar el bitmap
-
-	//Caso raro: no nos dan bloques => no importa
-	//Los bloques una vez que sabemos el numero de bloques y tenemos el bitmap
-	// vamos a Blocks/x.bin, segun esten en el bitmap
-
-	//Levantamos pokemones:
-	//Entramos a /Files, de alguna manera deberiamos obtener que directorios tiene
-	//adentro.
-	//Por cada directorio entro a /Files/Dir/Metadata.bin y levanto
+	/*
+	 * Decidimos levantar solamente el metadata y el bitmap. Los bloques y archivos
+	 * pokemon los traemos cuando los necesitamos
+	 */
 }
 
 

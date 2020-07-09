@@ -25,23 +25,15 @@ void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad){
 
 	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, cantidad);
 
-	printf("[Insertar posicion] Bloque ya tiene posicion: %d\n", bloque);
-
 	if(bloque > -1){
 		//Algun bloque ya tiene la posicion y tiene lugar para sumarle la cantidad
 		agregar_pokemon_a_bloque(bloque, posicion, cantidad);
-
-		printf("[Insertar posicion] Modificada la cantidad de la posicion en ese bloque\n");
 	}else{
 		//No hay bloques que tengan la posicion con lugar para sumarle
 		bloque = obtener_primer_bloque_con_espacio(bloques_array, posicion, cantidad);
 
-		printf("[Insertar posicion] Bloque con lugar: %d\n", bloque);
-
 		if(bloque < 0){
 			bloque = obtener_bloque_disponible();
-
-			printf("[Insertar posicion] Nuevo bloque creado para posicion: %d\n", bloque);
 
 			//TODO: catchear caso extremo de que devuelva -1 (no hay bloques libres)
 			crear_block(bloque);
@@ -52,17 +44,21 @@ void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad){
 			char* bloques_actualizados = string_from_format("%s,%d]", bloques_string, bloque);
 
 			config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
-			config_save(config_metadata);
 			free(bloques_actualizados);
 			free(bloques_string);
 		}
 
 		agregar_nuevo_pokemon_a_bloque(bloque, posicion, cantidad);
-
-		printf("[Insertar posicion] Modificada la cantidad de la posicion en ese bloque\n");
 	}
 
+	char* size = string_itoa(obtener_tamanio_listado_de_bloques(bloques_array));
+	config_set_value(config_metadata, "SIZE", size);
+	free(size);
+
+	config_save(config_metadata);
 	config_destroy(config_metadata);
+
+	free(bloques_array);
 }
 
 /*
@@ -76,7 +72,6 @@ void decrementar_cantidad(char* archivo, t_posicion posicion){
 	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
 
 	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, 0);
-	free(bloques_array);
 
 	int elimino_fila = eliminar_pokemon_de_bloque(bloque, posicion);
 	if(elimino_fila){
@@ -88,7 +83,13 @@ void decrementar_cantidad(char* archivo, t_posicion posicion){
 		//En caso de que no se borre, habria que actualizar el bitmap
 	}
 
+	char* size = string_itoa(obtener_tamanio_listado_de_bloques(bloques_array));
+	config_set_value(config_metadata, "SIZE", size);
+	free(size);
+
+	config_save(config_metadata);
 	config_destroy(config_metadata);
+	free(bloques_array);
 }
 
 

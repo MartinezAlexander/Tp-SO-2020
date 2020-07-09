@@ -131,6 +131,21 @@ int entra_en_bloque(t_posicion posicion,int cantidad, int numero_bloque){
 }
 
 /*
+ * Retorna la suma de los tamanios de todos los bloques dados
+ */
+int obtener_tamanio_listado_de_bloques(char** bloques){
+	int tam = 0;
+	int index = 0;
+	while(bloques[index] != NULL){
+		tam += obtener_tamanio_ocupado_por_bloque(atoi(bloques[index]));
+
+		index++;
+	}
+
+	return tam;
+}
+
+/*
  * Devuelve el bloque del listado que tiene la posicion dada y tiene lugar para sumarle la cantidad.
  * En caso de que no exista o no tenga lugar devuelve -1.
  */

@@ -10,8 +10,8 @@
 void bitmap_cargar(){
 	estado_bloques = malloc(sizeof(bitmap));
 
-	// TODO posibilidad de que el bitmap no este pero haya bloques creados
-	// TODO cargar bitmap en base a nombre de archivos de bloques
+	// TODO PREGUNTA posibilidad de que el bitmap no este pero haya bloques creados (caso extremo)
+	// habria que cargar bitmap en base a nombre de archivos de bloques
 	if (!existe_archivo_en("Bitmap.bin",obtener_directorio_metadata())) {
 		estado_bloques->path = obtener_directorio_bitmap();
 
@@ -58,5 +58,5 @@ int obtener_bloque_disponible(){
 	}
 	printf("No se encontraron bloques disponibles");
 	return -1;
-	//TODO Si nos dicen que hacer en este caso en el enunciado resolver error.
+	//TODO LEER ENUNCIADO / PREGUNTAR Si nos dicen que hacer en este caso en el enunciado resolver error.
 }

@@ -44,4 +44,6 @@ char* posicion_to_key(t_posicion posicion);
 int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion);
 t_list* obtener_posiciones_de_bloque(int bloque);
 
+int obtener_tamanio_listado_de_bloques(char** bloques);
+
 #endif /* BLOCK_H_ */
