@@ -35,7 +35,8 @@ void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad){
 		if(bloque < 0){
 			bloque = obtener_bloque_disponible();
 
-			//TODO: catchear caso extremo de que devuelva -1 (no hay bloques libres)
+			//TODO: (luego de responder duda) catchear caso extremo de que devuelva -1
+			// (no hay bloques libres)
 			crear_block(bloque);
 
 			//Actualizo los bloques en el metadata
@@ -83,7 +84,7 @@ void decrementar_cantidad(char* archivo, t_posicion posicion){
 			config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
 			free(bloques_actualizados);
 		}
-		//TODO: Si el bloque queda vacio se elimina??
+		//TODO: (luego de responder duda) Si el bloque queda vacio se elimina??
 		//En ese caso habria que chequear si pasa esto
 		//Eliminarlo de bitmap y eliminar archivo
 		//Sacarlo del array de bloques dentro del metadata
@@ -143,36 +144,53 @@ int existe_posicion(char* archivo, t_posicion posicion){
 }
 
 
-
-//TODO: sincronizacion para abrir y cerrar archivos
 void abrir_archivo(char* archivo){
 
 	//Uso config para leer el archivo metadata
 	t_config* config_metadata = config_create(archivo);
 	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
 
+	pthread_mutex_lock(&mutex_modificacion_de_archivo);
 	char* valor_open = config_get_string_value(config_metadata, "OPEN");
+	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
 	//En caso que ya este abiero espero x segundos
 	while(string_equals_ignore_case(valor_open, "Y")){
 		sleep(tiempo_reintento_operacion);
-		valor_open = config_get_string_value(config_metadata, "OPEN");
+		printf("-Reintento abrir archivo- ");
+
+		t_config* config_metadata_actualizado = config_create(archivo);
+
+		pthread_mutex_lock(&mutex_modificacion_de_archivo);
+		valor_open = config_get_string_value(config_metadata_actualizado, "OPEN");
+		pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+
+		config_destroy(config_metadata_actualizado);
 	}
 
-	//Cambiamos el valor de OPEN a Y
+	pthread_mutex_lock(&mutex_modificacion_de_archivo);
 	config_set_value(config_metadata, "OPEN", "Y");
 	config_save(config_metadata);
+	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+
 	config_destroy(config_metadata);
 
+	printf("-Se abrio archivo-\n");
 }
 
 void cerrar_archivo(char* archivo){
 	//Uso config para leer el archivo metadata
 	t_config* config_metadata = config_create(archivo);
 	if(config_metadata == NULL) printf("Error al crear config de metadata\n");
+
+	pthread_mutex_lock(&mutex_modificacion_de_archivo);
 	config_set_value(config_metadata, "OPEN", "N");
 	config_save(config_metadata);
+	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+
 	config_destroy(config_metadata);
+
+	printf("-Se cerro archivo-\n");
 }
 
 char* pokemon_file_create(char* especie){

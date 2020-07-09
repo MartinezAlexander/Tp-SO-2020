@@ -24,9 +24,15 @@
 #include "tall_grass.h"
 #include "variables_globales.h"
 
-void ejecutar_new(t_new_pokemon* pokemon, int id);
-void ejecutar_catch(t_catch_pokemon* pokemon, int id);
-void ejecutar_get(t_get_pokemon* pokemon, int id);
+/*
+ * Dado un mensaje, crea un hilo que ejecuta a la funcion pasada por parametro
+ * para atenderlo. (ejecutar_new, ejecutar_catch, o ejecutar_get)
+ */
+void procesar_mensaje(t_mensaje* mensaje_recibido, void* funcion_ejecutar);
+
+void ejecutar_new(t_mensaje* mensaje_recibido);
+void ejecutar_catch(t_mensaje* mensaje_recibido);
+void ejecutar_get(t_mensaje* mensaje_recibido);
 
 void enviar_mensaje_al_broker(t_mensaje* mensaje);
 

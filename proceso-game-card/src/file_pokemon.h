@@ -8,8 +8,11 @@
 #ifndef FILE_POKEMON_H_
 #define FILE_POKEMON_H_
 
+#include <pthread.h>
 #include "tall_grass.h"
 #include "block.h"
+
+pthread_mutex_t mutex_modificacion_de_archivo;
 
 char* obtener_pokemon(char* especie);
 char* pokemon_file_create(char* especie);
@@ -23,7 +26,6 @@ int existe_posicion(char* archivo, t_posicion posicion);
 void abrir_archivo(char* archivo);
 void cerrar_archivo(char* archivo);
 
-//TODO cuando creo un archivo, ya creo un bloque aunque este vacio
 void crear_metadata(char* ruta);
 
 #endif /* FILE_POKEMON_H_ */

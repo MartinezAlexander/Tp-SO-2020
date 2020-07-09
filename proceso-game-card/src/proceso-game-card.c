@@ -16,8 +16,6 @@ int main(void) {
 
 	inicializar_filesystem();
 
-	//test_agregar_cantidad_a_archivo();
-
 	//iniciar_conexion_broker();
 	iniciar_puerto_de_escucha();
 
@@ -35,13 +33,16 @@ void inicializar_variables_globales(){
 	puerto_broker = config_get_string_value(config, "PUERTO_BROKER");
 	iniciar_logger(config_get_string_value(config, "LOG_FILE"));
 	card_id = config_get_int_value(config,"ID_GAMECARD");
+	ip_gamecard = config_get_string_value(config, "IP_GAMECARD");
+	puerto_gamecard = config_get_string_value(config, "PUERTO_GAMECARD");
 }
 
 void inicializar_filesystem(){
-	//TODO PREGUNTAR el metadata si o si debe existir, sino deberiamos inventar blocks y blocks_size
 	metadata_cargar();
 
 	bitmap_cargar();
+
+	pthread_mutex_init(&mutex_modificacion_de_archivo, NULL);
 
 	/*
 	 * Decidimos levantar solamente el metadata y el bitmap. Los bloques y archivos

@@ -1,8 +1,18 @@
 #include "procesamiento_mensajes.h"
 
-//TODO cada llamado tiene que ser en un hilo nuevo
 
-void ejecutar_new(t_new_pokemon* new_pokemon, int id) {
+void procesar_mensaje(t_mensaje* mensaje_recibido, void* funcion_ejecutar){
+	pthread_t hilo_procesamiento;
+	pthread_create(&hilo_procesamiento, NULL, (void*) funcion_ejecutar, (void*) mensaje_recibido);
+	pthread_detach(hilo_procesamiento);
+
+	printf("[Procesamiento] Creado nuevo hilo para atender mensaje\n");
+}
+
+void ejecutar_new(t_mensaje* mensaje_recibido) {
+	t_new_pokemon* new_pokemon = (t_new_pokemon*) mensaje_recibido->mensaje;
+	int id = mensaje_recibido->id;
+
 	//Obtengo el archivo del pokemon que necesito. Si no existe se crea.
 	char* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
 
@@ -20,12 +30,15 @@ void ejecutar_new(t_new_pokemon* new_pokemon, int id) {
 					new_pokemon->pokemon->posicion.posicionY);
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create(appeared, APPEARED_POKEMON, id);
 	enviar_mensaje_al_broker(mensaje);
+
+	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
 }
 
-void ejecutar_catch(t_catch_pokemon* catch_pokemon, int id) {
-	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem (Si no existe->se informa el error
+void ejecutar_catch(t_mensaje* mensaje_recibido) {
+	t_catch_pokemon* catch_pokemon = (t_catch_pokemon*) mensaje_recibido->mensaje;
+	int id = mensaje_recibido->id;
 
-	//PREGUNTAR EL SABADO: 'Se informa error' si no existe se loggea o se manda cuaght negativo??
+	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem (Si no existe->se informa el error
 
 	t_caught_pokemon* caught_respuesta;
 
@@ -57,18 +70,20 @@ void ejecutar_catch(t_catch_pokemon* catch_pokemon, int id) {
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create(caught_respuesta,CAUGHT_POKEMON, id);
 	enviar_mensaje_al_broker(mensaje);
 
-
+	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
 }
 
-void ejecutar_get(t_get_pokemon* get_pokemon, int id) {
+void ejecutar_get(t_mensaje* mensaje_recibido) {
+	t_get_pokemon* get_pokemon = (t_get_pokemon*) mensaje_recibido->mensaje;
+	int id = mensaje_recibido->id;
+
 	t_localized_pokemon* localized_respuesta;
 
 	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem
 	if (!existe_archivo_en(get_pokemon->nombre, obtener_directorio_files())) {
 		printf("[Get] El filesystem no tiene al pokemon dado\n");
-		//TODO: (Si no existe->se informa el mensaje sin posiciones ni cantidades (???)
-		//Me imagino (mas que nada por lo que dice al final) que si no hay pokemon
-		//no hago nada. A lo sumo algun log pero no mando nada al broker.
+		//TODO: (esperar a preguntar duda sobre esto)
+		//Me imagino que hay que hacer return. A lo sumo loggeamos algo nose
 		return;
 	}
 
@@ -92,6 +107,8 @@ void ejecutar_get(t_get_pokemon* get_pokemon, int id) {
 	//6. Si se encontro al menos 1 posicion, conectarse y enviar al broker
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*) localized_respuesta, LOCALIZED_POKEMON, id);
 	enviar_mensaje_al_broker(mensaje);
+
+	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
 }
 
 void enviar_mensaje_al_broker(t_mensaje* mensaje){

@@ -7,8 +7,6 @@
 
 #include "block.h"
 
-//TODO ver donde repetimos codigo o no usamos funciones de cuando mergeamos con lo de ale
-
 char* crear_nombre_bloque_numero(int numero){
 	char* nombre_bloque = NULL;
 

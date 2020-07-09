@@ -98,7 +98,7 @@ char* obtener_directorio_metadata(){
 
 	if(!existe_archivo_en("Metadata",punto_de_montaje_tallgrass)){
 		crear_directorio(punto_de_montaje_tallgrass,"Metadata");
-		//TODO Crear archivo metadata propio y cargarlo con valores default?
+		//TODO (luego de responder duda) Crear archivo metadata propio y cargarlo con valores default?
 		//crear_archivo(punto_de_montaje_tallgrass,"Metadata.bin");
 		//cargar archivo metadata
 	}
