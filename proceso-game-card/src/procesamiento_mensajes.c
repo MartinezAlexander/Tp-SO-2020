@@ -24,12 +24,16 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	sleep(tiempo_retardo_operacion);//Espero x segundos para simular el acceso al disco
 
 	cerrar_archivo(archivo_pokemon);
+	free(archivo_pokemon);
 
 	t_appeared_pokemon* appeared = appeared_pokemon_create(new_pokemon->pokemon->especie,
 					new_pokemon->pokemon->posicion.posicionX,
 					new_pokemon->pokemon->posicion.posicionY);
+
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create(appeared, APPEARED_POKEMON, id);
 	enviar_mensaje_al_broker(mensaje);
+	mensaje_destroy(mensaje);
+	mensaje_destroy(mensaje_recibido);
 
 	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
 }
@@ -62,13 +66,16 @@ void ejecutar_catch(t_mensaje* mensaje_recibido) {
 
 		//6. Cerrar el archivo
 		cerrar_archivo(archivo_pokemon);
-
+		free(archivo_pokemon);
 		caught_respuesta = caught_pokemon_create(existe);
 	}
+
 
 	//7. Conectarse y enviar al broker el resultado (ID recibido, resultado)
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create(caught_respuesta,CAUGHT_POKEMON, id);
 	enviar_mensaje_al_broker(mensaje);
+	mensaje_destroy(mensaje);
+	mensaje_destroy(mensaje_recibido);
 
 	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
 }
@@ -103,10 +110,15 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 
 	//5. Cerrar el archivo
 	cerrar_archivo(archivo_pokemon);
-
+	free(archivo_pokemon);
 	//6. Si se encontro al menos 1 posicion, conectarse y enviar al broker
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*) localized_respuesta, LOCALIZED_POKEMON, id);
+	//67 (16 direct, 51 indirect) bytes in 1 blocks are definitely lost
 	enviar_mensaje_al_broker(mensaje);
+	//Liberar cada string de la lista de posiciones???
+
+	mensaje_destroy(mensaje);
+	mensaje_destroy(mensaje_recibido);;
 
 	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
 }

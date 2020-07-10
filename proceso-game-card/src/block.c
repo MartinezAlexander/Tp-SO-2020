@@ -28,16 +28,14 @@ char* crear_directorio_bloque(){
 	return directorio_bloque;
 }
 
-t_config* crear_block(int numero){
+void crear_block(int numero){
 
 	char* directorio_bloques = crear_directorio_bloque();
 	char* nombre_bloque = crear_nombre_bloque_numero(numero);
-	t_config* bloque = NULL;
 
 	if(nombre_bloque != NULL){
 		FILE* bloque_file = crear_archivo(directorio_bloques, nombre_bloque);
 		if(bloque_file != NULL){
-			bloque = config_create(path(directorio_bloques, nombre_bloque));
 			ocupar_bloque(numero);
 			fclose(bloque_file);
 		}
@@ -45,7 +43,6 @@ t_config* crear_block(int numero){
 
 	free(nombre_bloque);
 	free(directorio_bloques);
-	return bloque;
 }
 
 t_config* obtener_bloque_por_indice(int numero_bloque){
@@ -99,8 +96,13 @@ int obtener_tamanio_ocupado_por_bloque(int numero_bloque){
 
 	if(!bloque_esta_libre(numero_bloque)){
 
-		char* path_bloque = path(crear_directorio_bloque(),crear_nombre_bloque_numero(numero_bloque));
+		char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
+		char* dir_bloque = crear_directorio_bloque();
+		char* path_bloque = path(dir_bloque, nombre_bloque);
+		free(dir_bloque);
+		free(nombre_bloque);
 		FILE* bloque = fopen(path_bloque, "r");
+		free(path_bloque);
 
 		if(bloque != NULL){
 			char caracter = fgetc(bloque);
@@ -181,6 +183,8 @@ int obtener_bloque_con_posicion(char** bloques, t_posicion posicion, int cantida
 
 		index++;
 	}
+
+	free(posicion_string);
 
 	return  -1;
 }
@@ -275,9 +279,15 @@ int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion){
  */
 t_list* obtener_posiciones_de_bloque(int bloque){
 	t_list* posiciones = list_create();
+	//16 (8 direct, 8 indirect) bytes in 1 blocks are definitely lost
 
-	char* path_bloque = path(crear_directorio_bloque(),crear_nombre_bloque_numero(bloque));
+	char* nombre_bloque = crear_nombre_bloque_numero(bloque);
+	char* dir_bloque = crear_directorio_bloque();
+	char* path_bloque = path(dir_bloque,nombre_bloque);
+	free(dir_bloque);
+	free(nombre_bloque);
 	FILE* archivo_bloque = fopen(path_bloque, "r");
+	free(path_bloque);
 
 	char caracter = 'x';
 
@@ -303,15 +313,18 @@ t_list* obtener_posiciones_de_bloque(int bloque){
 			estado_lectura = 1;
 			posicion_x = string_new();
 			posicion_y = string_new();
+			//1 bytes in 1 blocks are definitely lost
 			continue;
 		}
 
 		if(estado_lectura == 1){
 			string_append_with_format(&posicion_x, "%c", caracter);
+			//4 bytes in 2 blocks are definitely lost
 		}
 
 		if(estado_lectura == 2){
 			string_append_with_format(&posicion_y, "%c", caracter);
+			//4 bytes in 2 blocks are definitely lost
 		}
 
 		if(estado_lectura == 3){
@@ -321,6 +334,8 @@ t_list* obtener_posiciones_de_bloque(int bloque){
 			posicion->posicionX = atoi(posicion_x);
 			posicion->posicionY = atoi(posicion_y);
 			list_add(posiciones, posicion);
+			free(posicion_x);
+			free(posicion_y);
 		}
 	}
 

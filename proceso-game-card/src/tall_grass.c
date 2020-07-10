@@ -8,6 +8,7 @@ char* path(char* direccion, char* direccion2){
 	char* path = string_duplicate(direccion);
 	string_append(&path, "/");
 	string_append(&path, direccion2);
+	//(aprox 40 en promedio) 56 bytes in 1 blocks are definitely lost (x casi infinitas veces)
 	return path;
 }
 
@@ -16,18 +17,23 @@ void crear_directorio(char* en_donde_crear, char* nombre_directorio){
 	if(mkdir(ruta, 0777) == -1){
 		puts("No se pudo crear el directorio /n");
 	}
+	free(ruta);
 }
 
 FILE* crear_archivo(char* directorio, char* archivo){
 	char* ruta = path(directorio, archivo);
-	return txt_open_for_append(ruta);
+	FILE* file =  txt_open_for_append(ruta);
+	free(ruta);
+	return file;
 }
 
 void metadata_cargar(){
 	char* metadata_dir = path(punto_de_montaje_tallgrass, "Metadata");
 	char* metadata_path = path(metadata_dir, "Metadata.bin");
+	free(metadata_dir);
 
 	t_config* config = config_create(metadata_path);
+	free(metadata_path);
 	if(config == NULL) puts("Error al leer Metadata/Metadata.bin");
 
 	block_size = config_get_int_value(config, "BLOCK_SIZE");

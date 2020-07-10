@@ -21,8 +21,9 @@ void loggear_info(char* info) {
 
 void loggear_conexion(int socket) {
 	if(socket<=0){
-	char* log = string_from_format("El gamecard no se pudo conectar al proceso Broker");
-	log_info(logger, log);
+		char* log = string_from_format("El gamecard no se pudo conectar al proceso Broker");
+		log_info(logger, log);
+		free(log);
 	}
 }
 
