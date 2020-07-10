@@ -16,19 +16,11 @@ int main(void) {
 
 	inicializar_filesystem();
 
-	//iniciar_conexion_broker();
-	//iniciar_puerto_escucha();
-/*
-	FILE* fd = fopen("/home/utnso/Escritorio/tall-grass/Metadata/Bitmap.bin","a");
-	char x = '0';
-	if (fd != NULL) {
-		for (int i = 0; i < 5192; i++) {
-			fputc(x, fd);
-		}
-	}
+	//test_agregar_cantidad_a_archivo();
 
-	fclose(fd);
-*/
+	//iniciar_conexion_broker();
+	//iniciar_puerto_de_escucha();
+
 	terminar_programa();
 }
 
@@ -46,49 +38,15 @@ void inicializar_variables_globales(){
 }
 
 void inicializar_filesystem(){
-	//Primero levantamos las variables de Metadata/Metadata.bin
+	//TODO PREGUNTAR el metadata si o si debe existir, sino deberiamos inventar blocks y blocks_size
 	metadata_cargar();
 
-	//Lo mismo con el Bitmap, es ir al path, leer el archivo y listo
 	bitmap_cargar();
 
-	/*puts("Bitmap antes de crear bloque 2");
-	for(int i=0 ; i<5; i++){
-		printf("Bloque %d - cero = libre - uno = ocupado - %c \n",i,estado_bloques->bitarray[i]);
-	}*/
-
-	 //Creo el bloque 2.bin
-	/*t_config* bloque_dos = crear_block(2);
-	// guardo 20 pokemones en la posicion 8,9
-	config_set_value(bloque_dos,"8-9","20");
-	config_set_value(bloque_dos,"1-2","3");
-	config_set_value(bloque_dos,"4-4","1");
-	config_save(bloque_dos);
-	*/
 	/*
-	puts("Bitmap despues de crear bloque 2");
-	for(int i=0 ; i<5; i++){
-		printf("Bloque %d - cero = libre - uno = ocupado - %c \n",i,estado_bloques->bitarray[i]);
-	}*/
-
-	/*int tamanio = obtener_tamanio_ocupado_por_bloque(2);
-
-	printf("Tamanio de bloque %d\n",tamanio);
-	printf("Tamanio disponible: %d\n",bytes_libres_bloque(2));*/
-
-	//Caso raro: En caso de que no nos den bitmap, tendriamos que armarlo nosotros
-	//Depues de levantar los poke
-	//Vamos por cada metadata, vemos que bloques tiene, nos armamos los bloques
-	//y ahi ya podemos armar el bitmap
-
-	//Caso raro: no nos dan bloques => no importa
-	//Los bloques una vez que sabemos el numero de bloques y tenemos el bitmap
-	// vamos a Blocks/x.bin, segun esten en el bitmap
-
-	//Levantamos pokemones:
-	//Entramos a /Files, de alguna manera deberiamos obtener que directorios tiene
-	//adentro.
-	//Por cada directorio entro a /Files/Dir/Metadata.bin y levanto
+	 * Decidimos levantar solamente el metadata y el bitmap. Los bloques y archivos
+	 * pokemon los traemos cuando los necesitamos
+	 */
 }
 
 

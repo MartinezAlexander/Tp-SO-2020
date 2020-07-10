@@ -7,6 +7,8 @@
 
 #include "block.h"
 
+//TODO ver donde repetimos codigo o no usamos funciones de cuando mergeamos con lo de ale
+
 char* crear_nombre_bloque_numero(int numero){
 	char* nombre_bloque = NULL;
 
@@ -19,7 +21,13 @@ char* crear_nombre_bloque_numero(int numero){
 }
 
 char* crear_directorio_bloque(){
-	return path(punto_de_montaje_tallgrass, "Blocks");
+	char* directorio_bloque = obtener_directorio_blocks();
+
+	if(obtener_directorio_blocks()==NULL){
+		crear_directorio(punto_de_montaje_tallgrass,"Blocks");
+		directorio_bloque = obtener_directorio_blocks();
+	}
+	return directorio_bloque;
 }
 
 t_config* crear_block(int numero){
@@ -43,17 +51,21 @@ t_config* crear_block(int numero){
 }
 
 t_config* obtener_bloque_por_indice(int numero_bloque){
-	char* directorio_bloques = crear_directorio_bloque();
-	char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
 	t_config* bloque = NULL;
 
-	if(nombre_bloque != NULL){
-		//crear_archivo(directorio_bloques, nombre_bloque);
-		bloque = config_create(path(directorio_bloques,nombre_bloque));
-	}
+	if(obtener_directorio_blocks() != NULL){
 
-	free(nombre_bloque);
-	free(directorio_bloques);
+		char* directorio_bloques = crear_directorio_bloque();
+		char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
+		char* path_bloque = path(directorio_bloques, nombre_bloque);
+		if (bloque_esta_libre(numero_bloque)==0) {
+			bloque = config_create(path_bloque);
+		}
+
+		free(path_bloque);
+		free(nombre_bloque);
+		free(directorio_bloques);
+	}
 
 	return bloque;
 }
@@ -79,6 +91,9 @@ int es_un_caracter_valido(char caracter){
 		valido = 1;
 	}
 	if(caracter == 61){
+		valido = 1;
+	}
+	if(caracter == '\n'){
 		valido = 1;
 	}
 	return valido;
@@ -114,8 +129,235 @@ int bytes_libres_bloque(int numero_bloque){
 
 int entra_en_bloque(t_posicion posicion,int cantidad, int numero_bloque){
 	char* info_cantidad = string_from_format("%d-%d=%d",posicion.posicionX,posicion.posicionY,cantidad);
-	int tamanio_entrada = string_length(info_cantidad);
+	int tamanio_entrada = string_length(info_cantidad)+1;
 	return bytes_libres_bloque(numero_bloque) >= tamanio_entrada;
+}
+
+int agregar_registro_a_bloque(t_posicion posicion,int cantidad, int numero_bloque){
+	char* registro = info_pokemon_to_string(posicion,cantidad);
+	int bloque_nuevo = -1;
+
+	if(entra_en_bloque(posicion,cantidad,numero_bloque)){
+		guardar_registro_en(registro,numero_bloque);
+	}else{
+		bloque_nuevo = obtener_bloque_disponible();
+		if(bloque_nuevo != -1){
+			ocupar_bloque(bloque_nuevo);
+			guardar_registro_por_partes_en(registro,numero_bloque,bloque_nuevo);
+		}
+	}
+
+	return bloque_nuevo;
+}
+
+
+void guardar_registro_en(char* registro,int numero_bloque){
+	char* path_blocks = obtener_directorio_blocks();
+	char* path_bloque;
+	char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
+
+	if(path_blocks == NULL){
+		crear_directorio(punto_de_montaje_tallgrass,"Blocks");
+		path_blocks = obtener_directorio_blocks();
+		path_bloque = path(path_blocks,nombre_bloque);
+	}else{
+		path_bloque = path(path_blocks,nombre_bloque);
+	}
+
+	int ultimo_caracter;
+
+	if(!existe_archivo_en(nombre_bloque,path_blocks)){
+		crear_archivo(path_blocks,nombre_bloque);
+		ocupar_bloque(numero_bloque);
+		ultimo_caracter = 0;
+	}else{
+		ultimo_caracter = obtener_tamanio_ocupado_por_bloque(numero_bloque);
+	}
+
+	FILE* fd = fopen(path_bloque, "a");
+
+	if (fd != NULL) {
+		fseek(fd,ultimo_caracter,SEEK_SET);
+
+		for (int i = 0; i < string_length(registro); i++) {
+			fputc(registro[i], fd);
+		}
+
+		fputc('\n',fd);
+	}
+
+	fclose(fd);
+}
+
+void guardar_registro_por_partes_en(char* registro,int numero_bloque,int bloque_nuevo){
+	char* path_blocks = obtener_directorio_blocks();
+	char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
+	char* path_bloque = path(path_blocks,nombre_bloque);
+	int ultimo_caracter = obtener_tamanio_ocupado_por_bloque(numero_bloque);
+	int cantidad_bytes_para_primer_bloque = bytes_libres_bloque(numero_bloque);
+
+	FILE* fd = fopen(path_bloque, "a");
+
+	if (fd != NULL) {
+		fseek(fd,ultimo_caracter,SEEK_SET);
+
+		for (int i = 0; i < cantidad_bytes_para_primer_bloque; i++) {
+			fputc(registro[i], fd);
+		}
+	}
+
+	fclose(fd);
+
+	char* nombre_bloque_nuevo = crear_nombre_bloque_numero(bloque_nuevo);
+	char* path_bloque_nuevo = path(path_blocks,nombre_bloque_nuevo);
+	crear_archivo(path_blocks,nombre_bloque_nuevo);
+
+	FILE* fd_nuevo = fopen(path_bloque_nuevo, "a");
+
+	if (fd_nuevo != NULL) {
+		fseek(fd_nuevo,0,SEEK_SET);
+
+		for (int i = cantidad_bytes_para_primer_bloque; i < string_length(registro); i++) {
+			fputc(registro[i], fd_nuevo);
+		}
+
+		fputc('\n',fd_nuevo);
+	}
+
+	fclose(fd_nuevo);
+}
+
+char* leer_bloque(int bloque){
+	char* path_blocks = obtener_directorio_blocks();
+	char* nombre_bloque = crear_nombre_bloque_numero(bloque);
+	char* path_bloque = path(path_blocks, nombre_bloque);
+
+	FILE* fd = fopen(path_bloque, "r");
+
+	char caracter = fgetc(fd);
+
+	char* posiciones = "";
+
+	while (caracter != EOF) {
+		posiciones = string_from_format("%s%c",posiciones,caracter);
+		caracter = fgetc(fd);
+	}
+
+	fclose(fd);
+
+	return posiciones;
+}
+
+t_list* obtener_posiciones_de_bloques(char** bloques){
+	char* posiciones = string_new();
+
+	int i=0;
+
+	while(bloques[i]!=NULL){
+		int bloque = atoi(bloques[i]);
+		char* posiciones_por_bloque = leer_bloque(bloque);
+		string_append(&posiciones,posiciones_por_bloque);
+		i++;
+	}
+
+	return convertir_info_posiciones(posiciones);
+}
+
+int agregar_registro_a_bloque_con_segunda_opcion(t_posicion posicion,int cantidad, int numero_bloque, int bloque_nuevo){
+	char* registro = info_pokemon_to_string(posicion,cantidad);
+
+	if(entra_en_bloque(posicion,cantidad,numero_bloque)){
+		guardar_registro_en(registro,numero_bloque);
+	}else{
+		ocupar_bloque(bloque_nuevo);
+		guardar_registro_por_partes_en(registro,numero_bloque,bloque_nuevo);
+	}
+
+	return string_length(registro)+1;
+}
+
+int array_cantidad_de_elementos(char** array){
+    int cantidad = 0;
+    while(array[cantidad] != NULL) cantidad++;
+    return cantidad;
+}
+
+char* obtener_path_bloque_de_lista(char** bloques,int indice_numero_bloque){
+	char* path_blocks = obtener_directorio_blocks();
+	char* nombre_bloque = NULL;
+	char* path_bloque = NULL;
+
+	if(indice_numero_bloque >= 0 && indice_numero_bloque < array_cantidad_de_elementos(bloques)){
+		int num_bloque = atoi(bloques[indice_numero_bloque]);
+		nombre_bloque = crear_nombre_bloque_numero(num_bloque);
+		path_bloque = path(path_blocks, nombre_bloque);
+	}
+
+	return path_bloque;
+}
+
+void vaciar_bloques(char** bloques){
+	int i = 0;
+	while(bloques[i]!=NULL){
+		char* path_bloque = obtener_path_bloque_de_lista(bloques,i);
+		FILE* fd = fopen(path_bloque,"w");
+		fclose(fd);
+		i++;
+	}
+}
+
+void actualizar_bloques(char** bloques, t_list* posiciones){
+	// [2,0]
+
+	vaciar_bloques(bloques);
+
+	char* posiciones_string = lista_info_posicion_to_string(posiciones);
+
+	int indice_numero_bloque = 0;
+	int cantidad_escrita = 0;
+	char* path_bloque = obtener_path_bloque_de_lista(bloques,indice_numero_bloque);
+
+	FILE* bloque = fopen(path_bloque,"a");
+
+	int cantidad_bloques_usados = 1;
+
+	for(int i=0; i<string_length(posiciones_string);i++){
+		if(cantidad_escrita==block_size){
+			cantidad_escrita = 0;
+			fclose(bloque);
+			path_bloque = obtener_path_bloque_de_lista(bloques,indice_numero_bloque+1);
+			bloque = fopen(path_bloque,"a");
+			cantidad_bloques_usados++;
+		}
+		fputc(posiciones_string[i],bloque);
+		cantidad_escrita++;
+	}
+
+	fclose(bloque);
+
+	int cant_liberados = array_cantidad_de_elementos(bloques)-cantidad_bloques_usados;
+
+	if(cant_liberados > 0){
+		for(int i=0; i<cant_liberados; i++){
+			int bloque = atoi(bloques[cantidad_bloques_usados-i]);
+			liberar_bloque(bloque);
+		}
+	}
+}
+
+/*
+ * Retorna la suma de los tamanios de todos los bloques dados
+ */
+int obtener_tamanio_listado_de_bloques(char** bloques){
+	int tam = 0;
+	int index = 0;
+	while(bloques[index] != NULL){
+		tam += obtener_tamanio_ocupado_por_bloque(atoi(bloques[index]));
+
+		index++;
+	}
+
+	return tam;
 }
 
 /*
@@ -216,4 +458,90 @@ void agregar_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad){
 
 	free(nueva_cantidad);
 	free(posicion_string);
+}
+
+/*
+ * Decrementa en uno la cantidad de pokemon para la posicion dada.
+ * Devuelve 1 en caso de que haya eliminado la fila debido a que la cantidad quedo en 0.
+ */
+int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion){
+	char* posicion_string = posicion_to_key(posicion);
+
+	t_config* config_bloque = obtener_bloque_por_indice(bloque);
+	int cantidad_actual = config_get_int_value(config_bloque, posicion_string);
+
+	int eliminar_fila = cantidad_actual - 1 <= 0;
+
+	if(eliminar_fila){
+		config_remove_key(config_bloque, posicion_string);
+	}else{
+		char* nueva_cantidad = string_itoa(cantidad_actual - 1);
+		config_set_value(config_bloque, posicion_string, nueva_cantidad);
+		free(nueva_cantidad);
+	}
+
+	config_save(config_bloque);
+	config_destroy(config_bloque);
+	free(posicion_string);
+
+	return eliminar_fila;
+}
+
+/*
+ * Retorna un listado con todas las posiciones que posee un bloque
+ */
+t_list* obtener_posiciones_de_bloque(int bloque){
+	t_list* posiciones = list_create();
+
+	char* path_bloque = path(crear_directorio_bloque(),crear_nombre_bloque_numero(bloque));
+	FILE* archivo_bloque = fopen(path_bloque, "r");
+
+	char caracter = 'x';
+
+	char* posicion_x = string_new();
+	char* posicion_y = string_new();
+
+	int estado_lectura = 1;
+
+	while(caracter != EOF){
+		caracter = fgetc(archivo_bloque);
+
+		if(caracter == '='){
+			estado_lectura = 3;
+			continue;
+		}
+
+		if(caracter == '-'){
+			estado_lectura = 2;
+			continue;
+		}
+
+		if(caracter == '\n'){
+			estado_lectura = 1;
+			posicion_x = string_new();
+			posicion_y = string_new();
+			continue;
+		}
+
+		if(estado_lectura == 1){
+			string_append_with_format(&posicion_x, "%c", caracter);
+		}
+
+		if(estado_lectura == 2){
+			string_append_with_format(&posicion_y, "%c", caracter);
+		}
+
+		if(estado_lectura == 3){
+			estado_lectura = 4;
+
+			t_posicion* posicion = malloc(sizeof(t_posicion));
+			posicion->posicionX = atoi(posicion_x);
+			posicion->posicionY = atoi(posicion_y);
+			list_add(posiciones, posicion);
+		}
+	}
+
+	fclose(archivo_bloque);
+
+	return posiciones;
 }
