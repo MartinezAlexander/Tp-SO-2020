@@ -23,19 +23,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: proceso-game-card
+all: gamecard
 
 # Tool invocations
-proceso-game-card: $(OBJS) $(USER_OBJS)
+gamecard: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc  -o "proceso-game-card" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc  -o "gamecard" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) proceso-game-card
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) gamecard
 	-@echo ' '
 
 .PHONY: all clean dependents
