@@ -25,33 +25,30 @@ int main(void) {
 	//Envio mensaje GET al broker segun objetivos globales
 	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
-	iniciar_puerto_de_escucha();
+	//iniciar_puerto_de_escucha();
 
-	//test_sjf_con_desalojo();
+	/*
+	 * Tengo que esperar a que me llegue señal de que mis entrenadores estan
+	 * en EXIT o en DEADLOCK, para poder resolverlo en caso de que sea necesario
+	 */
+	sem_wait(&semaforo_resolucion_deadlock);
 
-	//test_deadlock2();
-
-	//TODO: [DL] Aca deberia chequear si todos mis entrenadores estan o en EXIT
-	//o en DEADLOCK. Si es asi, puedo comenzar a resolver los intercambios
-
-	//Opciones:
-	//			Un semaforo, y cada vez que actualizo estados, veo si se cumple esto
-	//				y mando el signal si es asi
-
-
-
-	//resolver_deadlock();
+	printf("[Deadlock] Comienza la deteccion de deadlock\n");
+	resolver_deadlock();
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)
 	//Cuando esto ocurra, tambien significara que el
 	//proceso team termino.
 	esperar_hilos_planificacion();
+	printf("[Team] Todos sus entrenadores han cumplido su objetivo\n");
+
+	//ESTO NO VA!
 	//Una vez que llego a esta zona se que ya todos los entrenadores
 	//estan en estado exit, por lo que puedo liberar las conexiones
 	//con el broker y joinear los hilos que llevaban a cabo
 	//la escucha y el procesamiento de mensajes
-	cerrar_conexion_broker();
+	//cerrar_conexion_broker();
 
 	int ciclos_cpu_totales = 0;
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
@@ -60,6 +57,7 @@ int main(void) {
 		ciclos_cpu_totales += ciclos;
 	}
 
+	printf("[Team] Resultados proceso team:\n");
 	//Loggear estadisticas
 
 	//quedaria liberar variables globales
@@ -95,6 +93,8 @@ void inicializar_variables(){
 
 	pthread_mutex_init(&mutex_procesamiento_pokemon, NULL);
 
+	sem_init(&semaforo_resolucion_deadlock, 0, 0);
+
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");
 
@@ -108,6 +108,8 @@ void inicializar_variables(){
 
 	ip_team = config_get_string_value(config, "IP_TEAM");
 	puerto_team = config_get_string_value(config, "PUERTO_TEAM");
+
+	//config_destroy(config);
 }
 
 t_log* iniciar_logger(char* path)
@@ -124,7 +126,7 @@ t_log* iniciar_logger(char* path)
 t_config* leer_config(void)
 {
 	t_config *config;
-	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
+	if((config = config_create("src/team.config")) == NULL)//Nota: para correr desde Debug
 	{														//hay que agregar ../ al path
 		printf("No pude leer la config\n");
 		exit(2);
@@ -138,9 +140,5 @@ void terminar_programa(t_log* logger, t_config* config){
 	{
 		log_info(logger, "finalizando programa...");
 		log_destroy(logger);
-	}
-	if(config != NULL)
-	{
-		config_destroy(config);
 	}
 }

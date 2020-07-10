@@ -24,12 +24,14 @@ void resolver_deadlock(){
 		queue_push(cola_intercambios_deadlock, intercambio);
 	}
 
+	printf("[Deadlock] Se detectaron %d intercambios para resolver\n", queue_size(cola_intercambios_deadlock));
+
 	encolar_proximo_intercambio(1);
 }
 
 void encolar_proximo_intercambio(int primer_intercambio){
 	if(queue_is_empty(cola_intercambios_deadlock)){
-		//TODO [DL] Avisar de alguna manera que termino? O ya de por si por los estados termina?
+		printf("[Deadlock] Se ha terminado la resolucion de deadlock exitosamente\n");
 		return;
 	}
 
@@ -37,6 +39,8 @@ void encolar_proximo_intercambio(int primer_intercambio){
 	t_entrenador* entrenador = intercambio->entrenador;
 	entrenador->intercambio_actual = intercambio;
 	encolar(entrenador);
+
+	printf("[Deadlock] Encolando a entrenador %d para resolver intercambio de deadlock\n", entrenador->identificador);
 
 	if(primer_intercambio) planificar();
 }
@@ -67,7 +71,6 @@ t_intercambio* primer_intercambio(t_list* entrenadores_deadlock){
 	return convertir_a_intercambio_real(mejor_intercambio);
 }
 
-//TODO: Ver si la clase intercambio_copia me sirve realmente
 
 /*
  * Devuelve el intercambio cuyos movimientos necesarios para llevarse a cabo
@@ -240,8 +243,8 @@ int preparar_entrenador(t_entrenador_copia* entrenador){
 
 	//Necesitamos que esten ordenadas para un toque mas adelante,
 	//OJO, se ordena de Mayor a Menor por algun motivo
-	list_sort(entrenador->adquiridos, strcmp);
-	list_sort(entrenador->objetivos, strcmp);
+	list_sort(entrenador->adquiridos, strcasecmp);
+	list_sort(entrenador->objetivos, strcasecmp);
 
 	return !list_is_empty(entrenador->objetivos);
 }
@@ -326,8 +329,8 @@ t_intercambio_copia* intercambio_copia_create(t_entrenador_copia* entrenador, t_
 t_entrenador_copia* entrenador_copia_create(t_entrenador* entrenador){
 	t_entrenador_copia* entrenador_intercambio = malloc(sizeof(t_entrenador_copia));
 	entrenador_intercambio->entrenador = entrenador;
-	entrenador_intercambio->objetivos = entrenador->objetivos;
-	entrenador_intercambio->adquiridos = entrenador->pokemones_adquiridos;
+	entrenador_intercambio->objetivos = list_duplicate(entrenador->objetivos);
+	entrenador_intercambio->adquiridos = list_duplicate(entrenador->pokemones_adquiridos);
 	entrenador_intercambio->posicion = entrenador->posicion;
 	return entrenador_intercambio;
 }

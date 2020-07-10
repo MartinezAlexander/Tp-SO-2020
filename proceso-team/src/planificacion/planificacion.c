@@ -194,6 +194,8 @@ void ejecutar_hilo(t_entrenador* entrenador){
 
 		sem_post(&semaforo_planificacion);
 	}
+
+	printf("[Ejecucion] Hilo de entrenador %d termina su ejecucion\n", entrenador->identificador);
 }
 
 void planificar(){

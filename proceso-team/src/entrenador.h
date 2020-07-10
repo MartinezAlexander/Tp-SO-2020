@@ -94,6 +94,7 @@ void actualizar_estadistica_entrenador(int id_entrenador);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);
 int entrenador_en_deadlock(t_entrenador *entrenador);
+int entrenador_termino_ejecucion_normal(t_entrenador *entrenador);
 
 void asignar_pokemones(t_entrenador* entrenador, char* pokemones);
 t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial);
@@ -108,5 +109,6 @@ int entrenador_estado_deadlock(t_entrenador* entrenador);
 int cumplio_objetivo_entrenador(t_entrenador* entrenador);
 
 t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion posicion);
+void actualizar_estado_entrenador(t_entrenador* entrenador);
 
 #endif

@@ -73,7 +73,7 @@ typedef struct{
 
 
 t_queue* cola_intercambios_deadlock;
-
+sem_t semaforo_resolucion_deadlock;
 
 t_intercambio* intercambio_create(t_entrenador* entrenador, t_entrenador* entrenadorObjetivo, char* pokemonADar, char* pokemonARecibir);
 t_intercambio_copia* intercambio_copia_create(t_entrenador_copia* entrenador, t_entrenador_copia* entrenadorObjetivo, char* pokemonADar, char* pokemonARecibir);

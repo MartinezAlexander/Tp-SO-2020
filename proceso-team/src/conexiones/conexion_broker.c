@@ -29,7 +29,7 @@ void iniciar_conexion_broker(){
 
 void cerrar_conexion_broker(){
 	finalizo_team = 1;
-	//TODO: Duda -> Hay que joinear aca? Creo que no
+	//TODO: Duda -> Hay que joinear aca? Creo que no. Es mas seguramente esta funcion vuela
 	pthread_join(hilo_appeared, NULL);
 	pthread_join(hilo_caught, NULL);
 	pthread_join(hilo_localized, NULL);
@@ -139,7 +139,7 @@ void suscribirse_a_cola(int* socket, op_code cola){
 	printf("Suscripcion a la cola %d del broker exitosa\n", cola);
 }
 
-//TODO: Ver tambien -> Es necesario lo de finalizo team y liberar conexion??
+//TODO: Ver tambien -> Es necesario lo de finalizo team y liberar conexion?? Probablemente no.
 // Ya dijimos hace un tiempo que en realidad nunca voy a terminar estos hilos
 // ya que se quedan bloqueados con el recv
 void recibir_appeared(){
