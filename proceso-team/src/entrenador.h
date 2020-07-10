@@ -26,6 +26,8 @@
 
 
 
+struct t_intercambio;
+typedef struct unIntercambio t_intercambio;
 
 uint32_t retardo_cpu;
 
