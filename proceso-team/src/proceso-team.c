@@ -20,11 +20,13 @@ int main(void) {
 	//Me suscribo a las colas y abro hilos para recibir mensajes
 	iniciar_conexion_broker();
 	//Envio mensaje GET al broker segun objetivos globales
-	//enviar_get_objetivo(objetivo_global);
+	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
-	//iniciar_puerto_de_escucha();
+	iniciar_puerto_de_escucha();
 
-	//test();
+	//test_sjf_con_desalojo();
+
+	//test_deadlock2();
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)
@@ -46,6 +48,7 @@ int main(void) {
 
 	//Loggear estadisticas
 
+	//quedaria liberar variables globales
 	terminar_programa(logger, config);
 }
 
@@ -59,14 +62,24 @@ void inicializar_variables(){
 
 	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
 	uint32_t quantum = config_get_int_value(config, "QUANTUM");
+
 	uint32_t estimacion_inicial = config_get_int_value(config, "ESTIMACION_INICIAL");
+
 	double alpha = config_get_double_value(config, "ALPHA");
 
 	planificador = planificador_create(algoritmo_planificacion, quantum, estimacion_inicial, alpha);
 
 	entrenadores = leer_entrenadores(config, estimacion_inicial);
+
 	objetivo_global = obtener_objetivo_global(entrenadores);
+
 	diccionario_especies_recibidas = inicializar_diccionario_especies();
+	pthread_mutex_init(&mutex_diccionario_especies, NULL);
+
+	cola_pokemones_en_espera = queue_create();
+	pthread_mutex_init(&mutex_cola_espera, NULL);
+
+	pthread_mutex_init(&mutex_procesamiento_pokemon, NULL);
 
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");
@@ -96,8 +109,8 @@ t_log* iniciar_logger(char* path)
 
 t_config* leer_config(void)
 {
-	t_config *config;//Puede que este mal el path
-	if((config = config_create("src/team.config")) == NULL)//Nota: para correr desde Debug
+	t_config *config;
+	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
 	{														//hay que agregar ../ al path
 		printf("No pude leer la config\n");
 		exit(2);

@@ -19,6 +19,9 @@
 #include"../variables_globales.h"
 #include"../entrenador.h"
 
+struct t_entrenador;
+typedef struct unEntrenador t_entrenador;
+
 typedef enum{
 	FIFO, RR, SJF_CD, SJF_SD
 }tipo_planificacion;
@@ -34,8 +37,19 @@ typedef struct{
 	double alpha;
 
 	t_entrenador* entrenador_en_exec;
+	//En caso de que este usando planificacion con desalojo, el debo_desalojar
+	//indica si al finalizar la ejecucion del ciclo actual, me deben desalojar
+	//y encolar devuelta
+	int debo_desalojar_al_fin_de_ciclo;
+	pthread_mutex_t mutex_desalojo;
+	//Y los dos semaforos me ayudan a sincronizar el encolamiento en el desalojo
+	//ya que lo que hacemos cuando llega alguien nuevo para planificar es:
+	//esperarar a que el actual ejecute -> encolar actual -> encolar nuevo -> replanificar
+	//Entonces uso estos semaforos para eso
+	sem_t semaforo_desalojo;
+	sem_t semaforo_post_desalojo;
 
-	sem_t semaforo;
+	//sem_t semaforo;
 	pthread_t hilo_planificacion;
 
 	pthread_mutex_t mutex_planificacion;

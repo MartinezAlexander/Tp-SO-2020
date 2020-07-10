@@ -1,7 +1,7 @@
 #include "config.h"
 
 void iniciar_config(){
-	if((config = config_create("src/broker.config")) == NULL)
+	if((config = config_create("../src/broker.config")) == NULL)
 	{
 		printf("No pude leer la config\n");
 		exit(2);
@@ -22,4 +22,10 @@ void obtener_info_del_config(){
 	frecuencia_compactacion = config_get_int_value(config,"FRECUENCIA_COMPACTACION");
 
 	path_logger = config_get_string_value(config, "LOG_FILE");
+}
+
+void finalizar_config(){
+	if(config != NULL){
+		config_destroy(config);
+	}
 }

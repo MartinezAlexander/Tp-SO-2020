@@ -26,4 +26,6 @@ void elimino_posicion_11_11();
 
 void elimino_posicion_11_11_y_2_3_para_liberar_bloque_0();
 
+void test_agregar_cantidad_a_archivo();
+
 #endif /* TEST_H_ */

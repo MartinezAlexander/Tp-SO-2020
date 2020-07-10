@@ -9,10 +9,10 @@
 
 //TODO ver donde repetimos codigo o no usamos funciones de cuando mergeamos con lo de ale
 
-char* crear_nombre_bloque_numero(int numero){
+char* crear_nombre_bloque_numero(int numero) {
 	char* nombre_bloque = NULL;
 
-	if(numero >= 0 && numero < blocks){
+	if (numero >= 0 && numero < blocks) {
 		nombre_bloque = string_itoa(numero);
 		string_append(&nombre_bloque, ".bin");
 	}
@@ -20,26 +20,24 @@ char* crear_nombre_bloque_numero(int numero){
 	return nombre_bloque;
 }
 
-char* crear_directorio_bloque(){
+char* crear_directorio_bloque() {
 	char* directorio_bloque = obtener_directorio_blocks();
 
-	if(obtener_directorio_blocks()==NULL){
-		crear_directorio(punto_de_montaje_tallgrass,"Blocks");
+	if (obtener_directorio_blocks() == NULL) {
+		crear_directorio(punto_de_montaje_tallgrass, "Blocks");
 		directorio_bloque = obtener_directorio_blocks();
 	}
 	return directorio_bloque;
 }
 
-t_config* crear_block(int numero){
+void crear_block(int numero) {
 
 	char* directorio_bloques = crear_directorio_bloque();
 	char* nombre_bloque = crear_nombre_bloque_numero(numero);
-	t_config* bloque = NULL;
 
-	if(nombre_bloque != NULL){
+	if (nombre_bloque != NULL) {
 		FILE* bloque_file = crear_archivo(directorio_bloques, nombre_bloque);
-		if(bloque_file != NULL){
-			bloque = config_create(path(directorio_bloques, nombre_bloque));
+		if (bloque_file != NULL) {
 			ocupar_bloque(numero);
 			fclose(bloque_file);
 		}
@@ -47,18 +45,17 @@ t_config* crear_block(int numero){
 
 	free(nombre_bloque);
 	free(directorio_bloques);
-	return bloque;
 }
 
-t_config* obtener_bloque_por_indice(int numero_bloque){
+t_config* obtener_bloque_por_indice(int numero_bloque) {
 	t_config* bloque = NULL;
 
-	if(obtener_directorio_blocks() != NULL){
+	if (obtener_directorio_blocks() != NULL) {
 
 		char* directorio_bloques = crear_directorio_bloque();
 		char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
 		char* path_bloque = path(directorio_bloques, nombre_bloque);
-		if (bloque_esta_libre(numero_bloque)==0) {
+		if (bloque_esta_libre(numero_bloque) == 0) {
 			bloque = config_create(path_bloque);
 		}
 
@@ -70,47 +67,53 @@ t_config* obtener_bloque_por_indice(int numero_bloque){
 	return bloque;
 }
 
-int bloque_esta_libre(int numero_bloque){
+int bloque_esta_libre(int numero_bloque) {
 	int libre = -1;
 
-	if(numero_bloque >= 0 && numero_bloque < blocks && estado_bloques->bitarray[numero_bloque]=='0'){
+	if (numero_bloque >= 0 && numero_bloque < blocks
+			&& estado_bloques->bitarray[numero_bloque] == '0') {
 		libre = 1;
-	}else{
+	} else {
 		libre = 0;
 	}
 
 	return libre;
 }
 
-int es_un_caracter_valido(char caracter){
+int es_un_caracter_valido(char caracter) {
 	int valido = 0;
-	if(caracter > 47 && caracter < 58){
+	if (caracter > 47 && caracter < 58) {
 		valido = 1;
 	}
-	if(caracter == 45){
+	if (caracter == 45) {
 		valido = 1;
 	}
-	if(caracter == 61){
+	if (caracter == 61) {
 		valido = 1;
 	}
-	if(caracter == '\n'){
+	if (caracter == '\n') {
 		valido = 1;
 	}
 	return valido;
 }
 
-int obtener_tamanio_ocupado_por_bloque(int numero_bloque){
+int obtener_tamanio_ocupado_por_bloque(int numero_bloque) {
 	int tamanio = 0;
 
-	if(!bloque_esta_libre(numero_bloque)){
+	if (!bloque_esta_libre(numero_bloque)) {
 
-		char* path_bloque = path(crear_directorio_bloque(),crear_nombre_bloque_numero(numero_bloque));
+		char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
+		char* dir_bloque = crear_directorio_bloque();
+		char* path_bloque = path(dir_bloque, nombre_bloque);
+		free(dir_bloque);
+		free(nombre_bloque);
 		FILE* bloque = fopen(path_bloque, "r");
+		free(path_bloque);
 
-		if(bloque != NULL){
+		if (bloque != NULL) {
 			char caracter = fgetc(bloque);
-			while(caracter != EOF){
-				if(es_un_caracter_valido(caracter)){
+			while (caracter != EOF) {
+				if (es_un_caracter_valido(caracter)) {
 					tamanio++;
 				}
 				caracter = fgetc(bloque);
@@ -123,83 +126,86 @@ int obtener_tamanio_ocupado_por_bloque(int numero_bloque){
 	return tamanio;
 }
 
-int bytes_libres_bloque(int numero_bloque){
+int bytes_libres_bloque(int numero_bloque) {
 	return block_size - obtener_tamanio_ocupado_por_bloque(numero_bloque);
 }
 
-int entra_en_bloque(t_posicion posicion,int cantidad, int numero_bloque){
-	char* info_cantidad = string_from_format("%d-%d=%d",posicion.posicionX,posicion.posicionY,cantidad);
-	int tamanio_entrada = string_length(info_cantidad)+1;
+int entra_en_bloque(t_posicion posicion, int cantidad, int numero_bloque) {
+	char* info_cantidad = string_from_format("%d-%d=%d", posicion.posicionX,
+			posicion.posicionY, cantidad);
+	int tamanio_entrada = string_length(info_cantidad) + 1;
 	return bytes_libres_bloque(numero_bloque) >= tamanio_entrada;
 }
 
-int agregar_registro_a_bloque(t_posicion posicion,int cantidad, int numero_bloque){
-	char* registro = info_pokemon_to_string(posicion,cantidad);
+int agregar_registro_a_bloque(t_posicion posicion, int cantidad,
+		int numero_bloque) {
+	char* registro = info_pokemon_to_string(posicion, cantidad);
 	int bloque_nuevo = -1;
 
-	if(entra_en_bloque(posicion,cantidad,numero_bloque)){
-		guardar_registro_en(registro,numero_bloque);
-	}else{
+	if (entra_en_bloque(posicion, cantidad, numero_bloque)) {
+		guardar_registro_en(registro, numero_bloque);
+	} else {
 		bloque_nuevo = obtener_bloque_disponible();
-		if(bloque_nuevo != -1){
+		if (bloque_nuevo != -1) {
 			ocupar_bloque(bloque_nuevo);
-			guardar_registro_por_partes_en(registro,numero_bloque,bloque_nuevo);
+			guardar_registro_por_partes_en(registro, numero_bloque,
+					bloque_nuevo);
 		}
 	}
 
 	return bloque_nuevo;
 }
 
-
-void guardar_registro_en(char* registro,int numero_bloque){
+void guardar_registro_en(char* registro, int numero_bloque) {
 	char* path_blocks = obtener_directorio_blocks();
 	char* path_bloque;
 	char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
 
-	if(path_blocks == NULL){
-		crear_directorio(punto_de_montaje_tallgrass,"Blocks");
+	if (path_blocks == NULL) {
+		crear_directorio(punto_de_montaje_tallgrass, "Blocks");
 		path_blocks = obtener_directorio_blocks();
-		path_bloque = path(path_blocks,nombre_bloque);
-	}else{
-		path_bloque = path(path_blocks,nombre_bloque);
+		path_bloque = path(path_blocks, nombre_bloque);
+	} else {
+		path_bloque = path(path_blocks, nombre_bloque);
 	}
 
 	int ultimo_caracter;
 
-	if(!existe_archivo_en(nombre_bloque,path_blocks)){
-		crear_archivo(path_blocks,nombre_bloque);
+	if (!existe_archivo_en(nombre_bloque, path_blocks)) {
+		crear_archivo(path_blocks, nombre_bloque);
 		ocupar_bloque(numero_bloque);
 		ultimo_caracter = 0;
-	}else{
+	} else {
 		ultimo_caracter = obtener_tamanio_ocupado_por_bloque(numero_bloque);
 	}
 
 	FILE* fd = fopen(path_bloque, "a");
 
 	if (fd != NULL) {
-		fseek(fd,ultimo_caracter,SEEK_SET);
+		fseek(fd, ultimo_caracter, SEEK_SET);
 
 		for (int i = 0; i < string_length(registro); i++) {
 			fputc(registro[i], fd);
 		}
 
-		fputc('\n',fd);
+		fputc('\n', fd);
 	}
 
 	fclose(fd);
 }
 
-void guardar_registro_por_partes_en(char* registro,int numero_bloque,int bloque_nuevo){
+void guardar_registro_por_partes_en(char* registro, int numero_bloque,
+		int bloque_nuevo) {
 	char* path_blocks = obtener_directorio_blocks();
 	char* nombre_bloque = crear_nombre_bloque_numero(numero_bloque);
-	char* path_bloque = path(path_blocks,nombre_bloque);
+	char* path_bloque = path(path_blocks, nombre_bloque);
 	int ultimo_caracter = obtener_tamanio_ocupado_por_bloque(numero_bloque);
 	int cantidad_bytes_para_primer_bloque = bytes_libres_bloque(numero_bloque);
 
 	FILE* fd = fopen(path_bloque, "a");
 
 	if (fd != NULL) {
-		fseek(fd,ultimo_caracter,SEEK_SET);
+		fseek(fd, ultimo_caracter, SEEK_SET);
 
 		for (int i = 0; i < cantidad_bytes_para_primer_bloque; i++) {
 			fputc(registro[i], fd);
@@ -209,25 +215,26 @@ void guardar_registro_por_partes_en(char* registro,int numero_bloque,int bloque_
 	fclose(fd);
 
 	char* nombre_bloque_nuevo = crear_nombre_bloque_numero(bloque_nuevo);
-	char* path_bloque_nuevo = path(path_blocks,nombre_bloque_nuevo);
-	crear_archivo(path_blocks,nombre_bloque_nuevo);
+	char* path_bloque_nuevo = path(path_blocks, nombre_bloque_nuevo);
+	crear_archivo(path_blocks, nombre_bloque_nuevo);
 
 	FILE* fd_nuevo = fopen(path_bloque_nuevo, "a");
 
 	if (fd_nuevo != NULL) {
-		fseek(fd_nuevo,0,SEEK_SET);
+		fseek(fd_nuevo, 0, SEEK_SET);
 
-		for (int i = cantidad_bytes_para_primer_bloque; i < string_length(registro); i++) {
+		for (int i = cantidad_bytes_para_primer_bloque;
+				i < string_length(registro); i++) {
 			fputc(registro[i], fd_nuevo);
 		}
 
-		fputc('\n',fd_nuevo);
+		fputc('\n', fd_nuevo);
 	}
 
 	fclose(fd_nuevo);
 }
 
-char* leer_bloque(int bloque){
+char* leer_bloque(int bloque) {
 	char* path_blocks = obtener_directorio_blocks();
 	char* nombre_bloque = crear_nombre_bloque_numero(bloque);
 	char* path_bloque = path(path_blocks, nombre_bloque);
@@ -239,7 +246,7 @@ char* leer_bloque(int bloque){
 	char* posiciones = "";
 
 	while (caracter != EOF) {
-		posiciones = string_from_format("%s%c",posiciones,caracter);
+		posiciones = string_from_format("%s%c", posiciones, caracter);
 		caracter = fgetc(fd);
 	}
 
@@ -248,46 +255,49 @@ char* leer_bloque(int bloque){
 	return posiciones;
 }
 
-t_list* obtener_posiciones_de_bloques(char** bloques){
+t_list* obtener_posiciones_de_bloques(char** bloques) {
 	char* posiciones = string_new();
 
-	int i=0;
+	int i = 0;
 
-	while(bloques[i]!=NULL){
+	while (bloques[i] != NULL) {
 		int bloque = atoi(bloques[i]);
 		char* posiciones_por_bloque = leer_bloque(bloque);
-		string_append(&posiciones,posiciones_por_bloque);
+		string_append(&posiciones, posiciones_por_bloque);
 		i++;
 	}
 
 	return convertir_info_posiciones(posiciones);
 }
 
-int agregar_registro_a_bloque_con_segunda_opcion(t_posicion posicion,int cantidad, int numero_bloque, int bloque_nuevo){
-	char* registro = info_pokemon_to_string(posicion,cantidad);
+int agregar_registro_a_bloque_con_segunda_opcion(t_posicion posicion,
+		int cantidad, int numero_bloque, int bloque_nuevo) {
+	char* registro = info_pokemon_to_string(posicion, cantidad);
 
-	if(entra_en_bloque(posicion,cantidad,numero_bloque)){
-		guardar_registro_en(registro,numero_bloque);
-	}else{
+	if (entra_en_bloque(posicion, cantidad, numero_bloque)) {
+		guardar_registro_en(registro, numero_bloque);
+	} else {
 		ocupar_bloque(bloque_nuevo);
-		guardar_registro_por_partes_en(registro,numero_bloque,bloque_nuevo);
+		guardar_registro_por_partes_en(registro, numero_bloque, bloque_nuevo);
 	}
 
-	return string_length(registro)+1;
+	return string_length(registro) + 1;
 }
 
-int array_cantidad_de_elementos(char** array){
-    int cantidad = 0;
-    while(array[cantidad] != NULL) cantidad++;
-    return cantidad;
+int array_cantidad_de_elementos(char** array) {
+	int cantidad = 0;
+	while (array[cantidad] != NULL)
+		cantidad++;
+	return cantidad;
 }
 
-char* obtener_path_bloque_de_lista(char** bloques,int indice_numero_bloque){
+char* obtener_path_bloque_de_lista(char** bloques, int indice_numero_bloque) {
 	char* path_blocks = obtener_directorio_blocks();
 	char* nombre_bloque = NULL;
 	char* path_bloque = NULL;
 
-	if(indice_numero_bloque >= 0 && indice_numero_bloque < array_cantidad_de_elementos(bloques)){
+	if (indice_numero_bloque >= 0
+			&& indice_numero_bloque < array_cantidad_de_elementos(bloques)) {
 		int num_bloque = atoi(bloques[indice_numero_bloque]);
 		nombre_bloque = crear_nombre_bloque_numero(num_bloque);
 		path_bloque = path(path_blocks, nombre_bloque);
@@ -296,17 +306,17 @@ char* obtener_path_bloque_de_lista(char** bloques,int indice_numero_bloque){
 	return path_bloque;
 }
 
-void vaciar_bloques(char** bloques){
+void vaciar_bloques(char** bloques) {
 	int i = 0;
-	while(bloques[i]!=NULL){
-		char* path_bloque = obtener_path_bloque_de_lista(bloques,i);
-		FILE* fd = fopen(path_bloque,"w");
+	while (bloques[i] != NULL) {
+		char* path_bloque = obtener_path_bloque_de_lista(bloques, i);
+		FILE* fd = fopen(path_bloque, "w");
 		fclose(fd);
 		i++;
 	}
 }
 
-void actualizar_bloques(char** bloques, t_list* posiciones){
+void actualizar_bloques(char** bloques, t_list* posiciones) {
 	// [2,0]
 
 	vaciar_bloques(bloques);
@@ -315,31 +325,34 @@ void actualizar_bloques(char** bloques, t_list* posiciones){
 
 	int indice_numero_bloque = 0;
 	int cantidad_escrita = 0;
-	char* path_bloque = obtener_path_bloque_de_lista(bloques,indice_numero_bloque);
+	char* path_bloque = obtener_path_bloque_de_lista(bloques,
+			indice_numero_bloque);
 
-	FILE* bloque = fopen(path_bloque,"a");
+	FILE* bloque = fopen(path_bloque, "a");
 
 	int cantidad_bloques_usados = 1;
 
-	for(int i=0; i<string_length(posiciones_string);i++){
-		if(cantidad_escrita==block_size){
+	for (int i = 0; i < string_length(posiciones_string); i++) {
+		if (cantidad_escrita == block_size) {
 			cantidad_escrita = 0;
 			fclose(bloque);
-			path_bloque = obtener_path_bloque_de_lista(bloques,indice_numero_bloque+1);
-			bloque = fopen(path_bloque,"a");
+			path_bloque = obtener_path_bloque_de_lista(bloques,
+					indice_numero_bloque + 1);
+			bloque = fopen(path_bloque, "a");
 			cantidad_bloques_usados++;
 		}
-		fputc(posiciones_string[i],bloque);
+		fputc(posiciones_string[i], bloque);
 		cantidad_escrita++;
 	}
 
 	fclose(bloque);
 
-	int cant_liberados = array_cantidad_de_elementos(bloques)-cantidad_bloques_usados;
+	int cant_liberados = array_cantidad_de_elementos(bloques)
+			- cantidad_bloques_usados;
 
-	if(cant_liberados > 0){
-		for(int i=0; i<cant_liberados; i++){
-			int bloque = atoi(bloques[cantidad_bloques_usados-i]);
+	if (cant_liberados > 0) {
+		for (int i = 0; i < cant_liberados; i++) {
+			int bloque = atoi(bloques[cantidad_bloques_usados - i]);
 			liberar_bloque(bloque);
 		}
 	}
@@ -348,10 +361,10 @@ void actualizar_bloques(char** bloques, t_list* posiciones){
 /*
  * Retorna la suma de los tamanios de todos los bloques dados
  */
-int obtener_tamanio_listado_de_bloques(char** bloques){
+int obtener_tamanio_listado_de_bloques(char** bloques) {
 	int tam = 0;
 	int index = 0;
-	while(bloques[index] != NULL){
+	while (bloques[index] != NULL) {
 		tam += obtener_tamanio_ocupado_por_bloque(atoi(bloques[index]));
 
 		index++;
@@ -364,29 +377,33 @@ int obtener_tamanio_listado_de_bloques(char** bloques){
  * Devuelve el bloque del listado que tiene la posicion dada y tiene lugar para sumarle la cantidad.
  * En caso de que no exista o no tenga lugar devuelve -1.
  */
-int obtener_bloque_con_posicion(char** bloques, t_posicion posicion, int cantidad){
+int obtener_bloque_con_posicion(char** bloques, t_posicion posicion,
+		int cantidad) {
 	char* posicion_string = posicion_to_key(posicion);
 
 	int index = 0;
-	while(bloques[index] != NULL){
+	while (bloques[index] != NULL) {
 		int bloque = atoi(bloques[index]);
 
 		t_config* config_bloque = obtener_bloque_por_indice(bloque);
 
-		if(config_has_property(config_bloque, posicion_string)){
-			int espacio_libre = block_size - obtener_tamanio_ocupado_por_bloque(bloque);
+		if (config_has_property(config_bloque, posicion_string)) {
+			int espacio_libre = block_size
+					- obtener_tamanio_ocupado_por_bloque(bloque);
 
-			int cantidad_en_posicion = config_get_int_value(config_bloque, posicion_string);
+			int cantidad_en_posicion = config_get_int_value(config_bloque,
+					posicion_string);
 
 			char* cantidad_vieja = string_itoa(cantidad_en_posicion);
 			char* cantidad_nueva = string_itoa(cantidad_en_posicion + cantidad);
 
-			int espacio_necesario = string_length(cantidad_nueva) - string_length(cantidad_vieja);
+			int espacio_necesario = string_length(cantidad_nueva)
+					- string_length(cantidad_vieja);
 
 			free(cantidad_vieja);
 			free(cantidad_nueva);
 
-			if(espacio_necesario < espacio_libre){
+			if (espacio_necesario < espacio_libre) {
 				free(posicion_string);
 				config_destroy(config_bloque);
 
@@ -399,10 +416,12 @@ int obtener_bloque_con_posicion(char** bloques, t_posicion posicion, int cantida
 		index++;
 	}
 
-	return  -1;
+	free(posicion_string);
+
+	return -1;
 }
 
-char* posicion_to_key(t_posicion posicion){
+char* posicion_to_key(t_posicion posicion) {
 	return string_from_format("%d-%d", posicion.posicionX, posicion.posicionY);
 }
 
@@ -411,18 +430,22 @@ char* posicion_to_key(t_posicion posicion){
  * 'x-y=cantidad'.
  * Devuelve -1 en caso de que ninguno tenga lugar
  */
-int obtener_primer_bloque_con_espacio(char** bloques, t_posicion posicion, int cantidad){
+int obtener_primer_bloque_con_espacio(char** bloques, t_posicion posicion,
+		int cantidad) {
 	int index = 0;
-	while(bloques[index] != NULL){
+	while (bloques[index] != NULL) {
 		int bloque = atoi(bloques[index]);
 
-		int espacio_libre = block_size - obtener_tamanio_ocupado_por_bloque(bloque);
+		int espacio_libre = block_size
+				- obtener_tamanio_ocupado_por_bloque(bloque);
 
-		char* nueva_entrada = string_from_format("%d-%d=%d", posicion.posicionX, posicion.posicionY, cantidad);
+		char* nueva_entrada = string_from_format("%d-%d=%d", posicion.posicionX,
+				posicion.posicionY, cantidad);
 		int tamanio_nueva_entrada = string_length(nueva_entrada);
 		free(nueva_entrada);
 
-		if(tamanio_nueva_entrada < espacio_libre) return bloque;
+		if (tamanio_nueva_entrada < espacio_libre)
+			return bloque;
 
 		index++;
 	}
@@ -430,7 +453,8 @@ int obtener_primer_bloque_con_espacio(char** bloques, t_posicion posicion, int c
 	return -1;
 }
 
-void agregar_nuevo_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad){
+void agregar_nuevo_pokemon_a_bloque(int bloque, t_posicion posicion,
+		int cantidad) {
 	char* posicion_string = posicion_to_key(posicion);
 	char* nueva_cantidad = string_itoa(cantidad);
 
@@ -444,8 +468,7 @@ void agregar_nuevo_pokemon_a_bloque(int bloque, t_posicion posicion, int cantida
 	free(posicion_string);
 }
 
-
-void agregar_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad){
+void agregar_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad) {
 	char* posicion_string = posicion_to_key(posicion);
 
 	t_config* config_bloque = obtener_bloque_por_indice(bloque);
@@ -464,7 +487,7 @@ void agregar_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad){
  * Decrementa en uno la cantidad de pokemon para la posicion dada.
  * Devuelve 1 en caso de que haya eliminado la fila debido a que la cantidad quedo en 0.
  */
-int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion){
+int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion) {
 	char* posicion_string = posicion_to_key(posicion);
 
 	t_config* config_bloque = obtener_bloque_por_indice(bloque);
@@ -472,9 +495,9 @@ int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion){
 
 	int eliminar_fila = cantidad_actual - 1 <= 0;
 
-	if(eliminar_fila){
+	if (eliminar_fila) {
 		config_remove_key(config_bloque, posicion_string);
-	}else{
+	} else {
 		char* nueva_cantidad = string_itoa(cantidad_actual - 1);
 		config_set_value(config_bloque, posicion_string, nueva_cantidad);
 		free(nueva_cantidad);
@@ -490,11 +513,18 @@ int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion){
 /*
  * Retorna un listado con todas las posiciones que posee un bloque
  */
-t_list* obtener_posiciones_de_bloque(int bloque){
+t_list* obtener_posiciones_de_bloque(int bloque) {
 	t_list* posiciones = list_create();
 
-	char* path_bloque = path(crear_directorio_bloque(),crear_nombre_bloque_numero(bloque));
+	//16 (8 direct, 8 indirect) bytes in 1 blocks are definitely lost
+
+	char* nombre_bloque = crear_nombre_bloque_numero(bloque);
+	char* dir_bloque = crear_directorio_bloque();
+	char* path_bloque = path(dir_bloque, nombre_bloque);
+	free(dir_bloque);
+	free(nombre_bloque);
 	FILE* archivo_bloque = fopen(path_bloque, "r");
+	free(path_bloque);
 
 	char caracter = 'x';
 
@@ -503,41 +533,54 @@ t_list* obtener_posiciones_de_bloque(int bloque){
 
 	int estado_lectura = 1;
 
-	while(caracter != EOF){
+	while (caracter != EOF) {
 		caracter = fgetc(archivo_bloque);
 
-		if(caracter == '='){
+		if (caracter == '=') {
 			estado_lectura = 3;
 			continue;
 		}
 
-		if(caracter == '-'){
+		if (caracter == '-') {
 			estado_lectura = 2;
 			continue;
 		}
 
-		if(caracter == '\n'){
+		if (caracter == '\n') {
 			estado_lectura = 1;
 			posicion_x = string_new();
 			posicion_y = string_new();
+
+			//1 bytes in 1 blocks are definitely lost
+
 			continue;
 		}
 
-		if(estado_lectura == 1){
+		if (estado_lectura == 1) {
 			string_append_with_format(&posicion_x, "%c", caracter);
+
+			//4 bytes in 2 blocks are definitely lost
+
 		}
 
-		if(estado_lectura == 2){
+		if (estado_lectura == 2) {
 			string_append_with_format(&posicion_y, "%c", caracter);
+
+			//4 bytes in 2 blocks are definitely lost
+
 		}
 
-		if(estado_lectura == 3){
+		if (estado_lectura == 3) {
 			estado_lectura = 4;
 
 			t_posicion* posicion = malloc(sizeof(t_posicion));
 			posicion->posicionX = atoi(posicion_x);
 			posicion->posicionY = atoi(posicion_y);
 			list_add(posiciones, posicion);
+
+			free(posicion_x);
+			free(posicion_y);
+
 		}
 	}
 
@@ -545,3 +588,40 @@ t_list* obtener_posiciones_de_bloque(int bloque){
 
 	return posiciones;
 }
+
+/*
+ * Dado un array de strings que contiene cada bloque, y un bloque a sacar
+ * devuelve un string del tipo '[bloque,bloque,bloque]' que contenga todos los
+ * bloques dados menos el bloque a sacar
+ */
+char* obtener_string_bloques_sin(char** bloques_array, int bloque_a_sacar) {
+	char* listado_bloques = string_new();
+	string_append(&listado_bloques, "[");
+	char* bloque_a_sacar_string = string_itoa(bloque_a_sacar);
+
+	int primer_append = 1;
+
+	int index = 0;
+	while (bloques_array[index] != NULL) {
+		char* bloque_actual = bloques_array[index];
+
+		if (!string_equals_ignore_case(bloque_actual, bloque_a_sacar_string)) {
+			if (primer_append) {
+				string_append(&listado_bloques, bloque_actual);
+				primer_append = 0;
+			} else {
+				string_append_with_format(&listado_bloques, ",%s",
+						bloque_actual);
+			}
+		}
+
+		index++;
+	}
+
+	free(bloque_a_sacar_string);
+
+	string_append(&listado_bloques, "]");
+
+	return listado_bloques;
+}
+

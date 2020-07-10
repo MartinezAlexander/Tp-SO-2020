@@ -9,6 +9,7 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 #include<commons/collections/list.h>
+#include <pthread.h>
 
 #include "variables_globales.h"
 #include "entrenador.h"
@@ -17,12 +18,13 @@
 #include "conexiones/conexion_gameboy.h"
 #include "conexiones/conexion_broker.h"
 //Includes necesarios para el test manual que hay
-#include <pthread.h>
+
 #include "planificacion/planificacion.h"
 #include<mensajes/appeared_pokemon.h>
 #include<mensajes/mensajes.h>
 #include<mensajes/pokemon.h>
-#include"test.h"
+#include"tests/test_planificacion.h"
+#include"tests/test_deadlock.h"
 
 void terminar_programa(t_log* logger, t_config* config);
 t_config* leer_config(void);

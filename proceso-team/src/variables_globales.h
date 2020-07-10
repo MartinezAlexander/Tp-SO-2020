@@ -15,8 +15,13 @@
 #include<commons/config.h>
 #include<commons/collections/list.h>
 #include<commons/collections/dictionary.h>
+#include<commons/collections/queue.h>
 #include<commons/log.h>
 #include<commons/string.h>
+#include<semaphore.h>
+
+//Controla el hilo de planificacion. Sirve para poder tener el ciclo: entrenador -> planificador
+sem_t semaforo_planificacion;
 
 t_config* config;
 
@@ -34,9 +39,22 @@ int32_t team_id;
 
 t_log* logger;
 
+//Aca guardo las especies que recibi con un appeared o localized.
+//Sirve para que el localized pueda saber si ya procese mensajes de una especie
 t_dictionary* diccionario_especies_recibidas;
+pthread_mutex_t mutex_diccionario_especies;
 
-//Estadisticas
+//Aca tengo todos los pokemones que no pude procesar en el momento que llegaron
+//ya sea porque no habia entrenadores libres o porque la especie ya esta siendo procesada
+//y me quiero guardar un pokemon de repuesto en caso de que falle el catch
+t_queue* cola_pokemones_en_espera;
+pthread_mutex_t mutex_cola_espera;
+
+//Utilizado para garantizar mutua exclusion en el procesamiento de un pokemon.
+//Ya que puedo procesar por nuevo mensaje o por cola de espera en hilos simultaneos
+pthread_mutex_t mutex_procesamiento_pokemon;
+
+//Para llevar las cuentas de cuantos ciclos realizo cada entrenador
 t_dictionary* diccionario_ciclos_entrenador;
 int cambios_de_contexto;
 

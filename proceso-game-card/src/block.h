@@ -26,7 +26,7 @@ t_list* bloques;
 
 char* crear_nombre_bloque_numero(int numero);
 char* crear_directorio_bloque();
-t_config* crear_block(int numero);
+void crear_block(int numero);
 t_config* obtener_bloque_por_indice(int numero_bloque);
 int bloque_esta_libre(int numero_bloque);
 int obtener_tamanio_ocupado_por_bloque(int numero_bloque);
@@ -52,5 +52,7 @@ int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion);
 t_list* obtener_posiciones_de_bloque(int bloque);
 
 int obtener_tamanio_listado_de_bloques(char** bloques);
+
+char* obtener_string_bloques_sin(char** bloques_array, int bloque_a_sacar);
 
 #endif /* BLOCK_H_ */

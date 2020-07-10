@@ -21,9 +21,15 @@ void loggear_info(char* info) {
 
 void loggear_conexion(t_proceso id_proceso,int socket) {
 	if(socket>=0){
-	char* log = string_from_format("El proceso se conecto al proceso %s", proceso_to_string(id_proceso));
+	char* log = string_from_format("El gameboy se conecto al proceso %s", proceso_to_string(id_proceso));
 	log_info(logger, log);
 	}
+}
+
+
+void loggear_desconexion(t_proceso id_proceso){
+	char* log = string_from_format("El gameboy se desconecto del proceso %s", proceso_to_string(id_proceso));
+	log_info(logger,log);
 }
 
 void loggear_suscripcion(op_code id_cola) {

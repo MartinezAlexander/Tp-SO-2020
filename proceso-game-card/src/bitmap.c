@@ -10,8 +10,10 @@
 void bitmap_cargar(){
 	estado_bloques = malloc(sizeof(bitmap));
 
+
 	// TODO PREGUNTA posibilidad de que el bitmap no este pero haya bloques creados (caso extremo)
 	// habria que cargar bitmap en base a nombre de archivos de bloques
+
 	if (!existe_archivo_en("Bitmap.bin",obtener_directorio_metadata())) {
 		estado_bloques->path = obtener_directorio_bitmap();
 
@@ -40,7 +42,7 @@ void ocupar_bloque(int nuevo_bloque){
 	if(nuevo_bloque >= 0 && nuevo_bloque < blocks){
 		estado_bloques->bitarray[nuevo_bloque] = '1';
 	}else{
-		//TODO Error bloque no existe
+		printf("[Bloque] Error al ocupar bloque, no existe el bloque %d\n", nuevo_bloque);
 	}
 }
 
@@ -48,6 +50,7 @@ void liberar_bloque(int numero_bloque){
 	if(numero_bloque >= 0 && numero_bloque < blocks){
 		estado_bloques->bitarray[numero_bloque] = '0';
 	}else{
+		printf("[Bloque] Error al liberar bloque, no existe el bloque %d\n", numero_bloque);
 		//TODO Error bloque no existe
 	}
 }
@@ -58,5 +61,7 @@ int obtener_bloque_disponible(){
 	}
 	printf("No se encontraron bloques disponibles");
 	return -1;
+
 	//TODO LEER ENUNCIADO / PREGUNTAR Si nos dicen que hacer en este caso en el enunciado resolver error.
+
 }

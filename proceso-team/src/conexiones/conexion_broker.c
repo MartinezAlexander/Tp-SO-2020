@@ -18,6 +18,7 @@ void iniciar_conexion_broker(){
 	pthread_create(&hilo_caught, NULL, (void*) iniciar_suscripcion_broker,(void*)CAUGHT_POKEMON);
 	sleep(1);
 	pthread_create(&hilo_localized, NULL, (void*) iniciar_suscripcion_broker,(void*)LOCALIZED_POKEMON);
+	sleep(1);
 
 	//Iniciamos un hilo de reconexion, este comenzara bloqueado por lo que
 	//no ejecutara nada, hasta que haya un problema en la conexion
@@ -28,22 +29,36 @@ void iniciar_conexion_broker(){
 
 void cerrar_conexion_broker(){
 	finalizo_team = 1;
+	//TODO: Duda -> Hay que joinear aca? Creo que no
 	pthread_join(hilo_appeared, NULL);
 	pthread_join(hilo_caught, NULL);
 	pthread_join(hilo_localized, NULL);
 }
 
-void enviar_get_objetivo(t_list* objetivo_global){
+//TODO: Problema en el envio de GET mientras me suscribo
+/*
+ * Luego de testear lo del envio de GET que descubri:
+ *
+ * 1. Cuando comento la suscripcion al broker anda perfecto. Asi que no es tema del GET.
+ * 2. Cuando falla, rompe en el recibimiento de id, y de ahi en adelante no procesa nada mas
+ * 		el main. El programa sigue andando solo porque estan los hilos, pero lo de abrir el
+ * 		puerto de escucha para el gameboy no lo hace, asi que ahi muere	el main.
+ *
+ * 	Solucion parcial: sleep(1) despues de crear el ultimo hilo de suscripcion
+ */
 
-	//Por cada especie distinta a la anterior
-	//(la lista esta ordenada, asi que mandare
-	//un get por cada especie)
+void enviar_get_objetivo(t_list* objetivo_global){
+	//Como queremos mandar un get por especie, planteamos
+	//tener esta lista ordenada desde antes, y aca solo me queda
+	//recorrer uno por uno y enviar get siempre y cuando
+	//la especie actual es distinta a la anterior
+
 	char* ultima_especie_enviada = "";
+
 	for(int i = 0 ; i < list_size(objetivo_global) ; i++){
 		char* pokemon = list_get(objetivo_global, i);
 
 		if(strcmp(pokemon, ultima_especie_enviada) != 0){
-			//Envio mensaje GET al broker
 			t_get_pokemon* mensaje_get = get_pokemon_create(pokemon);
 			t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON);
 
@@ -51,6 +66,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 
 			if(socket >= 0){
 				int envio = enviar_mensaje(mensaje, socket);
+
 				if(envio < 0){
 					loggear_error_broker("envio de mensaje get");
 				}else{
@@ -59,7 +75,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 
 				liberar_conexion(socket);
 
-				printf("Enviando especie GET al broker: %s\n", pokemon);
+				printf("[GET] Enviado mensaje GET al broker: %s\n", pokemon);
 			}else{
 				loggear_error_broker("envio de mensaje get");
 			}
@@ -97,8 +113,10 @@ void suscribirse_a_cola(int* socket, op_code cola){
 	//Reintento conexion
 	while(*socket < 0){
 		loggear_inicio_reintento_broker();
+
 		sleep(tiempo_de_reconexion);
 		*socket = crear_conexion(ip_broker, puerto_broker);
+
 		loggear_resultado_reintento_broker(*socket > 0);
 	}
 
@@ -106,8 +124,10 @@ void suscribirse_a_cola(int* socket, op_code cola){
 	//Es necesario???
 	while(envio < 0){
 		loggear_inicio_reintento_broker();
+
 		sleep(tiempo_de_reconexion);
 		envio = enviar_mensaje(mensaje, *socket);
+
 		loggear_resultado_reintento_broker(envio > 0);
 	}
 
@@ -116,12 +136,20 @@ void suscribirse_a_cola(int* socket, op_code cola){
 		printf("Error: el broker no acepto la suscripcion a la cola %d\n", cola);
 	}
 
-	printf("Suscripcion a la cola %d del broker exitosa\n");
+	printf("Suscripcion a la cola %d del broker exitosa\n", cola);
 }
 
+//TODO: Ver tambien -> Es necesario lo de finalizo team y liberar conexion??
+// Ya dijimos hace un tiempo que en realidad nunca voy a terminar estos hilos
+// ya que se quedan bloqueados con el recv
 void recibir_appeared(){
 	while(!finalizo_team){
+
 		t_mensaje* mensaje = recibir_mensaje(socket_appeared);
+		//Cuando detectamos que el mensaje es NULL (significa que se cayo el socket),
+		//disparamos el hilo de reconexion y pausamos cada uno de
+		// los hilos de recibimiento de mensajes hasta que
+		//el otro hilo logre reconectar
 		if(mensaje == NULL){
 			iniciar_reconexion();
 			sem_wait(&semaforo_procesamiento_appeared);
@@ -164,6 +192,12 @@ void recibir_localized(){
 	liberar_conexion(socket_localized);
 }
 
+
+//Esta funcion normalmente la van a intentar llamar los 3 hilos cuando detecten
+//que se cayo la conexion, por eso es que esta rodeada de mutex y un valor que indica
+//si estoy reconectando. En realidad lo unico que hay que hacer aca es desbloquear
+//el semaforo, pero para evitar que los 3 hilos traten de hacer post al mismo tiempo,
+//y se hagan reconexiones de mas, es que agregamos una variable de control
 void iniciar_reconexion(){
 	pthread_mutex_lock(&mutex_reconexion);
 	if(!estoy_reconectando){
@@ -173,19 +207,22 @@ void iniciar_reconexion(){
 	pthread_mutex_unlock(&mutex_reconexion);
 }
 
-//El hilo de reconexion, no lo joineamos, sino que una vez
-//que termine el proceso team, el hilo va a morir
+
 void reconectar_al_broker(){
 	while(!finalizo_team){
 		sem_wait(&semaforo_reconexion);
+
 		loggear_inicio_reintento_broker();
+
 		suscribirse_a_cola(&socket_appeared, APPEARED_POKEMON);
 		sem_post(&semaforo_procesamiento_appeared);
 		suscribirse_a_cola(&socket_caught, CAUGHT_POKEMON);
 		sem_post(&semaforo_procesamiento_caught);
 		suscribirse_a_cola(&socket_localized, LOCALIZED_POKEMON);
 		sem_post(&semaforo_procesamiento_localized);
+
 		loggear_resultado_reintento_broker(1);
+
 		estoy_reconectando = 0;
 	}
 }

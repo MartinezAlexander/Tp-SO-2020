@@ -3,74 +3,51 @@
 
 void memoria_cache_create(){
 	memoria_cache = malloc(sizeof(t_memoria_cache));
-	memoria_cache->memoria_cache = dictionary_create();
+	memoria_cache->cache = malloc(tamano_memoria);
 }
 
-//TODO crear un semaforo mutex
-void memoria_cache_agregar_mensaje(t_memoria_cache* memoria, t_mensaje* mensaje){
-	char* cola = op_code_to_string(mensaje->codigo);
-	int existen_mensajes = dictionary_has_key(memoria->memoria_cache,cola);
-	if(existen_mensajes){
-		t_list* mensajes = (t_list*)dictionary_get(memoria->memoria_cache,cola);
-		list_add(mensajes,(void*)mensaje);
-	}else{
-		t_list* mensajes = list_create();
-		list_add(mensajes,(void*)mensaje);
-		dictionary_put(memoria->memoria_cache,cola,mensajes);
+void memoria_cache_agregar_mensaje(t_mensaje* mensaje, int donde_agregar){
+	void* stream_mensaje = mensaje_to_stream(mensaje);
+	memcpy(memoria_cache->cache + donde_agregar, stream_mensaje, mensaje_size(mensaje));
+	free(stream_mensaje);
+}
+
+t_mensaje* memoria_cache_leer_mensaje(int desde_donde, int cuanto_leer, op_code que_leer){
+	void* stream = malloc(cuanto_leer);
+	memcpy(stream, memoria_cache->cache + desde_donde, cuanto_leer);
+	t_mensaje* mensaje = mensaje_from_stream(stream, que_leer);
+	return mensaje;
+}
+
+int memoria_cache_es_un_mensaje_tipo(int desde_donde, int cuanto_leer, op_code cola){
+	void* stream = malloc(cuanto_leer);
+	memcpy(stream, memoria_cache->cache + desde_donde, cuanto_leer);
+	op_code codigo = mensaje_stream_obtener_codigo(stream);
+	int es_del_tipo = 0;
+	if(codigo == cola){
+		es_del_tipo = 1;
 	}
+	free(stream);
+	return es_del_tipo;
 }
 
-//TODO crear un semaforo mutex
-t_list* memoria_cache_obtener_mensajes_por_cola(t_memoria_cache* memoria, op_code cola_suscripcion){
-	char* cola = op_code_to_string(cola_suscripcion);
-
-	int existen_mensajes = dictionary_has_key(memoria->memoria_cache,cola);
-
-	t_list* mensajes = NULL;
-
-	if(existen_mensajes){
-		mensajes = (t_list*)dictionary_get(memoria->memoria_cache,cola);
-	}
-
-	return mensajes;
+void* memoria_cache_leer_stream(int desde_donde, int cuanto_leer){
+	void* stream = malloc(cuanto_leer);
+	memcpy(stream, memoria_cache->cache + desde_donde, cuanto_leer);
+	return stream;
 }
 
-//TODO crear un semaforo mutex
-void memoria_cache_enviar_mensajes_cacheados(para_envio_mensaje_cacheados* parametros){
-	t_list* mensajes = memoria_cache_obtener_mensajes_por_cola(parametros->memoria,parametros->cola);
-
-	if(mensajes != NULL){
-		int i;
-		for (i = 0; i < list_size(mensajes); i++) {
-			t_mensaje* mensaje = (t_mensaje*) list_get(mensajes, i);
-			int resultado_envio = enviar_mensaje(mensaje,parametros->suscriptor->socket);
-
-			if (resultado_envio > 0) {
-				//TODO pasar a log personal
-				loggear_envio_mensaje(mensaje_to_string(mensaje));
-
-				//TODO verificar retorno de ack
-				recibir_ACK(parametros->suscriptor->socket);
-				loggear_recepcion_ACK(suscriptor_to_string(parametros->suscriptor));
-			} else {
-				log_personal_error_envio_a_suscriptor(suscriptor_to_string(parametros->suscriptor));
-				i = list_size(mensajes);
-			}
-		}
-	}
-
-	parametros_destroy(parametros);
+void memoria_cache_agregar_stream(void* stream, int donde_agregar, int cuanto_agregar){
+	memcpy(memoria_cache->cache + donde_agregar, stream, cuanto_agregar);
+	free(stream);
 }
 
-para_envio_mensaje_cacheados* parametros_create(t_suscriptor* suscriptor, op_code cola, t_memoria_cache* memoria){
-	para_envio_mensaje_cacheados* parametros = malloc(sizeof(para_envio_mensaje_cacheados));
-	parametros->suscriptor = suscriptor;
-	parametros->cola = cola;
-	parametros->memoria = memoria;
-	return parametros;
+int memoria_cache_tamanio(){
+	return tamano_memoria;
 }
 
-void parametros_destroy(para_envio_mensaje_cacheados* parametros){
-	free(parametros);
+void memoria_cache_destroy(){
+	free(memoria_cache->cache);
+	free(memoria_cache);
 }
 

@@ -54,4 +54,8 @@ new_pokemon_destroy libera la memoria utilizada para crear el mensaje new pokemo
 */
 void new_pokemon_destroy(t_new_pokemon* new_pokemon);
 
+void* new_pokemon_to_stream(t_new_pokemon* new_pokemon);
+
+t_new_pokemon* new_pokemon_from_stream(void* stream);
+
 #endif
