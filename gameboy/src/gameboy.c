@@ -121,8 +121,8 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 	if (id == BROKER && codigo == APPEARED_POKEMON) {
 		char* id_c_string = filtrar_string_dejar_solo_caracteres_validos(mensaje[6]);
 		uint32_t x = (uint32_t) atoi(mensaje[4]);
-		uint32_t y = (uint32_t) atoi(id_c_string);
-		int32_t id_c = atoi(mensaje[6]);
+		uint32_t y = (uint32_t) atoi(mensaje[5]);
+		int32_t id_c = atoi(id_c_string);
 		mensaje_creado = (void*) appeared_pokemon_create(mensaje[3], x, y);
 		mensaje_procesado = mensaje_con_id_correlativo_create(mensaje_creado,codigo, id_c);
 	}
