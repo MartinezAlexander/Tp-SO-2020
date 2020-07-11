@@ -61,8 +61,11 @@ void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad) {
 	free(bloques_array);
 	list_destroy(renglones);
 
+	printf("Size: %d\n",tamanio);
 	char* size = string_itoa(tamanio);
+	puts(size);
 	config_set_value(config_metadata, "SIZE", size);
+	config_save(config_metadata);
 	free(size);
 	config_destroy(config_metadata);
 }

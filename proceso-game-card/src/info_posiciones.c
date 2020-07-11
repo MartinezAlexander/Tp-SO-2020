@@ -24,7 +24,22 @@ int tamanio_info_posiciones(t_list* renglones){
  * En caso de que no exista la posicion, agrega un nuevo item a la lista
  */
 void agregar_info_posicion_a_listado(t_list* renglones, t_posicion posicion, int cantidad){
-//TODO
+	int no_encontre = 1;
+
+	for(int i = 0; i<list_size(renglones);i++){
+		info_posicion* posicion_info = list_get(renglones,i);
+		if(posicion_info->posicion.posicionX == posicion.posicionX && posicion_info->posicion.posicionY == posicion.posicionY){
+			no_encontre = 0;
+			posicion_info->cantidad += cantidad;
+		}
+	}
+
+	if(no_encontre){
+		info_posicion* nueva_info = malloc(sizeof(info_posicion));
+		nueva_info->posicion = posicion;
+		nueva_info->cantidad = cantidad;
+		list_add(renglones,nueva_info);
+	}
 }
 
 /*
@@ -50,16 +65,20 @@ info_posicion* info_posicion_from_string(char* posicion){
 }
 
 t_list* convertir_info_posiciones(char* posiciones_string){
-	char** posiciones = string_split(posiciones_string,"\n");
-	int i = 0;
-
 	t_list* posiciones_reales = list_create();
 
-	while(posiciones[i] != NULL){
-		info_posicion* posicion_real = info_posicion_from_string(posiciones[i]);
-		list_add(posiciones_reales,posicion_real);
-		i++;
+	if(string_length(posiciones_string) > 0){
+
+		char** posiciones = string_split(posiciones_string, "\n");
+		int i = 0;
+
+		while (posiciones[i] != NULL) {
+			info_posicion* posicion_real = info_posicion_from_string(posiciones[i]);
+			list_add(posiciones_reales, posicion_real);
+			i++;
+		}
 	}
+
 
 	return posiciones_reales;
 }

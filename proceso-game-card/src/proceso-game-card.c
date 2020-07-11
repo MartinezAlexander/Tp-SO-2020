@@ -18,7 +18,7 @@ int main(void) {
 
 	//test_agregar_cantidad_a_archivo();
 
-	//iniciar_conexion_broker();
+	iniciar_conexion_broker();
 
 	iniciar_puerto_de_escucha();
 

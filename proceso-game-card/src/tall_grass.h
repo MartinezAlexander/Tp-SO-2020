@@ -20,7 +20,6 @@
 #include <commons/config.h>
 #include <mensajes/posiciones.h>
 #include <dirent.h>
-
 #include "variables_globales.h"
 
 /*

@@ -296,8 +296,12 @@ char* obtener_path_bloque_de_lista(char** bloques, int indice_numero_bloque) {
 	char* nombre_bloque = NULL;
 	char* path_bloque = NULL;
 
-	if (indice_numero_bloque >= 0
-			&& indice_numero_bloque < array_cantidad_de_elementos(bloques)) {
+	if(path_blocks == NULL){
+		crear_directorio(punto_de_montaje_tallgrass,"Blocks");
+		path_blocks = path(punto_de_montaje_tallgrass, "Blocks");
+	}
+
+	if (indice_numero_bloque >= 0 && indice_numero_bloque < array_cantidad_de_elementos(bloques)) {
 		int num_bloque = atoi(bloques[indice_numero_bloque]);
 		nombre_bloque = crear_nombre_bloque_numero(num_bloque);
 		path_bloque = path(path_blocks, nombre_bloque);
@@ -329,8 +333,7 @@ int actualizar_bloques(char** bloques, t_list* posiciones) {
 
 	int indice_numero_bloque = 0;
 	int cantidad_escrita = 0;
-	char* path_bloque = obtener_path_bloque_de_lista(bloques,
-			indice_numero_bloque);
+	char* path_bloque = obtener_path_bloque_de_lista(bloques,indice_numero_bloque);
 
 	FILE* bloque = fopen(path_bloque, "a");
 
@@ -338,10 +341,10 @@ int actualizar_bloques(char** bloques, t_list* posiciones) {
 
 	for (int i = 0; i < string_length(posiciones_string); i++) {
 		if (cantidad_escrita == block_size) {
+			indice_numero_bloque++;
 			cantidad_escrita = 0;
 			fclose(bloque);
-			path_bloque = obtener_path_bloque_de_lista(bloques,
-					indice_numero_bloque + 1);
+			path_bloque = obtener_path_bloque_de_lista(bloques,indice_numero_bloque);
 			bloque = fopen(path_bloque, "a");
 			cantidad_bloques_usados++;
 		}
