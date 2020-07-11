@@ -68,6 +68,14 @@ char* info_pokemon_to_string(t_posicion posicion, int cantidad){
 	return string_from_format("%d-%d=%d",posicion.posicionX,posicion.posicionY,cantidad);
 }
 
+void freeargpointer(char** array)
+{
+    int i;
+    for ( i = 0; array[i]; i++ )
+        free( array[i] );
+    free( array );
+}
+
 info_posicion* info_posicion_from_string(char* posicion){
 	info_posicion* posicion_real = malloc(sizeof(info_posicion));
 	char** posicion_aux = string_split(posicion,"-");
@@ -75,8 +83,8 @@ info_posicion* info_posicion_from_string(char* posicion){
 	char** posicion_aux2 = string_split(posicion_aux[1],"=");
 	posicion_real->posicion.posicionY = atoi(posicion_aux2[0]);
 	posicion_real->cantidad = atoi(posicion_aux2[1]);
-	free(posicion_aux);
-	free(posicion_aux2);
+	freeargpointer(posicion_aux);
+	freeargpointer(posicion_aux2);
 	return posicion_real;
 }
 
