@@ -316,7 +316,11 @@ void vaciar_bloques(char** bloques) {
 	}
 }
 
-void actualizar_bloques(char** bloques, t_list* posiciones) {
+/*
+ * Actualiza los bloques con el  listado dado, y en caso de que ocupen menos lugar que antes
+ * libera los ultimos bloques y devuelve cuantos bloques libero
+ */
+int actualizar_bloques(char** bloques, t_list* posiciones) {
 	// [2,0]
 
 	vaciar_bloques(bloques);
@@ -347,8 +351,7 @@ void actualizar_bloques(char** bloques, t_list* posiciones) {
 
 	fclose(bloque);
 
-	int cant_liberados = array_cantidad_de_elementos(bloques)
-			- cantidad_bloques_usados;
+	int cant_liberados = array_cantidad_de_elementos(bloques) - cantidad_bloques_usados;
 
 	if (cant_liberados > 0) {
 		for (int i = 0; i < cant_liberados; i++) {
@@ -356,6 +359,8 @@ void actualizar_bloques(char** bloques, t_list* posiciones) {
 			liberar_bloque(bloque);
 		}
 	}
+
+	return cant_liberados;
 }
 
 /*

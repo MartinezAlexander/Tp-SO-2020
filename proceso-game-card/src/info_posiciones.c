@@ -8,6 +8,33 @@
 
 #include "info_posiciones.h"
 
+/*
+ * Dado un listado de info_posicion, devuelve el tamanio que ocuparia en disco
+ */
+int tamanio_info_posiciones(t_list* renglones){
+	char* renglones_string = lista_info_posicion_to_string(renglones);
+	int length = string_length(renglones_string);
+	free(renglones_string);
+	return length;
+}
+
+/*
+ * Dada una posicion, busca la posicion en la lista de info_posicion, y de encontrarla
+ * agrega la cantidad dada.
+ * En caso de que no exista la posicion, agrega un nuevo item a la lista
+ */
+void agregar_info_posicion_a_listado(t_list* renglones, t_posicion posicion, int cantidad){
+//TODO
+}
+
+/*
+ * Retorna 1 si decremento la posicion y 0 en caso de que no exista
+ */
+int decrementar_info_posicion_en_listado(t_list* renglones, t_posicion posicion){
+//TODO
+	return 0;
+}
+
 char* info_pokemon_to_string(t_posicion posicion, int cantidad){
 	return string_from_format("%d-%d=%d",posicion.posicionX,posicion.posicionY,cantidad);
 }

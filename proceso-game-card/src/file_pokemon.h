@@ -20,7 +20,7 @@ char* pokemon_file_create(char* especie);
 void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad);
 
 t_list* obtener_posiciones_pokemon(char* archivo);
-void decrementar_cantidad(char* archivo, t_posicion posicion);
+int decrementar_cantidad(char* archivo, t_posicion posicion);
 int existe_posicion(char* archivo, t_posicion posicion);
 
 void abrir_archivo(char* archivo);

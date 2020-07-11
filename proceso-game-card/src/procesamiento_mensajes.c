@@ -18,8 +18,7 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 
 	abrir_archivo(archivo_pokemon);
 
-	agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion,
-			new_pokemon->cantidad);
+	agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
 	printf("[New] Se agrego la posicion al pokemon dado\n");
 
 	sleep(tiempo_retardo_operacion); //Espero x segundos para simular el acceso al disco
@@ -53,20 +52,15 @@ void ejecutar_catch(t_mensaje* mensaje_recibido) {
 			obtener_directorio_files())) {
 		caught_respuesta = caught_pokemon_create(0);
 	} else {
-		char* archivo_pokemon = obtener_pokemon(
-				catch_pokemon->pokemon->especie);
+		char* archivo_pokemon = obtener_pokemon(catch_pokemon->pokemon->especie);
 		//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
 		abrir_archivo(archivo_pokemon);
 
 		//3. Verificar si las posiciones ya existen dentro del archivo (Si no->se informa error)
-		int existe = existe_posicion(archivo_pokemon,
-				catch_pokemon->pokemon->posicion);
+		int existe = decrementar_cantidad(archivo_pokemon, catch_pokemon->pokemon->posicion);
 		if (existe) {
 			//4. SI la cantidad = 1, se elimina la linea. Sino se decrementa la cantidad en 1
-			decrementar_cantidad(archivo_pokemon,
-					catch_pokemon->pokemon->posicion);
-			printf(
-					"[Catch] Se decremento una cantidad para la posicion del pokemon\n");
+			printf("[Catch] Se decremento una cantidad para la posicion del pokemon\n");
 		}
 
 		//5. Esperar la cantidad de segundos definidos por archivo de configuracion

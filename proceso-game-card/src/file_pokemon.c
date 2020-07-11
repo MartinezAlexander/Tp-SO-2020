@@ -36,91 +36,80 @@ void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad) {
 	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
 	//2 bytes in 1 blocks are definitely lost
 
-	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, cantidad);
+	t_list* renglones = obtener_posiciones_de_bloques(bloques_array);
+	agregar_info_posicion_a_listado(renglones, posicion, cantidad);
+	int tamanio = tamanio_info_posiciones(renglones);
 
-	if (bloque > -1) {
-		//Algun bloque ya tiene la posicion y tiene lugar para sumarle la cantidad
-		agregar_pokemon_a_bloque(bloque, posicion, cantidad);
-	} else {
-		//No hay bloques que tengan la posicion con lugar para sumarle
-		bloque = obtener_primer_bloque_con_espacio(bloques_array, posicion,
-				cantidad);
+	int cantidad_bloques_actuales = array_cantidad_de_elementos(bloques_array);
+	int capacidad_bloques_actuales = block_size * cantidad_bloques_actuales;
+	free(bloques_array);
 
-		if (bloque < 0) {
-			bloque = obtener_bloque_disponible();
+	if(tamanio > capacidad_bloques_actuales){
+		int nuevo_bloque = obtener_bloque_disponible();
+		crear_block(nuevo_bloque);
 
-			//TODO: (luego de responder duda) catchear caso extremo de que devuelva -1
-			// (no hay bloques libres)
-
-			crear_block(bloque);
-
-			//Actualizo los bloques en el metadata
-			char* bloques_string = config_get_string_value(config_metadata,
-					"BLOCKS");
-			bloques_string = string_substring(bloques_string, 0,
-					string_length(bloques_string) - 1);
-			char* bloques_actualizados = string_from_format("%s,%d]",
-					bloques_string, bloque);
-
-			config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
-			free(bloques_actualizados);
-			free(bloques_string);
-		}
-
-		agregar_nuevo_pokemon_a_bloque(bloque, posicion, cantidad);
+		char* bloques_string = config_get_string_value(config_metadata,"BLOCKS");
+		bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - 1);
+		char* bloques_actualizados = string_from_format("%s,%d]", bloques_string, nuevo_bloque);
+		config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
+		config_save(config_metadata);
 	}
 
-	char* size = string_itoa(obtener_tamanio_listado_de_bloques(bloques_array));
+	bloques_array = config_get_array_value(config_metadata, "BLOCKS");
+
+	actualizar_bloques(bloques_array, renglones);
+	free(bloques_array);
+	list_destroy(renglones);
+
+	char* size = string_itoa(tamanio);
 	config_set_value(config_metadata, "SIZE", size);
 	free(size);
-
-	config_save(config_metadata);
 	config_destroy(config_metadata);
-
-	free(bloques_array);
 }
 
 /*
  * Decrementa la cantidad de pokemones en la posicion dada para tal archivo pokemon.
  * En caso de que no queden mas luego de decrementar, elimina la posicion del archivo.
  */
-void decrementar_cantidad(char* archivo, t_posicion posicion) {
+int decrementar_cantidad(char* archivo, t_posicion posicion) {
 	t_config* config_metadata = config_create(archivo);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
 	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
-
 	//2 bytes in 1 blocks are definitely lost
 
-	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, 0);
+	t_list* renglones = obtener_posiciones_de_bloques(bloques_array);
+	int existe_posicion = decrementar_info_posicion_en_listado(renglones, posicion);
 
-	int elimino_fila = eliminar_pokemon_de_bloque(bloque, posicion);
-	if (elimino_fila) {
-		int tamanio_bloque = obtener_tamanio_ocupado_por_bloque(bloque);
-
-		if (tamanio_bloque == 0) {
-			liberar_bloque(bloque);
-			char* bloques_actualizados = obtener_string_bloques_sin(
-					bloques_array, bloque);
-			config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
-			free(bloques_actualizados);
-		}
-		//TODO: (luego de responder duda) Si el bloque queda vacio se elimina??
-		//En ese caso habria que chequear si pasa esto
-		//Eliminarlo de bitmap y eliminar archivo
-		//Sacarlo del array de bloques dentro del metadata
-
-		//En caso de que no se borre, habria que actualizar el bitmap
+	if(!existe_posicion){
+		free(bloques_array);
+		list_destroy(renglones);
+		config_destroy(config_metadata);
+		return 0;
 	}
 
-	char* size = string_itoa(obtener_tamanio_listado_de_bloques(bloques_array));
+	int tamanio = tamanio_info_posiciones(renglones);
+
+	int bloques_liberados = actualizar_bloques(bloques_array, renglones);
+	list_destroy(renglones);
+	free(bloques_array);
+
+	char* bloques_string = config_get_string_value(config_metadata,"BLOCKS");
+	bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - 1);
+	bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - bloques_liberados * 2);
+	bloques_string = string_from_format("%s]", bloques_string);
+	config_set_value(config_metadata,"BLOCKS", bloques_string);
+	free(bloques_string);
+
+	char* size = string_itoa(tamanio);
 	config_set_value(config_metadata, "SIZE", size);
 	free(size);
 
 	config_save(config_metadata);
 	config_destroy(config_metadata);
-	free(bloques_array);
+
+	return 1;
 }
 
 /*
@@ -135,22 +124,18 @@ t_list* obtener_posiciones_pokemon(char* archivo) {
 		printf("Error al crear config de metadata\n");
 
 	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
-
-	//2 bytes in 1 blocks are definitely lost
-
-	int index = 0;
-	while (bloques_array[index] != NULL) {
-		int bloque = atoi(bloques_array[index]);
-
-		t_list* posiciones_bloque = obtener_posiciones_de_bloque(bloque);
-		list_add_all(posiciones, posiciones_bloque);
-		list_destroy(posiciones_bloque);
-
-		index++;
-	}
-
-	free(bloques_array);
 	config_destroy(config_metadata);
+	//2 bytes in 1 blocks are definitely lost
+	t_list* renglones = obtener_posiciones_de_bloques(bloques_array);
+	free(bloques_array);
+
+	for(int i = 0 ; i < list_size(renglones) ; i++){
+		info_posicion* renglon = list_get(renglones, i);
+		t_posicion* posicion = malloc(sizeof(t_posicion));
+		posicion->posicionX = renglon->posicion.posicionX;
+		posicion->posicionY = renglon->posicion.posicionY;
+		list_add(posiciones, posicion);
+	}
 
 	return posiciones;
 }
@@ -162,12 +147,11 @@ int existe_posicion(char* archivo, t_posicion posicion) {
 		printf("Error al crear config de metadata\n");
 
 	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
-
-//2 bytes in 1 blocks are definitely lost
-
 	config_destroy(config_metadata);
 
 	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, 0);
+
+
 
 	free(bloques_array);
 
