@@ -24,5 +24,6 @@
 void iniciar_puerto_de_escucha();
 void procesar_mensajes_directos(int* socket);
 
+void correr_servidor_gameboy();
 
 #endif /* CONEXION_GAMEBOY_H_ */

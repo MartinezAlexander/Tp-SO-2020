@@ -2,6 +2,8 @@
 
 void iniciar_hilos_planificacion(){
 	pthread_create(&(planificador->hilo_planificacion), NULL, (void*)ejecutar_hilo_planificador, NULL);
+	pthread_detach(planificador->hilo_planificacion);
+
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores, i);
 		sem_init(&(entrenador->semaforo), 0, 0);
@@ -14,7 +16,6 @@ void esperar_hilos_planificacion(){
 		t_entrenador* entrenador = list_get(entrenadores, i);
 		pthread_join(entrenador->hilo, NULL);
 	}
-	pthread_join(planificador->hilo_planificacion, NULL);
 }
 
 

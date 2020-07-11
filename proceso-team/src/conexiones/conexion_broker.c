@@ -14,10 +14,13 @@ void iniciar_conexion_broker(){
 	//Realizamos la suscripcion, y posteriormente, el recibimiento y procesamiento de
 	//mensajes para cada cola en hilos distintos
 	pthread_create(&hilo_appeared, NULL, (void*) iniciar_suscripcion_broker,(void*)APPEARED_POKEMON);
+	pthread_detach(hilo_appeared);
 	sleep(1);
 	pthread_create(&hilo_caught, NULL, (void*) iniciar_suscripcion_broker,(void*)CAUGHT_POKEMON);
+	pthread_detach(hilo_caught);
 	sleep(1);
 	pthread_create(&hilo_localized, NULL, (void*) iniciar_suscripcion_broker,(void*)LOCALIZED_POKEMON);
+	pthread_detach(hilo_localized);
 	sleep(1);
 
 	//Iniciamos un hilo de reconexion, este comenzara bloqueado por lo que
@@ -25,6 +28,7 @@ void iniciar_conexion_broker(){
 	//y tengamos que reconectarnos
 	sem_init(&semaforo_reconexion, 0, 0);
 	pthread_create(&hilo_reconexion, NULL, (void*) reconectar_al_broker, NULL);
+	pthread_detach(hilo_reconexion);
 }
 
 //TODO: Problema en el envio de GET mientras me suscribo
@@ -50,7 +54,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 	for(int i = 0 ; i < list_size(objetivo_global) ; i++){
 		char* pokemon = list_get(objetivo_global, i);
 
-		if(strcmp(pokemon, ultima_especie_enviada) != 0){
+		if(!string_equals_ignore_case(pokemon, ultima_especie_enviada)){
 			t_get_pokemon* mensaje_get = get_pokemon_create(pokemon);
 			t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON);
 

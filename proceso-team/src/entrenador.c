@@ -200,7 +200,7 @@ int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie){
 
 void agregar_a_objetivos_globales(char* especie){
 	list_add(objetivo_global, especie);
-	list_sort(objetivo_global, strcmp);
+	list_sort(objetivo_global, strcasecmp);
 }
 
 void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
@@ -243,7 +243,7 @@ void asignar_pokemones(t_entrenador* entrenador, char* pokemones){
 	free(pokemones_adquiridos_array);
 }
 
-t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial ){
+t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquiridos, int identificador, double estimacion_inicial ){
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	//TODO [ML] Nos tira leak pero tres lineas abajo no y hacemos lo mismo..?
@@ -254,6 +254,13 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 	char** objetivos_array = string_split(objetivos, "|");
 	entrenador->objetivos = array_to_list(objetivos_array);
 	free(objetivos_array);
+
+	//Asigno si veo que tiene pokemones de entrada
+	if(adquiridos != NULL){
+		asignar_pokemones(entrenador, adquiridos);
+	}else{
+		entrenador->pokemones_adquiridos = list_create();
+	}
 
 	entrenador->estado = NEW;
 	entrenador->identificador = identificador;
@@ -294,7 +301,7 @@ t_list* separar(char* listado){
 
 	char* token;
 	while((token = strsep(&listado_sin_brackets, ",")) != NULL){
-		if(!strcmp(token, "")){
+		if(!strcasecmp(token, "")){
 			list_add(listado_separado, NULL);
 		}else{
 			list_add(listado_separado, token);
@@ -325,16 +332,10 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	iniciarlizar_diccionario_catch();
 
 	for(int i = 0 ; i < numero_posiciones ; i++){
-		t_entrenador* entrenador = entrenador_create(posiciones_entrenadores[i],
-				objetivos_entrenadores[i], (i+1), estimacion_inicial);
-
 		char* pokemones = list_get(pokemones_entrenadores, i);
-		//Asigno si veo que tiene pokemones de entrada
-		if(pokemones != NULL){
-			asignar_pokemones(entrenador, pokemones);
-		}else{
-			entrenador->pokemones_adquiridos = list_create();
-		}
+
+		t_entrenador* entrenador = entrenador_create(posiciones_entrenadores[i],
+				objetivos_entrenadores[i], pokemones, (i+1), estimacion_inicial);
 
 		list_add(entrenadores, entrenador);
 	}
@@ -396,7 +397,7 @@ int cumplio_objetivo_entrenador(t_entrenador* entrenador){
 		char* pk1 = list_get(entrenador->pokemones_adquiridos, i);
 		char* pk2 = list_get(entrenador->objetivos, i);
 
-		if(string_equals_ignore_case(pk1,pk2) != 1) return 0;
+		if(!string_equals_ignore_case(pk1,pk2)) return 0;
 	}
 
 	return 1;

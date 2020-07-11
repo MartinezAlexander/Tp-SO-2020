@@ -13,7 +13,6 @@
 
 
 int main(void) {
-	// caso habria que chequear en todos cuando leemos y actualizar el estado
 	inicializar_variables();
 	//TODO [ML] probar mem leak de leer entrenadores si destruimos el config aca, total no lo usamos mas
 
@@ -24,7 +23,7 @@ int main(void) {
 	//Envio mensaje GET al broker segun objetivos globales
 	enviar_get_objetivo(objetivo_global);
 	//Abro socket de escucha para el Gameboy
-	//iniciar_puerto_de_escucha();
+	iniciar_puerto_de_escucha();
 
 	/*
 	 * Tengo que esperar a que me llegue señal de que mis entrenadores estan
