@@ -53,7 +53,7 @@ void inicializar_filesystem() {
 	bitmap_cargar();
 
 	pthread_mutex_init(&mutex_modificacion_de_archivo, NULL);
-
+	pthread_mutex_init(&mutex_listar_directorios, NULL);
 	pthread_mutex_init(&mutex_obtener_pokemon,NULL);
 
 	/*
@@ -64,7 +64,7 @@ void inicializar_filesystem() {
 
 t_config* leer_config(void) {
 	t_config *config;
-	if ((config = config_create("../src/gamecard.config")) == NULL) {
+	if ((config = config_create("src/gamecard.config")) == NULL) {
 		printf("No pude leer la config\n");
 		exit(2);
 	}

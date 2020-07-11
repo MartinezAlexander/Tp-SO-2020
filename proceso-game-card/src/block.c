@@ -243,10 +243,11 @@ char* leer_bloque(int bloque) {
 
 	char caracter = fgetc(fd);
 
-	char* posiciones = "";
+	char* posiciones = string_new();
 
 	while (caracter != EOF) {
-		posiciones = string_from_format("%s%c", posiciones, caracter);
+		char* c = &caracter;
+		string_append(&posiciones,c);
 		caracter = fgetc(fd);
 	}
 
@@ -264,6 +265,7 @@ t_list* obtener_posiciones_de_bloques(char** bloques) {
 		int bloque = atoi(bloques[i]);
 		char* posiciones_por_bloque = leer_bloque(bloque);
 		string_append(&posiciones, posiciones_por_bloque);
+		free(posiciones_por_bloque);
 		i++;
 	}
 

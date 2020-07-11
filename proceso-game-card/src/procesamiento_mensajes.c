@@ -2,8 +2,8 @@
 
 void procesar_mensaje(t_mensaje* mensaje_recibido, void* funcion_ejecutar) {
 	pthread_t hilo_procesamiento;
-	pthread_create(&hilo_procesamiento, NULL, (void*) funcion_ejecutar,
-			(void*) mensaje_recibido);
+	//TODO ver si funciona puntero al hilo data race condition
+	pthread_create(&hilo_procesamiento, NULL, (void*) funcion_ejecutar, (void*) mensaje_recibido);
 	pthread_detach(hilo_procesamiento);
 
 	printf("[Procesamiento] Creado nuevo hilo para atender mensaje\n");
@@ -14,7 +14,6 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	int id = mensaje_recibido->id;
 
 	//Obtengo el archivo del pokemon que necesito. Si no existe se crea.
-
 	pthread_mutex_lock(&mutex_obtener_pokemon);
 	char* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
 	pthread_mutex_unlock(&mutex_obtener_pokemon);
@@ -34,9 +33,8 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 			new_pokemon->pokemon->posicion.posicionX,
 			new_pokemon->pokemon->posicion.posicionY);
 
-	t_mensaje* mensaje = mensaje_con_id_correlativo_create(appeared,
-			APPEARED_POKEMON, id);
-	enviar_mensaje_al_broker(mensaje);
+	t_mensaje* mensaje = mensaje_con_id_correlativo_create(appeared, APPEARED_POKEMON, id);
+	//enviar_mensaje_al_broker(mensaje);
 	mensaje_destroy(mensaje);
 	mensaje_destroy(mensaje_recibido);
 
@@ -77,9 +75,10 @@ void ejecutar_catch(t_mensaje* mensaje_recibido) {
 	}
 
 	//7. Conectarse y enviar al broker el resultado (ID recibido, resultado)
+
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create(caught_respuesta,
 			CAUGHT_POKEMON, id);
-	enviar_mensaje_al_broker(mensaje);
+	//enviar_mensaje_al_broker(mensaje);
 	mensaje_destroy(mensaje);
 	mensaje_destroy(mensaje_recibido);
 
@@ -121,15 +120,14 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 	cerrar_archivo(archivo_pokemon);
 	free(archivo_pokemon);
 	//6. Si se encontro al menos 1 posicion, conectarse y enviar al broker
-	t_mensaje* mensaje = mensaje_con_id_correlativo_create(
-			(void*) localized_respuesta, LOCALIZED_POKEMON, id);
+
+	t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*) localized_respuesta, LOCALIZED_POKEMON, id);
 	//67 (16 direct, 51 indirect) bytes in 1 blocks are definitely lost
-	enviar_mensaje_al_broker(mensaje);
+	//enviar_mensaje_al_broker(mensaje);
 	//Liberar cada string de la lista de posiciones???
 
 	mensaje_destroy(mensaje);
 	mensaje_destroy(mensaje_recibido);
-	;
 
 	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
 }

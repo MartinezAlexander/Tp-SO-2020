@@ -20,7 +20,10 @@
 #include <commons/config.h>
 #include <mensajes/posiciones.h>
 #include <dirent.h>
+#include <pthread.h>
 #include "variables_globales.h"
+
+pthread_mutex_t mutex_listar_directorios;
 
 /*
 Crea un archivo con el nombre (char* archivo) en el directorio indicado por (char* directorio)

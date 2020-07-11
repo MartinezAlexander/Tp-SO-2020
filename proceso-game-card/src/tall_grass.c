@@ -69,7 +69,10 @@ t_list* listar_directorio(char* path) {
 
 int existe_archivo_en(char* nombre_archivo, char* path) {
 	int existe = 0;
+	pthread_mutex_lock(&mutex_listar_directorios);
 	t_list* lista_directorios = listar_directorio(path);
+	pthread_mutex_unlock(&mutex_listar_directorios);
+
 	for (int i = 0; i < list_size(lista_directorios); i++) {
 		char* nombre = list_get(lista_directorios, i);
 		if (string_equals_ignore_case(nombre_archivo, nombre)) {

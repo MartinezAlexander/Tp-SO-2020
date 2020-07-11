@@ -75,6 +75,8 @@ info_posicion* info_posicion_from_string(char* posicion){
 	char** posicion_aux2 = string_split(posicion_aux[1],"=");
 	posicion_real->posicion.posicionY = atoi(posicion_aux2[0]);
 	posicion_real->cantidad = atoi(posicion_aux2[1]);
+	free(posicion_aux);
+	free(posicion_aux2);
 	return posicion_real;
 }
 
@@ -91,6 +93,9 @@ t_list* convertir_info_posiciones(char* posiciones_string){
 			list_add(posiciones_reales, posicion_real);
 			i++;
 		}
+		//TODO liberar array de posiciones
+		free(posiciones);
+
 	}
 
 
