@@ -54,6 +54,8 @@ void inicializar_filesystem() {
 
 	pthread_mutex_init(&mutex_modificacion_de_archivo, NULL);
 
+	pthread_mutex_init(&mutex_obtener_pokemon,NULL);
+
 	/*
 	 * Decidimos levantar solamente el metadata y el bitmap. Los bloques y archivos
 	 * pokemon los traemos cuando los necesitamos

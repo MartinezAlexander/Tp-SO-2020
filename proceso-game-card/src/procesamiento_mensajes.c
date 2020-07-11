@@ -14,7 +14,10 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	int id = mensaje_recibido->id;
 
 	//Obtengo el archivo del pokemon que necesito. Si no existe se crea.
+
+	pthread_mutex_lock(&mutex_obtener_pokemon);
 	char* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
+	pthread_mutex_unlock(&mutex_obtener_pokemon);
 
 	abrir_archivo(archivo_pokemon);
 

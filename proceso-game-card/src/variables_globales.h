@@ -25,4 +25,5 @@ int card_id;
 
 int blocks;
 int block_size;
+
 #endif

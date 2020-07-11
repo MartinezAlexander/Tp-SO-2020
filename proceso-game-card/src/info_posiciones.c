@@ -46,7 +46,21 @@ void agregar_info_posicion_a_listado(t_list* renglones, t_posicion posicion, int
  * Retorna 1 si decremento la posicion y 0 en caso de que no exista
  */
 int decrementar_info_posicion_en_listado(t_list* renglones, t_posicion posicion){
-//TODO
+
+	for(int i=0; i<list_size(renglones); i++){
+		info_posicion* posicion_info = list_get(renglones,i);
+		if(posicion_info->posicion.posicionX == posicion.posicionX && posicion_info->posicion.posicionY == posicion.posicionY){
+
+			posicion_info->cantidad--;
+
+			if(posicion_info->cantidad == 0){
+				list_remove(renglones,i);
+			}
+
+			return 1;
+		}
+	}
+
 	return 0;
 }
 

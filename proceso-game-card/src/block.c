@@ -352,9 +352,15 @@ int actualizar_bloques(char** bloques, t_list* posiciones) {
 		cantidad_escrita++;
 	}
 
+	if(string_length(posiciones_string) == 0){
+		cantidad_bloques_usados = 0;
+	}
+
 	fclose(bloque);
 
 	int cant_liberados = array_cantidad_de_elementos(bloques) - cantidad_bloques_usados;
+
+	printf("canti liberados %d\n",cant_liberados);
 
 	if (cant_liberados > 0) {
 		for (int i = 0; i < cant_liberados; i++) {

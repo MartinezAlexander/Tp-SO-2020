@@ -24,6 +24,8 @@
 #include "tall_grass.h"
 #include "variables_globales.h"
 
+pthread_mutex_t mutex_obtener_pokemon;
+
 /*
  * Dado un mensaje, crea un hilo que ejecuta a la funcion pasada por parametro
  * para atenderlo. (ejecutar_new, ejecutar_catch, o ejecutar_get)

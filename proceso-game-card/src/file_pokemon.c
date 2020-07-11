@@ -61,9 +61,7 @@ void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad) {
 	free(bloques_array);
 	list_destroy(renglones);
 
-	printf("Size: %d\n",tamanio);
 	char* size = string_itoa(tamanio);
-	puts(size);
 	config_set_value(config_metadata, "SIZE", size);
 	config_save(config_metadata);
 	free(size);
@@ -81,6 +79,8 @@ int decrementar_cantidad(char* archivo, t_posicion posicion) {
 
 	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
 	//2 bytes in 1 blocks are definitely lost
+
+
 
 	t_list* renglones = obtener_posiciones_de_bloques(bloques_array);
 	int existe_posicion = decrementar_info_posicion_en_listado(renglones, posicion);
@@ -102,6 +102,11 @@ int decrementar_cantidad(char* archivo, t_posicion posicion) {
 	bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - 1);
 	bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - bloques_liberados * 2);
 	bloques_string = string_from_format("%s]", bloques_string);
+
+	if(!string_starts_with(bloques_string,"[")){
+		bloques_string = string_from_format("[%s", bloques_string);
+	}
+
 	config_set_value(config_metadata,"BLOCKS", bloques_string);
 	free(bloques_string);
 
