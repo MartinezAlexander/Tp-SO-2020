@@ -1,7 +1,7 @@
 #include "log_utils.h"
 
 
-//TODO log: 1. Cambio de un entrenador de cola de planificacion (indicando razon porque)
+//TODO [Log]: 1. Cambio de un entrenador de cola de planificacion (indicando razon porque)
 	//Preguntar a que se refiere con cambio
 	//Cuando encolo, cuando pongo alguien en ejecucion, cuando saco a alguien???
 void loggear_planificacion(){
@@ -17,25 +17,49 @@ void loggear_operacion_atrapar(t_pokemon* pokemon){
 	log_info(logger, "[Ejecucion] Inicio operacion CATCH de un: %s, ubicado en: [%d,%d]",
 			pokemon->especie, pokemon->posicion.posicionX, pokemon->posicion.posicionY);
 }
-//TODO log: 4. Operacion de intercambio (indicando entrenadores involucrados)
-void loggear_operacion_intercambio(){
-
+//4. Operacion de intercambio (indicando entrenadores involucrados)
+void loggear_operacion_intercambio(int entrenador, int otro_entrenador, char* especie, char* otra_especie){
+	log_info(logger, "[Deadlock] Se realizo intercambio de pokemones entre entrenadores %d y %d: %s por %s\n", entrenador, otro_entrenador, especie, otra_especie);
 }
-//TODO log: 5. Inicio de algoritmo de deteccion de deadlock
+//5. Inicio de algoritmo de deteccion de deadlock
 void loggear_inicio_deteccion_deadlock(){
-
+	log_info(logger, "[Deadlock] Comienza la deteccion de deadlock\n");
 }
-//TODO log: 6. Resultado de algoritmo de deteccion de deadlock
-void loggear_resultado_deteccion_deadlock(){
-
+//6. Resultado de algoritmo de deteccion de deadlock
+void loggear_resultado_deteccion_deadlock(int intercambios_detectados){
+	log_info(logger, "[Deadlock] Se detectaron %d intercambios para resolver\n", intercambios_detectados);
 }
 //7. Llegada de un mensaje (indicando el tipo del mismo y sus datos)
 void loggear_nuevo_mensaje(t_mensaje* mensaje){
 	log_info(logger, mensaje_to_string(mensaje));
 }
 
-//TODO log: 8. Resultado del Team (especificado anteriormente)
+//8. Resultado del Team (especificado anteriormente)
 void loggear_resultado_team(){
+	int ciclos_cpu_totales = 0;
+
+	for(int i = 0 ; i < dictionary_size(diccionario_ciclos_entrenador) ; i++){
+
+		char* key_entrenador = string_itoa(i+1);
+		int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, key_entrenador);
+		free(key_entrenador);
+		ciclos_cpu_totales += ciclos;
+	}
+
+	log_info(logger, "[Team] Resultado proceso team:\n");
+	log_info(logger, "[Team] Ciclos de cpu totales: %d\n", ciclos_cpu_totales);
+	log_info(logger, "[Team] Cambios de contexto realizados: %d\n", cambios_de_contexto);
+	log_info(logger, "[Team] Ciclos de cpu por entrenador: \n");
+
+	for(int i = 0 ; i < dictionary_size(diccionario_ciclos_entrenador) ; i++){
+		char* key_entrenador = string_itoa(i+1);
+		int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, key_entrenador);
+		free(key_entrenador);
+
+		log_info(logger, "[Team] Entrenador %d => %d ciclos de cpu\n", i+1, ciclos);
+	}
+
+	log_info(logger, "[Team] Deadlocks producidos y resueltos: %d\n", intercambios_detectados);
 
 }
 

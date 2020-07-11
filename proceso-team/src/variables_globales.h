@@ -58,6 +58,6 @@ pthread_mutex_t mutex_procesamiento_pokemon;
 t_dictionary* diccionario_ciclos_entrenador;
 int cambios_de_contexto;
 
-int finalizo_team;
+int intercambios_detectados;
 
 #endif /* VARIABLES_GLOBALES_H_ */

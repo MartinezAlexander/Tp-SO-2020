@@ -45,7 +45,6 @@ sem_t semaforo_procesamiento_caught;
 sem_t semaforo_procesamiento_localized;
 
 void iniciar_conexion_broker();
-void cerrar_conexion_broker();
 void iniciar_suscripcion_broker(op_code cola);
 
 void reconectar_al_broker();

@@ -130,7 +130,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 //ya que el hilo este podra decidir quien planificar y no perdemos tiempo
 //innecesariamente.
 void ejecutar_hilo_planificador(){
-	while(!finalizo_team){
+	while(1){
 		sem_wait(&(semaforo_planificacion));
 
 		planificar();
@@ -189,6 +189,10 @@ void ejecutar_hilo(t_entrenador* entrenador){
 	//en este nuevo loop hsata que lo resuelva
 	while(entrenador->estado != EXIT){
 		sem_wait(&(entrenador->semaforo));
+
+		if(entrenador->estado == EXIT){
+			break;
+		}
 
 		ejecutar_entrenador_intercambio_deadlock(entrenador);
 

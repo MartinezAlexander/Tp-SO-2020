@@ -1,6 +1,7 @@
 #include "deadlock.h"
 
 void resolver_deadlock(){
+	loggear_inicio_deteccion_deadlock();
 
 	//Pasar entrenadores a ent_intercambio
 	t_list* entrenadores_copia = list_create();
@@ -24,7 +25,8 @@ void resolver_deadlock(){
 		queue_push(cola_intercambios_deadlock, intercambio);
 	}
 
-	printf("[Deadlock] Se detectaron %d intercambios para resolver\n", queue_size(cola_intercambios_deadlock));
+	intercambios_detectados = queue_size(cola_intercambios_deadlock);
+	loggear_resultado_deteccion_deadlock(intercambios_detectados);
 
 	encolar_proximo_intercambio(1);
 }

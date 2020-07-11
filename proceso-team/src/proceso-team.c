@@ -13,10 +13,9 @@
 
 
 int main(void) {
-	//TODO: [DL] podriamos chequear si nos dan un entrenador de entrada con DEADLOCK, en ese
 	// caso habria que chequear en todos cuando leemos y actualizar el estado
 	inicializar_variables();
-	//TODO probar mem leak de leer entrenadores si destruimos el config aca, total no lo usamos mas
+	//TODO [ML] probar mem leak de leer entrenadores si destruimos el config aca, total no lo usamos mas
 
 	iniciar_hilos_planificacion();
 
@@ -43,33 +42,15 @@ int main(void) {
 	esperar_hilos_planificacion();
 	printf("[Team] Todos sus entrenadores han cumplido su objetivo\n");
 
-	//ESTO NO VA!
-	//Una vez que llego a esta zona se que ya todos los entrenadores
-	//estan en estado exit, por lo que puedo liberar las conexiones
-	//con el broker y joinear los hilos que llevaban a cabo
-	//la escucha y el procesamiento de mensajes
-	//cerrar_conexion_broker();
-
-	int ciclos_cpu_totales = 0;
-	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-		t_entrenador* entrenador = list_get(entrenadores, i);
-		int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, string_itoa(entrenador->identificador));
-		ciclos_cpu_totales += ciclos;
-	}
-
-	printf("[Team] Resultados proceso team:\n");
-	//Loggear estadisticas
+	loggear_resultado_team();
 
 	//quedaria liberar variables globales
 	terminar_programa(logger, config);
 }
 
-//TODO (estadisticas) Deadlocks producidos y resueltos
-
 void inicializar_variables(){
 	config = leer_config();
 
-	finalizo_team = 0;
 	cambios_de_contexto = 0;
 
 	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
@@ -126,7 +107,7 @@ t_log* iniciar_logger(char* path)
 t_config* leer_config(void)
 {
 	t_config *config;
-	if((config = config_create("src/team.config")) == NULL)//Nota: para correr desde Debug
+	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
 	{														//hay que agregar ../ al path
 		printf("No pude leer la config\n");
 		exit(2);

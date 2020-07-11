@@ -90,7 +90,7 @@ void bloquear_entrenador(t_entrenador* entrenador);
 void agregar_a_objetivos_globales(char* especie);
 void sacar_de_objetivos_globales(char* especie, t_list* objetivos);
 
-void actualizar_estadistica_entrenador(int id_entrenador);
+void actualizar_estadistica_entrenador(int id_entrenador, int ciclos_a_agregar);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);
 int entrenador_en_deadlock(t_entrenador *entrenador);

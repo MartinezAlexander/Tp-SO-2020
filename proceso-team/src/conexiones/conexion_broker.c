@@ -27,14 +27,6 @@ void iniciar_conexion_broker(){
 	pthread_create(&hilo_reconexion, NULL, (void*) reconectar_al_broker, NULL);
 }
 
-void cerrar_conexion_broker(){
-	finalizo_team = 1;
-	//TODO: Duda -> Hay que joinear aca? Creo que no. Es mas seguramente esta funcion vuela
-	pthread_join(hilo_appeared, NULL);
-	pthread_join(hilo_caught, NULL);
-	pthread_join(hilo_localized, NULL);
-}
-
 //TODO: Problema en el envio de GET mientras me suscribo
 /*
  * Luego de testear lo del envio de GET que descubri:
@@ -139,11 +131,18 @@ void suscribirse_a_cola(int* socket, op_code cola){
 	printf("Suscripcion a la cola %d del broker exitosa\n", cola);
 }
 
-//TODO: Ver tambien -> Es necesario lo de finalizo team y liberar conexion?? Probablemente no.
-// Ya dijimos hace un tiempo que en realidad nunca voy a terminar estos hilos
-// ya que se quedan bloqueados con el recv
+/*
+ * En un principio teniamos pensado que el while de estos hilos sea en base a una variable
+ * que indique si termino el team o no.
+ * Luego nos dimos cuenta de que era redundante, debido a que por como funciona el recv,
+ * el hilo quedara bloqueado en esa funcion hasta que le llegue un mensaje.
+ * Lo que pasaria entonces es que como la mayor parte del tiempo el hilo va a estar bloqueado asi,
+ * no servia ni lo de tener el while(!finalizo_team) asi como el liberar_conexion() al final.
+ *
+ * Nuestros hilos finalizaran cuando termine el hilo principal entonces.
+ */
 void recibir_appeared(){
-	while(!finalizo_team){
+	while(1){
 
 		t_mensaje* mensaje = recibir_mensaje(socket_appeared);
 		//Cuando detectamos que el mensaje es NULL (significa que se cayo el socket),
@@ -159,11 +158,11 @@ void recibir_appeared(){
 			procesar_appeared((t_appeared_pokemon*) mensaje->mensaje);
 		}
 	}
-	liberar_conexion(socket_appeared);
+	//liberar_conexion(socket_appeared);
 }
 
 void recibir_caught(){
-	while(!finalizo_team){
+	while(1){
 		t_mensaje* mensaje = recibir_mensaje(socket_caught);
 		if(mensaje == NULL){
 			iniciar_reconexion();
@@ -174,11 +173,11 @@ void recibir_caught(){
 			procesar_caught((t_caught_pokemon*) mensaje->mensaje, mensaje->id_correlativo);
 		}
 	}
-	liberar_conexion(socket_caught);
+	//liberar_conexion(socket_caught);
 }
 
 void recibir_localized(){
-	while(!finalizo_team){
+	while(1){
 		t_mensaje* mensaje = recibir_mensaje(socket_localized);
 		if(mensaje == NULL){
 			iniciar_reconexion();
@@ -189,7 +188,7 @@ void recibir_localized(){
 			procesar_localized((t_localized_pokemon*) mensaje->mensaje);
 		}
 	}
-	liberar_conexion(socket_localized);
+	//liberar_conexion(socket_localized);
 }
 
 
@@ -209,7 +208,7 @@ void iniciar_reconexion(){
 
 
 void reconectar_al_broker(){
-	while(!finalizo_team){
+	while(1){
 		sem_wait(&semaforo_reconexion);
 
 		loggear_inicio_reintento_broker();
