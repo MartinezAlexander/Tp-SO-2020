@@ -22,6 +22,7 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	char* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
 	pthread_mutex_unlock(&mutex_obtener_pokemon);
 
+	pthread_mutex_lock(&mutex_modificacion_de_archivo);
 	abrir_archivo(archivo_pokemon,numero_hilo);
 
 	agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
@@ -30,6 +31,8 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	sleep(tiempo_retardo_operacion); //Espero x segundos para simular el acceso al disco
 
 	cerrar_archivo(archivo_pokemon);
+	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+
 	free(archivo_pokemon);
 
 	t_appeared_pokemon* appeared = appeared_pokemon_create(

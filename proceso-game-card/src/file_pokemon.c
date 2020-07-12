@@ -185,14 +185,14 @@ void abrir_archivo(char* archivo, int hilo){
 
 //Uso config para leer el archivo metadata
 
-	pthread_mutex_lock(&mutex_modificacion_de_archivo);
+	//pthread_mutex_lock(&mutex_modificacion_de_archivo);
 	t_config* config_metadata = config_create(archivo);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
 	char* valor_open = config_get_string_value(config_metadata, "OPEN");
 	printf("Soy el hilo %d y leo el open\n",hilo);
-	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+	//pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
 //En caso que ya este abiero espero x segundos
 	while (string_equals_ignore_case(valor_open, "Y")) {
@@ -200,20 +200,20 @@ void abrir_archivo(char* archivo, int hilo){
 		sleep(tiempo_reintento_operacion);
 		printf("Soy el hilo %d y reintento abrir archivo- \n",hilo);
 
-		pthread_mutex_lock(&mutex_modificacion_de_archivo);
+		//pthread_mutex_lock(&mutex_modificacion_de_archivo);
 		t_config* config_metadata_actualizado = config_create(archivo);
 		valor_open = config_get_string_value(config_metadata_actualizado, "OPEN");
 		printf("Soy el hilo %d y leo el open (reintentando)\n",hilo);
-		pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+		//pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
 		//config_destroy(config_metadata_actualizado);
 	}
 
-	pthread_mutex_lock(&mutex_modificacion_de_archivo);
+	//pthread_mutex_lock(&mutex_modificacion_de_archivo);
 	config_set_value(config_metadata, "OPEN", "Y");
 	config_save(config_metadata);
 	printf("Soy el hilo %d y actualizo el open\n",hilo);
-	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+	//pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
 	config_destroy(config_metadata);
 
@@ -222,14 +222,14 @@ void abrir_archivo(char* archivo, int hilo){
 
 void cerrar_archivo(char* archivo) {
 //Uso config para leer el archivo metadata
-	pthread_mutex_lock(&mutex_modificacion_de_archivo);
+	//pthread_mutex_lock(&mutex_modificacion_de_archivo);
 	t_config* config_metadata = config_create(archivo);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
 	config_set_value(config_metadata, "OPEN", "N");
 	config_save(config_metadata);
-	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+	//pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
 	config_destroy(config_metadata);
 
