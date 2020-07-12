@@ -30,57 +30,50 @@ char* obtener_pokemon(char* especie) {
 
 void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad) {
 
-	puts("[Agregar pokemon]: Abro config");
 	t_config* config_metadata = config_create(archivo);
+
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
-	puts("Leo los bloques");
 	char** bloques_array = config_get_array_value(config_metadata, "BLOCKS");
 	//2 bytes in 1 blocks are definitely lost
 
-	puts("Obteniendo renglones");
 	t_list* renglones = obtener_posiciones_de_bloques(bloques_array);
 
-	puts("Agregar info posicion a lista");
 	agregar_info_posicion_a_listado(renglones, posicion, cantidad);
 
-	puts("Calcular nuevo tamaño de posiciones");
 	int tamanio = tamanio_info_posiciones(renglones);
 
-	puts("Calculo posible bloque nuevo");
 	int cantidad_bloques_actuales = array_cantidad_de_elementos(bloques_array);
 	int capacidad_bloques_actuales = block_size * cantidad_bloques_actuales;
 	free(bloques_array);
 
 	if(tamanio > capacidad_bloques_actuales){
-		puts("Busco un bloque nuevo");
 		int nuevo_bloque = obtener_bloque_disponible();
 		crear_block(nuevo_bloque);
 
-		puts("Agrego bloque nuevo");
 		char* bloques_string = config_get_string_value(config_metadata,"BLOCKS");
 		bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - 1);
 		char* bloques_actualizados = string_from_format("%s,%d]", bloques_string, nuevo_bloque);
 		config_set_value(config_metadata, "BLOCKS", bloques_actualizados);
+
 		config_save(config_metadata);
+
 		free(bloques_string);
 	}
 
-	puts("Leo nueva lista de bloques asignados");
 	bloques_array = config_get_array_value(config_metadata, "BLOCKS");
 
-	puts("Actualizo los bloques");
 	actualizar_bloques(bloques_array, renglones);
 	free(bloques_array);
 	list_destroy_and_destroy_elements(renglones,free);
 
-	puts("Actualizo el size");
 	char* size = string_itoa(tamanio);
 	config_set_value(config_metadata, "SIZE", size);
 	config_save(config_metadata);
-	free(size);
 	config_destroy(config_metadata);
+
+	free(size);
 }
 
 /*
@@ -183,39 +176,42 @@ int existe_posicion(char* archivo, t_posicion posicion) {
 
 void abrir_archivo(char* archivo, int hilo){
 
-//Uso config para leer el archivo metadata
+	//Uso config para leer el archivo metadata
 
+	//TODO: Habria que tener un diccionario de especies para los mutex.
+	//asi dos entradas de pokemon distintos no usan el mismo mutex y se traban
 	pthread_mutex_lock(&mutex_modificacion_de_archivo);
 	t_config* config_metadata = config_create(archivo);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
 	char* valor_open = config_get_string_value(config_metadata, "OPEN");
-	printf("Soy el hilo %d y leo el open\n",hilo);
+
 	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
-//En caso que ya este abiero espero x segundos
+	//En caso que ya este abiero espero x segundos
 	while (string_equals_ignore_case(valor_open, "Y")) {
 
 		sleep(tiempo_reintento_operacion);
-		printf("Soy el hilo %d y reintento abrir archivo- \n",hilo);
+		printf("-Reintento abrir archivo-\n");
 
 		pthread_mutex_lock(&mutex_modificacion_de_archivo);
 		t_config* config_metadata_actualizado = config_create(archivo);
 		valor_open = config_get_string_value(config_metadata_actualizado, "OPEN");
-		printf("Soy el hilo %d y leo el open (reintentando)\n",hilo);
-		pthread_mutex_unlock(&mutex_modificacion_de_archivo);
-
 		//config_destroy(config_metadata_actualizado);
+		pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 	}
 
 	pthread_mutex_lock(&mutex_modificacion_de_archivo);
-	config_set_value(config_metadata, "OPEN", "Y");
-	config_save(config_metadata);
-	printf("Soy el hilo %d y actualizo el open\n",hilo);
-	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
 	config_destroy(config_metadata);
+
+	config_metadata = config_create(archivo);
+	config_set_value(config_metadata, "OPEN", "Y");
+	config_save(config_metadata);
+	config_destroy(config_metadata);
+	//printf("Soy el hilo %d y actualizo el open\n",hilo);
+	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
 	printf("-Soy el hilo %d Se abrio archivo-\n",hilo);
 }
@@ -223,15 +219,15 @@ void abrir_archivo(char* archivo, int hilo){
 void cerrar_archivo(char* archivo) {
 //Uso config para leer el archivo metadata
 	pthread_mutex_lock(&mutex_modificacion_de_archivo);
+
 	t_config* config_metadata = config_create(archivo);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
 	config_set_value(config_metadata, "OPEN", "N");
 	config_save(config_metadata);
-	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
-
 	config_destroy(config_metadata);
+	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
 
 	printf("-Se cerro archivo-\n");
 }

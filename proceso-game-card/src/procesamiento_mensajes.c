@@ -25,11 +25,13 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	abrir_archivo(archivo_pokemon,numero_hilo);
 
 	agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
+
 	printf("[New] Se agrego la posicion al pokemon dado\n");
 
 	sleep(tiempo_retardo_operacion); //Espero x segundos para simular el acceso al disco
 
 	cerrar_archivo(archivo_pokemon);
+
 	free(archivo_pokemon);
 
 	t_appeared_pokemon* appeared = appeared_pokemon_create(

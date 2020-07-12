@@ -260,7 +260,6 @@ t_list* obtener_posiciones_de_bloques(char** bloques) {
 
 	int i = 0;
 
-	puts("Leo bloques");
 	while (bloques[i] != NULL) {
 		int bloque = atoi(bloques[i]);
 
@@ -270,7 +269,6 @@ t_list* obtener_posiciones_de_bloques(char** bloques) {
 		i++;
 	}
 
-	puts("Convierto los bloques en lista");
 
 	return convertir_info_posiciones(posiciones);
 }
