@@ -78,24 +78,37 @@ void freeargpointer(char** array)
 
 info_posicion* info_posicion_from_string(char* posicion){
 	info_posicion* posicion_real = malloc(sizeof(info_posicion));
+
+	puts(posicion);
+
+	puts("X");
 	char** posicion_aux = string_split(posicion,"-");
 	posicion_real->posicion.posicionX = atoi(posicion_aux[0]);
+
+	puts("Y");
 	char** posicion_aux2 = string_split(posicion_aux[1],"=");
 	posicion_real->posicion.posicionY = atoi(posicion_aux2[0]);
 	posicion_real->cantidad = atoi(posicion_aux2[1]);
+
+	/*puts("Free 1");
 	freeargpointer(posicion_aux);
-	freeargpointer(posicion_aux2);
+	puts("Free 2");
+	freeargpointer(posicion_aux2);*/
+
 	return posicion_real;
 }
 
 t_list* convertir_info_posiciones(char* posiciones_string){
 	t_list* posiciones_reales = list_create();
 
+	puts(posiciones_string);
+
 	if(string_length(posiciones_string) > 0){
 
 		char** posiciones = string_split(posiciones_string, "\n");
 		int i = 0;
 
+		puts("Creando lista");
 		while (posiciones[i] != NULL) {
 			info_posicion* posicion_real = info_posicion_from_string(posiciones[i]);
 			list_add(posiciones_reales, posicion_real);
@@ -105,7 +118,6 @@ t_list* convertir_info_posiciones(char* posiciones_string){
 		free(posiciones);
 
 	}
-
 
 	return posiciones_reales;
 }

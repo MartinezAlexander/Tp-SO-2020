@@ -5,11 +5,15 @@ void procesar_mensaje(t_mensaje* mensaje_recibido, void* funcion_ejecutar) {
 	//TODO ver si funciona puntero al hilo data race condition
 	pthread_create(&hilo_procesamiento, NULL, (void*) funcion_ejecutar, (void*) mensaje_recibido);
 	pthread_detach(hilo_procesamiento);
-
-	printf("[Procesamiento] Creado nuevo hilo para atender mensaje\n");
+	cantidad_hilos++;
+	//printf("[Procesamiento] Creado nuevo hilo para atender mensaje\n");
 }
 
 void ejecutar_new(t_mensaje* mensaje_recibido) {
+	int numero_hilo = cantidad_hilos;
+	puts("------------------------------------------------------");
+	printf("[Procesamiento] Hilo %d para procesar mensaje NEW\n",numero_hilo);
+
 	t_new_pokemon* new_pokemon = (t_new_pokemon*) mensaje_recibido->mensaje;
 	int id = mensaje_recibido->id;
 
@@ -18,7 +22,7 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	char* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
 	pthread_mutex_unlock(&mutex_obtener_pokemon);
 
-	abrir_archivo(archivo_pokemon);
+	abrir_archivo(archivo_pokemon,numero_hilo);
 
 	agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
 	printf("[New] Se agrego la posicion al pokemon dado\n");
@@ -38,24 +42,26 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	mensaje_destroy(mensaje);
 	mensaje_destroy(mensaje_recibido);
 
-	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
+	printf("[Procesamiento] Cerrando hilo %d de procesamiento de NEW\n",numero_hilo);
 }
 
 void ejecutar_catch(t_mensaje* mensaje_recibido) {
-	t_catch_pokemon* catch_pokemon =
-			(t_catch_pokemon*) mensaje_recibido->mensaje;
+	int numero_hilo = cantidad_hilos;
+	puts("------------------------------------------------------");
+	printf("[Procesamiento] Hilo %d para procesar mensaje CATCH\n",numero_hilo);
+
+	t_catch_pokemon* catch_pokemon = (t_catch_pokemon*) mensaje_recibido->mensaje;
 	int id = mensaje_recibido->id;
 
 	//1. Verificar si el Pokemon existe dentro de nuestro Filesystem (Si no existe->se informa el error
 	t_caught_pokemon* caught_respuesta;
 
-	if (!existe_archivo_en(catch_pokemon->pokemon->especie,
-			obtener_directorio_files())) {
+	if (!existe_archivo_en(catch_pokemon->pokemon->especie,obtener_directorio_files())) {
 		caught_respuesta = caught_pokemon_create(0);
 	} else {
 		char* archivo_pokemon = obtener_pokemon(catch_pokemon->pokemon->especie);
 		//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
-		abrir_archivo(archivo_pokemon);
+		abrir_archivo(archivo_pokemon,numero_hilo);
 
 		//3. Verificar si las posiciones ya existen dentro del archivo (Si no->se informa error)
 		int existe = decrementar_cantidad(archivo_pokemon, catch_pokemon->pokemon->posicion);
@@ -76,16 +82,19 @@ void ejecutar_catch(t_mensaje* mensaje_recibido) {
 
 	//7. Conectarse y enviar al broker el resultado (ID recibido, resultado)
 
-	t_mensaje* mensaje = mensaje_con_id_correlativo_create(caught_respuesta,
-			CAUGHT_POKEMON, id);
+	t_mensaje* mensaje = mensaje_con_id_correlativo_create(caught_respuesta,CAUGHT_POKEMON, id);
 	//enviar_mensaje_al_broker(mensaje);
 	mensaje_destroy(mensaje);
 	mensaje_destroy(mensaje_recibido);
 
-	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
+	printf("[Procesamiento] Cerrando hilo %d de procesamiento CATCH\n",numero_hilo);
 }
 
 void ejecutar_get(t_mensaje* mensaje_recibido) {
+	int numero_hilo = cantidad_hilos;
+	puts("------------------------------------------------------");
+	printf("[Procesamiento] Hilo %d para procesar mensaje GET\n",numero_hilo);
+
 	t_get_pokemon* get_pokemon = (t_get_pokemon*) mensaje_recibido->mensaje;
 	int id = mensaje_recibido->id;
 
@@ -103,7 +112,7 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 	char* archivo_pokemon = obtener_pokemon(get_pokemon->nombre);
 
 	//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
-	abrir_archivo(archivo_pokemon);
+	abrir_archivo(archivo_pokemon,numero_hilo);
 
 	//3. Obtener todas las posiciones del Pokemon requerido
 	t_list* pokemon_posiciones = obtener_posiciones_pokemon(archivo_pokemon);
@@ -129,7 +138,7 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 	mensaje_destroy(mensaje);
 	mensaje_destroy(mensaje_recibido);
 
-	printf("[Procesamiento] Cerrando hilo de procesamiento\n");
+	printf("[Procesamiento] Cerrando hilo %d de procesamiento GET\n",numero_hilo);
 }
 
 void enviar_mensaje_al_broker(t_mensaje* mensaje) {

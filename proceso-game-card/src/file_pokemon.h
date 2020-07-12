@@ -23,7 +23,7 @@ t_list* obtener_posiciones_pokemon(char* archivo);
 int decrementar_cantidad(char* archivo, t_posicion posicion);
 int existe_posicion(char* archivo, t_posicion posicion);
 
-void abrir_archivo(char* archivo);
+void abrir_archivo(char* archivo, int hilo);
 void cerrar_archivo(char* archivo);
 
 void crear_metadata(char* ruta);

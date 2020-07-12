@@ -56,6 +56,7 @@ void inicializar_filesystem() {
 	pthread_mutex_init(&mutex_listar_directorios, NULL);
 	pthread_mutex_init(&mutex_obtener_pokemon,NULL);
 
+	cantidad_hilos = 0;
 	/*
 	 * Decidimos levantar solamente el metadata y el bitmap. Los bloques y archivos
 	 * pokemon los traemos cuando los necesitamos
@@ -64,7 +65,7 @@ void inicializar_filesystem() {
 
 t_config* leer_config(void) {
 	t_config *config;
-	if ((config = config_create("src/gamecard.config")) == NULL) {
+	if ((config = config_create("../src/gamecard.config")) == NULL) {
 		printf("No pude leer la config\n");
 		exit(2);
 	}

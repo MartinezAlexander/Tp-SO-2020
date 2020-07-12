@@ -243,11 +243,10 @@ char* leer_bloque(int bloque) {
 
 	char caracter = fgetc(fd);
 
-	char* posiciones = string_new();
+	char* posiciones = "";
 
 	while (caracter != EOF) {
-		char* c = &caracter;
-		string_append(&posiciones,c);
+		posiciones = string_from_format("%s%c", posiciones, caracter);
 		caracter = fgetc(fd);
 	}
 
@@ -261,13 +260,17 @@ t_list* obtener_posiciones_de_bloques(char** bloques) {
 
 	int i = 0;
 
+	puts("Leo bloques");
 	while (bloques[i] != NULL) {
 		int bloque = atoi(bloques[i]);
+
 		char* posiciones_por_bloque = leer_bloque(bloque);
 		string_append(&posiciones, posiciones_por_bloque);
-		free(posiciones_por_bloque);
+		//free(posiciones_por_bloque);
 		i++;
 	}
+
+	puts("Convierto los bloques en lista");
 
 	return convertir_info_posiciones(posiciones);
 }
@@ -361,8 +364,6 @@ int actualizar_bloques(char** bloques, t_list* posiciones) {
 	fclose(bloque);
 
 	int cant_liberados = array_cantidad_de_elementos(bloques) - cantidad_bloques_usados;
-
-	printf("canti liberados %d\n",cant_liberados);
 
 	if (cant_liberados > 0) {
 		for (int i = 0; i < cant_liberados; i++) {

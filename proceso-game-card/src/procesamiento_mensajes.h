@@ -26,6 +26,8 @@
 
 pthread_mutex_t mutex_obtener_pokemon;
 
+int cantidad_hilos;
+
 /*
  * Dado un mensaje, crea un hilo que ejecuta a la funcion pasada por parametro
  * para atenderlo. (ejecutar_new, ejecutar_catch, o ejecutar_get)
