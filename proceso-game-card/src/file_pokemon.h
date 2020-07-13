@@ -14,6 +14,22 @@
 
 pthread_mutex_t mutex_modificacion_de_archivo;
 
+typedef struct{
+	char* especie;
+	t_config* file;
+	pthread_mutex_t mutex_file;
+}file_pokemon;
+
+t_list* pokemones_files;
+
+file_pokemon* file_pokemon_obtener(char* especie);
+void abrir_archivo_dos(file_pokemon* poke_file, int hilo);
+void agregar_pokemon_dos(file_pokemon* poke_file, t_posicion posicion, int cantidad);
+void cerrar_archivo_dos(file_pokemon* poke_file);
+int decrementar_cantidad_dos(file_pokemon* poke_file, t_posicion posicion);
+t_list* obtener_posiciones_pokemon_dos(file_pokemon* poke_file);
+
+
 char* obtener_pokemon(char* especie);
 char* pokemon_file_create(char* especie);
 

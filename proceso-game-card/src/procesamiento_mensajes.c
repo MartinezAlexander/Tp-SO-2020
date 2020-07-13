@@ -11,28 +11,35 @@ void procesar_mensaje(t_mensaje* mensaje_recibido, void* funcion_ejecutar) {
 
 void ejecutar_new(t_mensaje* mensaje_recibido) {
 	int numero_hilo = cantidad_hilos;
-	puts("------------------------------------------------------");
-	printf("[Procesamiento] Hilo %d para procesar mensaje NEW\n",numero_hilo);
 
 	t_new_pokemon* new_pokemon = (t_new_pokemon*) mensaje_recibido->mensaje;
 	int id = mensaje_recibido->id;
 
+	puts("------------------------------------------------------");
+	printf("[NEW] Soy el hilo %d para procesar especie %s\n",numero_hilo,new_pokemon->pokemon->especie);
+
 	//Obtengo el archivo del pokemon que necesito. Si no existe se crea.
 	pthread_mutex_lock(&mutex_obtener_pokemon);
-	char* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
+	//char* archivo_pokemon = obtener_pokemon(new_pokemon->pokemon->especie);
+	file_pokemon* archivo_pokemon = file_pokemon_obtener(new_pokemon->pokemon->especie);
 	pthread_mutex_unlock(&mutex_obtener_pokemon);
 
-	abrir_archivo(archivo_pokemon,numero_hilo);
+	//abrir_archivo(archivo_pokemon,numero_hilo);
+	abrir_archivo_dos(archivo_pokemon,numero_hilo);
+	printf(" %s\n",new_pokemon->pokemon->especie);
 
-	agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
+	//agregar_pokemon(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
+	agregar_pokemon_dos(archivo_pokemon, new_pokemon->pokemon->posicion, new_pokemon->cantidad);
 
-	printf("[New] Se agrego la posicion al pokemon dado\n");
+	printf("[NEW] Soy el hilo %d y agrego la posicion a la especie %s dado\n",numero_hilo,new_pokemon->pokemon->especie);
 
 	sleep(tiempo_retardo_operacion); //Espero x segundos para simular el acceso al disco
 
-	cerrar_archivo(archivo_pokemon);
+	//cerrar_archivo(archivo_pokemon);
+	cerrar_archivo_dos(archivo_pokemon);
+	printf("[NEW] Soy el hilo %d y cerre el archivo de especie %s\n",numero_hilo,new_pokemon->pokemon->especie);
 
-	free(archivo_pokemon);
+	//free(archivo_pokemon);
 
 	t_appeared_pokemon* appeared = appeared_pokemon_create(
 			new_pokemon->pokemon->especie,
@@ -44,7 +51,6 @@ void ejecutar_new(t_mensaje* mensaje_recibido) {
 	mensaje_destroy(mensaje);
 	mensaje_destroy(mensaje_recibido);
 
-	printf("[Procesamiento] Cerrando hilo %d de procesamiento de NEW\n",numero_hilo);
 }
 
 void ejecutar_catch(t_mensaje* mensaje_recibido) {
@@ -61,12 +67,17 @@ void ejecutar_catch(t_mensaje* mensaje_recibido) {
 	if (!existe_archivo_en(catch_pokemon->pokemon->especie,obtener_directorio_files())) {
 		caught_respuesta = caught_pokemon_create(0);
 	} else {
-		char* archivo_pokemon = obtener_pokemon(catch_pokemon->pokemon->especie);
+		//char* archivo_pokemon = obtener_pokemon(catch_pokemon->pokemon->especie);
+		pthread_mutex_lock(&mutex_obtener_pokemon);
+		file_pokemon* poke_file = file_pokemon_obtener(catch_pokemon->pokemon->especie);
+		pthread_mutex_unlock(&mutex_obtener_pokemon);
 		//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
-		abrir_archivo(archivo_pokemon,numero_hilo);
+		//abrir_archivo(archivo_pokemon,numero_hilo);
+		abrir_archivo_dos(poke_file,numero_hilo);
 
 		//3. Verificar si las posiciones ya existen dentro del archivo (Si no->se informa error)
-		int existe = decrementar_cantidad(archivo_pokemon, catch_pokemon->pokemon->posicion);
+		//int existe = decrementar_cantidad(archivo_pokemon, catch_pokemon->pokemon->posicion);
+		int existe = decrementar_cantidad_dos(poke_file,catch_pokemon->pokemon->posicion);
 		if (existe) {
 			//4. SI la cantidad = 1, se elimina la linea. Sino se decrementa la cantidad en 1
 			printf("[Catch] Se decremento una cantidad para la posicion del pokemon\n");
@@ -76,9 +87,8 @@ void ejecutar_catch(t_mensaje* mensaje_recibido) {
 		sleep(tiempo_retardo_operacion);
 
 		//6. Cerrar el archivo
-		cerrar_archivo(archivo_pokemon);
+		cerrar_archivo_dos(poke_file);
 
-		free(archivo_pokemon);
 		caught_respuesta = caught_pokemon_create(existe);
 	}
 
@@ -111,13 +121,18 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 		return;
 	}
 
-	char* archivo_pokemon = obtener_pokemon(get_pokemon->nombre);
+	//char* archivo_pokemon = obtener_pokemon(get_pokemon->nombre);
+	pthread_mutex_lock(&mutex_obtener_pokemon);
+	file_pokemon* poke_file = file_pokemon_obtener(get_pokemon->nombre);
+	pthread_mutex_unlock(&mutex_obtener_pokemon);
 
 	//2. Verificar si se puede abrir el archivo (Si no->Se reintenta cada X seg)
-	abrir_archivo(archivo_pokemon,numero_hilo);
+	//abrir_archivo(archivo_pokemon,numero_hilo);
+	abrir_archivo_dos(poke_file,numero_hilo);
 
 	//3. Obtener todas las posiciones del Pokemon requerido
-	t_list* pokemon_posiciones = obtener_posiciones_pokemon(archivo_pokemon);
+	//t_list* pokemon_posiciones = obtener_posiciones_pokemon(archivo_pokemon);
+	t_list* pokemon_posiciones = obtener_posiciones_pokemon_dos(poke_file);
 
 	localized_respuesta = localized_pokemon_create(get_pokemon->nombre,
 			pokemon_posiciones);
@@ -128,8 +143,9 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 	sleep(tiempo_retardo_operacion);
 
 	//5. Cerrar el archivo
-	cerrar_archivo(archivo_pokemon);
-	free(archivo_pokemon);
+	//cerrar_archivo(archivo_pokemon);
+	cerrar_archivo_dos(poke_file);
+	//free(archivo_pokemon);
 	//6. Si se encontro al menos 1 posicion, conectarse y enviar al broker
 
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*) localized_respuesta, LOCALIZED_POKEMON, id);

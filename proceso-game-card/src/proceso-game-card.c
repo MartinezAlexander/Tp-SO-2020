@@ -56,6 +56,8 @@ void inicializar_filesystem() {
 	pthread_mutex_init(&mutex_listar_directorios, NULL);
 	pthread_mutex_init(&mutex_obtener_pokemon,NULL);
 
+	pokemones_files = list_create();
+
 	cantidad_hilos = 0;
 	/*
 	 * Decidimos levantar solamente el metadata y el bitmap. Los bloques y archivos
