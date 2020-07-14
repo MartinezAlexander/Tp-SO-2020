@@ -14,6 +14,7 @@
 
 int main(void) {
 	inicializar_variables();
+
 	//TODO [ML] probar mem leak de leer entrenadores si destruimos el config aca, total no lo usamos mas
 
 	iniciar_hilos_planificacion();
@@ -33,6 +34,7 @@ int main(void) {
 
 	printf("[Deadlock] Comienza la deteccion de deadlock\n");
 	resolver_deadlock();
+
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)

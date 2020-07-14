@@ -101,6 +101,7 @@ t_buddy* buddy_consolidar(t_buddy* buddy){
 		padre->libre = 1;
 		destruir_hijo_derecho(padre);
 		destruir_hijo_izquierdo(padre);
+		loggear_asociacion_bloques(buddy->base,hermano->base);
 	}
 	return padre;
 }

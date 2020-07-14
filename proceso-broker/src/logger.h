@@ -18,6 +18,9 @@ void loggear_suscripcion_proceso(char* suscriptor);
 void loggear_reconexion_proceso(char* suscriptor);
 void loggear_conexion_al_broker(int socket_cliente);
 void loggear_mensaje_cacheado(char* mensaje, int base_particion);
+void loggear_compactacion(int tamanio_libre, int base_libre);
+void loggear_asociacion_bloques(int base_bloque1, int base_bloque2);
+void loggear_ejecucion_dump();
 void logger_destroy();
 
 void iniciar_log_personal(char* path);
