@@ -96,11 +96,16 @@ void procesar_pokemon(t_cola_mensajeria* cola){
 		t_mensaje* mensaje = (t_mensaje*) queue_pop(cola->queue);
 		pthread_mutex_unlock(&cola->mutex_cola_mensaje);
 
-		if (string_equals_ignore_case(algoritmo_memoria, "BS")) {
-			cachear_mensaje_bs(mensaje);
-		} else {
-			administrador_cachear_mensaje(mensaje);
+		if(mensaje_size(mensaje) <= tamano_memoria){
+			if (string_equals_ignore_case(algoritmo_memoria, "BS")) {
+				cachear_mensaje_bs(mensaje);
+			} else {
+				administrador_cachear_mensaje(mensaje);
+			}
+		}else{
+			log_personal_error_cacheo_mensaje(mensaje->id);
 		}
+
 
 		pthread_mutex_lock(&cola->semaforoSuscriptores);
 		int hay_suscriptores = !list_is_empty(cola->suscriptores);

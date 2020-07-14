@@ -81,6 +81,13 @@ void log_personal_error_envio_a_suscriptor(char* suscriptor){
 	free(suscriptor);
 }
 
+void log_personal_error_cacheo_mensaje(int32_t id){
+	char* string = string_from_format("[Cacheo fallido] El mensaje con id %d no entra en la cache\n----------------------------",id);
+	log_error(logger_personal,string);
+	free(string);
+}
+
+
 void log_personal_destroy(){
 	if(logger_personal!=NULL){
 		log_destroy(logger_personal);
