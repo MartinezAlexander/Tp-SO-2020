@@ -9,6 +9,7 @@
 #define FILE_POKEMON_H_
 
 #include <pthread.h>
+#include <ctype.h>
 #include "tall_grass.h"
 #include "block.h"
 

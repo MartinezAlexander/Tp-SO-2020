@@ -12,6 +12,10 @@
 
 file_pokemon* file_pokemon_obtener(char* especie){
 
+	char c = especie[0];
+	c = toupper(c);
+	especie[0] = c;
+
 	for(int i=0; i<list_size(pokemones_files); i++){
 		file_pokemon* poke_file = list_get(pokemones_files,i);
 		if(string_equals_ignore_case(especie,poke_file->especie)){
