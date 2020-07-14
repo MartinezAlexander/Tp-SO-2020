@@ -26,6 +26,6 @@ void logger_destroy();
 void iniciar_log_personal(char* path);
 void log_personal_error_envio_a_suscriptor(char* suscriptor);
 void log_personal_destroy();
-
+void log_personal_error_cacheo_mensaje(int32_t id);
 
 #endif
