@@ -9,8 +9,14 @@
 #include<commons/collections/dictionary.h>
 #include<commons/collections/queue.h>
 
-#include "entrenador.h"
+
 #include "utils/posicion_utils.h"
+
+#include "entrenador.h"
+#include "planificacion/planificacion.h"
+
+struct t_entrenador;
+typedef struct unEntrenador t_entrenador;
 
 /*
  * Con esta estructura manejamos los intercambios.
@@ -20,7 +26,7 @@
  * Aca esta toda la info necesaria para poder llevar a cabo un
  * intercambio por deadlock
  */
-typedef struct{
+typedef struct unIntercambio{
 	t_entrenador* entrenador;
 	t_entrenador* entrenadorObjetivo;
 	char* pokemonADar;
@@ -67,7 +73,7 @@ typedef struct{
 
 
 t_queue* cola_intercambios_deadlock;
-
+sem_t semaforo_resolucion_deadlock;
 
 t_intercambio* intercambio_create(t_entrenador* entrenador, t_entrenador* entrenadorObjetivo, char* pokemonADar, char* pokemonARecibir);
 t_intercambio_copia* intercambio_copia_create(t_entrenador_copia* entrenador, t_entrenador_copia* entrenadorObjetivo, char* pokemonADar, char* pokemonARecibir);
@@ -87,9 +93,9 @@ int entrenador_tiene_adquirido(t_entrenador_copia* entrenador, char* especie);
 int entrenador_tiene_en_objetivo(t_entrenador_copia* entrenador, char* especie);
 t_intercambio* convertir_a_intercambio_real(t_intercambio_copia* intercambio_copia);
 void realizar_intercambio_simbolico(t_intercambio_copia* intercambio);
-void cambiar_pokemon(t_entrenador_copia* entrenador, char* especieASacar, char* especieAMeter);
+void cambiar_pokemon(t_list* listado_pokemon, char* especieASacar, char* especieAMeter);
 
-
+void encolar_proximo_intercambio(int primer_intercambio);
 
 
 

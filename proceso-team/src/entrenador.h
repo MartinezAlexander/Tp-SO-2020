@@ -24,8 +24,10 @@
 #include "utils/log_utils.h"
 #include "mensajes/procesamiento_appeared.h"
 
+#include "deadlock.h"
 
-
+struct t_intercambio;
+typedef struct unIntercambio t_intercambio;
 
 uint32_t retardo_cpu;
 
@@ -53,6 +55,7 @@ typedef struct unEntrenador{
 	t_list* pokemones_adquiridos;
 
 	t_pokemon* objetivo_actual;
+	t_intercambio* intercambio_actual;
 
 	estado_planificacion estado;
 	estado_sjf* estado_sjf;
@@ -69,7 +72,7 @@ t_dictionary* mensajes_catch_pendientes;
 
 void iniciarlizar_diccionario_catch();
 
-int mover_proxima_posicion(t_entrenador* entrenador);
+int mover_proxima_posicion(t_entrenador* entrenador, t_posicion objetivo);
 void enviar_catch(t_entrenador* entrenador);
 /*
  * Realiza el proximo ciclo de ejecucion del entrenador,
@@ -77,8 +80,9 @@ void enviar_catch(t_entrenador* entrenador);
  * de lo contrario retorna 0
  */
 int ejecutar_entrenador(t_entrenador* entrenador);
+int ejecutar_entrenador_intercambio_deadlock(t_entrenador* entrenador);
 
-void resolver_caught_positivo(t_entrenador* entrenador);
+void resolver_caught_positivo(t_entrenador* entrenador, int asincronico);
 void resolver_caught_negativo(t_entrenador* entrenador);
 
 void bloquear_entrenador(t_entrenador* entrenador);
@@ -86,13 +90,14 @@ void bloquear_entrenador(t_entrenador* entrenador);
 void agregar_a_objetivos_globales(char* especie);
 void sacar_de_objetivos_globales(char* especie, t_list* objetivos);
 
-void actualizar_estadistica_entrenador(int id_entrenador);
+void actualizar_estadistica_entrenador(int id_entrenador, int ciclos_a_agregar);
 
 int entrenador_en_ejecucion(t_entrenador *entrenador);
 int entrenador_en_deadlock(t_entrenador *entrenador);
+int entrenador_termino_ejecucion_normal(t_entrenador *entrenador);
 
 void asignar_pokemones(t_entrenador* entrenador, char* pokemones);
-t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial);
+t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquiridos, int identificador, double estimacion_inicial);
 t_list* leer_entrenadores(t_config* config, double estimacion_inicial);
 
 int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie);
@@ -104,5 +109,6 @@ int entrenador_estado_deadlock(t_entrenador* entrenador);
 int cumplio_objetivo_entrenador(t_entrenador* entrenador);
 
 t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion posicion);
+void actualizar_estado_entrenador(t_entrenador* entrenador);
 
 #endif

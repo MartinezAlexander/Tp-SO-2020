@@ -20,7 +20,7 @@ t_list* obtener_objetivo_global(t_list* entrenadores){
 		list_add_all(adquiridos_globales, entrenador->pokemones_adquiridos);
 	}
 
-	list_sort(objetivos_globales, strcmp);
+	list_sort(objetivos_globales, strcasecmp);
 
 	//Por cada elemento de los adquiridos, lo borro de la lista de objetivos
 	for(int i = 0 ; i < list_size(adquiridos_globales) ; i++){
@@ -34,7 +34,7 @@ t_list* obtener_objetivo_global(t_list* entrenadores){
 
 int pokemon_dentro_de_objetivos(t_list* objetivos, char* pokemon){
 	for(int i = 0 ; i < list_size(objetivos); i++){
-		if(string_equals_ignore_case(list_get(objetivos, i),pokemon) == 1)
+		if(string_equals_ignore_case(list_get(objetivos, i),pokemon))
 			return 1;
 	}
 	return 0;
@@ -53,14 +53,14 @@ int cumplio_objetivo_global(t_list* objetivo_global, t_list* entrenadores){
 	if(list_size(adquiridos) != list_size(objetivo_global)) return 0;
 
 	//La ordeno para poder compararlas
-	list_sort(adquiridos, strcmp);
+	list_sort(adquiridos, strcasecmp);
 
 	//Comparo con los objetivos
 	for(int i = 0 ; i < list_size(adquiridos) ; i++){
 		char* pk1 = list_get(adquiridos, i);
 		char* pk2 = list_get(objetivo_global, i);
 
-		if(string_equals_ignore_case(pk1,pk2) != 1) return 0;
+		if(!string_equals_ignore_case(pk1,pk2)) return 0;
 	}
 
 	return 1;

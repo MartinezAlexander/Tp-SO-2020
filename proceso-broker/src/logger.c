@@ -60,6 +60,18 @@ void loggear_mensaje_cacheado(char* mensaje, int base_particion){
 	free(mensaje);
 }
 
+void loggear_compactacion(int tamanio_libre, int base_libre){
+	log_info(logger,"[Compactacion] Ejecutado: Tamanio de particion libre final %d - Base de particion libre final %d\n-----------------------------------------------------------------",tamanio_libre,base_libre);
+}
+
+void loggear_asociacion_bloques(int base_bloque1, int base_bloque2){
+	log_info(logger,"[Asociacion de bloques] Ejecutado: Base particiones asociadas %d %d\n-----------------------------------------------------------------",base_bloque1,base_bloque2);
+}
+
+void loggear_ejecucion_dump(){
+	log_info(logger,"[Dump] Se solicito la ejecucion del dump de la cache: solicitud procesada\n-----------------------------------------------------------------");
+}
+
 void logger_destroy(){
 	if(logger != NULL){
 		log_destroy(logger);

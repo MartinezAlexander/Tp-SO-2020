@@ -2,6 +2,8 @@
 
 void iniciar_hilos_planificacion(){
 	pthread_create(&(planificador->hilo_planificacion), NULL, (void*)ejecutar_hilo_planificador, NULL);
+	pthread_detach(planificador->hilo_planificacion);
+
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores, i);
 		sem_init(&(entrenador->semaforo), 0, 0);
@@ -14,7 +16,6 @@ void esperar_hilos_planificacion(){
 		t_entrenador* entrenador = list_get(entrenadores, i);
 		pthread_join(entrenador->hilo, NULL);
 	}
-	pthread_join(planificador->hilo_planificacion, NULL);
 }
 
 
@@ -130,7 +131,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 //ya que el hilo este podra decidir quien planificar y no perdemos tiempo
 //innecesariamente.
 void ejecutar_hilo_planificador(){
-	while(!finalizo_team){
+	while(1){
 		sem_wait(&(semaforo_planificacion));
 
 		planificar();
@@ -146,8 +147,17 @@ void ejecutar_hilo(t_entrenador* entrenador){
 	//Decimos que el entrenador ya termino de ejcutar
 	//cuando cumplio sus objetivos (y el del team)
 	//esto lo verificamos a traves de su estado
-	while(entrenador->estado != EXIT){
+	while(entrenador->estado != EXIT && entrenador->estado != BLOCKED_DEADLOCK){
 		sem_wait(&(entrenador->semaforo));
+
+		//Puede pasar que el entrenador pase a DEADLOCK, pero lo haga cuando reciba
+		//la respuesta del caught. En ese caso ya se habria bloqueado el entrenador,
+		//por lo que no saldria del while hasta el proximo ciclo.
+		//Decidimos entonces que cuando llega un caught y cambio el estado mando signal
+		//al semaforo de arriba para salir si corresponde
+		if(entrenador->estado == EXIT || entrenador->estado == BLOCKED_DEADLOCK){
+			break;
+		}
 
 		int termino_ejecucion = ejecutar_entrenador(entrenador);
 
@@ -174,6 +184,23 @@ void ejecutar_hilo(t_entrenador* entrenador){
 			sem_post(&semaforo_planificacion);
 		}
 	}
+
+	//La idea es que primero ejecute normalmente, y cuando termine de ejecutar
+	//(por EXIT o DEADLOCK) se fijara aca si tiene deadlock, y en ese caso entra
+	//en este nuevo loop hsata que lo resuelva
+	while(entrenador->estado != EXIT){
+		sem_wait(&(entrenador->semaforo));
+
+		if(entrenador->estado == EXIT){
+			break;
+		}
+
+		ejecutar_entrenador_intercambio_deadlock(entrenador);
+
+		sem_post(&semaforo_planificacion);
+	}
+
+	printf("[Ejecucion] Hilo de entrenador %d termina su ejecucion\n", entrenador->identificador);
 }
 
 void planificar(){

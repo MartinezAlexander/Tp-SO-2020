@@ -1,9 +1,16 @@
 #include "conexion_gameboy.h"
 
 void iniciar_puerto_de_escucha(){
-	iniciar_servidor(ip_team, puerto_team,(void*) procesar_mensajes_directos);
-	printf("[Gameboy] Iniciando puerto de escucha directo al gameboy\n");
+	pthread_t hilo_escucha_gameboy;
+	pthread_create(&hilo_escucha_gameboy, NULL, (void*) correr_servidor_gameboy, NULL);
+	pthread_detach(hilo_escucha_gameboy);
 }
+
+void correr_servidor_gameboy(){
+	printf("[Gameboy] Iniciando puerto de escucha directo al gameboy\n");
+	iniciar_servidor(ip_team, puerto_team,(void*) procesar_mensajes_directos);
+}
+
 
 //Para procesar los mensajes usamos las mismas funciones de procesamiento
 //que para el broker.
@@ -11,6 +18,12 @@ void iniciar_puerto_de_escucha(){
 //tenemos las funciones hechas dejamos los otros dos casos tambien, por las dudas
 void procesar_mensajes_directos(int* socket){
 	t_mensaje* mensaje = recibir_mensaje(*socket);
+
+	if(mensaje == NULL){
+		printf("[Gameboy] Se recibio un mensaje NULL de gameboy\n");
+		return;
+	}
+
 	loggear_nuevo_mensaje(mensaje);
 	enviar_ACK(*socket);
 
