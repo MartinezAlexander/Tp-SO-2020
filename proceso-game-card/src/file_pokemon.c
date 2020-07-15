@@ -10,6 +10,14 @@
 //---------------------------------------------------------------------------------------
 // Nueva implementacion
 
+void imprimir_bloques(char** blocks){
+	int i=0;
+	puts("---------------------------------------------------------");
+	while(blocks[i] != NULL){
+		puts(blocks[i]);
+	}
+}
+
 file_pokemon* file_pokemon_obtener(char* especie){
 
 	char c = especie[0];
@@ -27,7 +35,29 @@ file_pokemon* file_pokemon_obtener(char* especie){
 	pokemon_file->especie = string_new();
 	string_append(&pokemon_file->especie,especie);
 	pokemon_file->path = obtener_pokemon(especie);
-	pokemon_file->file = config_create(pokemon_file->path);
+
+	t_config* file = config_create(pokemon_file->path);
+	char* _open = config_get_string_value(file, "OPEN");
+	char* _blocks_string = config_get_string_value(file, "BLOCKS");
+	char* _directory = config_get_string_value(file, "DIRECTORY");
+	char* _size = config_get_string_value(file, "SIZE");
+
+	pokemon_file->open = string_new();
+	string_append(&pokemon_file->open,_open);
+	pokemon_file->blocks_string = string_new();
+	string_append(&pokemon_file->blocks_string,_blocks_string);
+	pokemon_file->directory = string_new();
+	string_append(&pokemon_file->directory,_directory);
+	pokemon_file->size = string_new();
+	string_append(&pokemon_file->size,_size);
+
+	_blocks_string = string_substring(_blocks_string,1,strlen(_blocks_string)-2);
+	pokemon_file->blocks = string_split(_blocks_string,"-");
+
+	imprimir_bloques(pokemon_file->blocks);
+
+	config_destroy(file);
+
 	pthread_mutex_init(&pokemon_file->mutex_file,NULL);
 
 	list_add(pokemones_files,pokemon_file);
@@ -42,13 +72,12 @@ void abrir_archivo_dos(file_pokemon* poke_file, int hilo){
 	//asi dos entradas de pokemon distintos no usan el mismo mutex y se traban
 	pthread_mutex_lock(&poke_file->mutex_file);
 
-	char* valor_open = config_get_string_value(poke_file->file, "OPEN");
+	char* valor_open = poke_file->open;
 
 	pthread_mutex_unlock(&poke_file->mutex_file);
 
 	//En caso que ya este abiero espero x segundos
 	while (string_equals_ignore_case(valor_open, "Y")) {
-
 
 		loggear_archivo_abierto(poke_file->especie);
 		sleep(tiempo_reintento_operacion);
@@ -59,16 +88,19 @@ void abrir_archivo_dos(file_pokemon* poke_file, int hilo){
 
 		pthread_mutex_lock(&poke_file->mutex_file);
 
-		valor_open = config_get_string_value(poke_file->file, "OPEN");
+		valor_open = poke_file->open;
 
 		pthread_mutex_unlock(&poke_file->mutex_file);
 	}
 
 	pthread_mutex_lock(&poke_file->mutex_file);
 
-	config_set_value(poke_file->file, "OPEN", "Y");
-	config_save(poke_file->file);
+	free(poke_file->open);
+	poke_file->open = string_new();
+	string_append(&poke_file->open, "Y");
+
 	//printf("Soy el hilo %d y actualizo el open\n",hilo);
+
 	pthread_mutex_unlock(&poke_file->mutex_file);
 
 	printf("Soy el hilo %d y se abrio archivo de la especie",hilo);
@@ -76,53 +108,65 @@ void abrir_archivo_dos(file_pokemon* poke_file, int hilo){
 
 void agregar_pokemon_dos(file_pokemon* poke_file, t_posicion posicion, int cantidad) {
 
-	char** bloques_array = config_get_array_value(poke_file->file, "BLOCKS");
+
+	char** bloques_array = poke_file->blocks;
 	//2 bytes in 1 blocks are definitely lost
-
+	puts("AAAAAAAAAAAAAAAAAAAAAA");
 	t_list* renglones = obtener_posiciones_de_bloques(bloques_array);
-
+	puts("BBBBBBBBBBBBBBBBBBBBBBB");
 	agregar_info_posicion_a_listado(renglones, posicion, cantidad);
 
 	int tamanio = tamanio_info_posiciones(renglones);
-
 	int cantidad_bloques_actuales = array_cantidad_de_elementos(bloques_array);
 	int capacidad_bloques_actuales = block_size * cantidad_bloques_actuales;
-	free(bloques_array);
 
 	if(tamanio > capacidad_bloques_actuales){
 		int nuevo_bloque = obtener_bloque_disponible();
 		crear_block(nuevo_bloque);
 
 		//TODO capaz deberia usar mutex del poke_file ?
-		char* bloques_string = config_get_string_value(poke_file->file,"BLOCKS");
+		char* bloques_string = poke_file->blocks_string;
 		bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - 1);
-		char* bloques_actualizados = string_from_format("%s,%d]", bloques_string, nuevo_bloque);
-		config_set_value(poke_file->file, "BLOCKS", bloques_actualizados);
+		poke_file->blocks_string = string_from_format("%s,%d]", bloques_string, nuevo_bloque);
 
-		config_save(poke_file->file);
+		char* _blocks_string = string_substring(poke_file->blocks_string,1,strlen(poke_file->blocks_string)-2);
+		poke_file->blocks = string_split(_blocks_string,"-");
+		//free(_blocks_string);
+		//config_set_value(poke_file->file, "BLOCKS", bloques_actualizados);
+
+		//config_save(poke_file->file);
 
 		free(bloques_string);
 	}
 
-	bloques_array = config_get_array_value(poke_file->file, "BLOCKS");
+	bloques_array = poke_file->blocks;
 
 	actualizar_bloques(bloques_array, renglones);
-	free(bloques_array);
+	//free(bloques_array);
 	list_destroy_and_destroy_elements(renglones,free);
 
-	char* size = string_itoa(tamanio);
-	config_set_value(poke_file->file, "SIZE", size);
-	config_save(poke_file->file);
-
-	free(size);
+	poke_file->size = string_itoa(tamanio);
+	//config_set_value(poke_file->file, "SIZE", size);
+	//config_save(poke_file->file);
+	//free(size);
 }
 
 void cerrar_archivo_dos(file_pokemon* poke_file) {
 //Uso config para leer el archivo metadata
 	pthread_mutex_lock(&poke_file->mutex_file);
 	//TODO Address 0x425dca0 is 0 bytes inside a block of size 5 alloc'd [PID: 8835]
-	config_set_value(poke_file->file, "OPEN", "N");
-	config_save(poke_file->file);
+
+	t_config* file = config_create(poke_file->path);
+	config_set_value(file, "OPEN", "N");
+	config_set_value(file, "BLOCKS", poke_file->blocks_string);
+	config_set_value(file, "DIRECTORY", poke_file->directory);
+	config_set_value(file, "SIZE", poke_file->size);
+	config_save(file);
+	config_destroy(file);
+
+	free(poke_file->open);
+	poke_file->open = string_new();
+	string_append(&poke_file->open, "N");
 
 	pthread_mutex_unlock(&poke_file->mutex_file);
 
@@ -132,7 +176,7 @@ void cerrar_archivo_dos(file_pokemon* poke_file) {
 
 int decrementar_cantidad_dos(file_pokemon* poke_file, t_posicion posicion){
 
-	char** bloques_array = config_get_array_value(poke_file->file, "BLOCKS");
+	char** bloques_array = poke_file->blocks;
 	//2 bytes in 1 blocks are definitely lost
 
 	t_list* renglones = obtener_posiciones_de_bloques(bloques_array);
@@ -151,7 +195,7 @@ int decrementar_cantidad_dos(file_pokemon* poke_file, t_posicion posicion){
 	list_destroy(renglones);
 	free(bloques_array);
 
-	char* bloques_string = config_get_string_value(poke_file->file,"BLOCKS");
+	char* bloques_string = poke_file->blocks_string;
 	bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - 1);
 	bloques_string = string_substring(bloques_string, 0, string_length(bloques_string) - bloques_liberados * 2);
 	bloques_string = string_from_format("%s]", bloques_string);
@@ -160,14 +204,14 @@ int decrementar_cantidad_dos(file_pokemon* poke_file, t_posicion posicion){
 		bloques_string = string_from_format("[%s", bloques_string);
 	}
 
-	config_set_value(poke_file->file,"BLOCKS", bloques_string);
+	poke_file->blocks_string = bloques_string;
 	free(bloques_string);
 
-	char* size = string_itoa(tamanio);
-	config_set_value(poke_file->file, "SIZE", size);
-	free(size);
-
-	config_save(poke_file->file);
+	//char* size = string_itoa(tamanio);
+	//config_set_value(poke_file->size = "SIZE", size);
+	//free(size);
+	poke_file->size = string_itoa(tamanio);
+	//config_save(poke_file->file);
 
 	return 1;
 }
@@ -175,7 +219,7 @@ int decrementar_cantidad_dos(file_pokemon* poke_file, t_posicion posicion){
 t_list* obtener_posiciones_pokemon_dos(file_pokemon* poke_file) {
 	t_list* posiciones = list_create();
 
-	char** bloques_array = config_get_array_value(poke_file->file, "BLOCKS");
+	char** bloques_array = poke_file->blocks;
 	//2 bytes in 1 blocks are definitely lost
 	t_list* renglones = obtener_posiciones_de_bloques(bloques_array);
 	free(bloques_array);

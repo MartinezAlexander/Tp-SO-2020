@@ -18,7 +18,11 @@ pthread_mutex_t mutex_modificacion_de_archivo;
 
 typedef struct{
 	char* especie;
-	t_config* file;
+	char* open;
+	char** blocks;
+	char* blocks_string;
+	char* directory;
+	char* size;
 	char* path;
 	pthread_mutex_t mutex_file;
 }file_pokemon;

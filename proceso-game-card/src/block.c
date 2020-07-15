@@ -240,11 +240,8 @@ char* leer_bloque(int bloque) {
 	char* path_bloque = path(path_blocks, nombre_bloque);
 
 	FILE* fd = fopen(path_bloque, "r");
-
 	char caracter = fgetc(fd);
-
 	char* posiciones = "";
-
 	while (caracter != EOF) {
 		posiciones = string_from_format("%s%c", posiciones, caracter);
 		caracter = fgetc(fd);
@@ -261,15 +258,17 @@ t_list* obtener_posiciones_de_bloques(char** bloques) {
 	int i = 0;
 
 	while (bloques[i] != NULL) {
+		puts(bloques[i]);
 		int bloque = atoi(bloques[i]);
-
+		puts("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
 		char* posiciones_por_bloque = leer_bloque(bloque);
+		puts("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
 		string_append(&posiciones, posiciones_por_bloque);
+		puts("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
 		//(invalid free()-VALAGRIND)free(posiciones_por_bloque);
 		i++;
 	}
-
-
+	puts(posiciones);
 	return convertir_info_posiciones(posiciones);
 }
 
