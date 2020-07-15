@@ -54,6 +54,7 @@ void inicializar_filesystem() {
 
 	pthread_mutex_init(&mutex_modificacion_de_archivo, NULL);
 	pthread_mutex_init(&mutex_listar_directorios, NULL);
+	//TODO Lock at 0x8051214 was first observed [PID: 8835]
 	pthread_mutex_init(&mutex_obtener_pokemon,NULL);
 
 	pokemones_files = list_create();

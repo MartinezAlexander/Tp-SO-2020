@@ -28,11 +28,6 @@ void iniciar_conexion_broker(){
 	estoy_reconectando = 0;
 }
 
-void cerrar_conexion_broker(){
-	//TODO cuando termina el proceso game card???
-	//No termina nunca, es como el broker
-}
-
 void procesar_cola(op_code cola){
 	switch(cola){
 		case CATCH_POKEMON:

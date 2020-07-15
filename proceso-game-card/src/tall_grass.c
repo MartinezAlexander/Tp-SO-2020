@@ -4,9 +4,11 @@
  * Toma dos strings, y devuelve la concatenacion de ambos
  * con el caracter '/' en el medio
  */
+//TODO Locks held: none [PID: 8835]
 char* path(char* direccion, char* direccion2) {
 	char* path = string_duplicate(direccion);
 	string_append(&path, "/");
+	//TODO Address 0x423ffb0 is 32 bytes inside a block of size 47 alloc'd [PID: 8835]
 	string_append(&path, direccion2);
 	//(aprox 40 en promedio) 56 bytes in 1 blocks are definitely lost (x casi infinitas veces)
 	return path;
@@ -108,6 +110,8 @@ char* obtener_directorio_metadata() {
 
 	if (!existe_archivo_en("Metadata", punto_de_montaje_tallgrass)) {
 		crear_directorio(punto_de_montaje_tallgrass, "Metadata");
+
+		//DUDA, ESTO ES VIEJO?
 
 		//TODO Crear archivo metadata propio y cargarlo con valores default?
 

@@ -265,7 +265,7 @@ t_list* obtener_posiciones_de_bloques(char** bloques) {
 
 		char* posiciones_por_bloque = leer_bloque(bloque);
 		string_append(&posiciones, posiciones_por_bloque);
-		//free(posiciones_por_bloque);
+		//(invalid free()-VALAGRIND)free(posiciones_por_bloque);
 		i++;
 	}
 
@@ -309,7 +309,9 @@ char* obtener_path_bloque_de_lista(char** bloques, int indice_numero_bloque) {
 		nombre_bloque = crear_nombre_bloque_numero(num_bloque);
 		path_bloque = path(path_blocks, nombre_bloque);
 	}
-
+	//TODO libero path
+	free(path_blocks);
+	free(nombre_bloque);
 	return path_bloque;
 }
 

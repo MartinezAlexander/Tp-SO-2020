@@ -52,6 +52,7 @@ void liberar_bloque(int numero_bloque){
 	}else{
 		printf("[Bloque] Error al liberar bloque, no existe el bloque %d\n", numero_bloque);
 		//TODO Error bloque no existe
+
 	}
 }
 

@@ -19,12 +19,34 @@ void loggear_info(char* info) {
 	log_info(logger, info);
 }
 
-void loggear_conexion(int socket) {
+void loggear_error_conexion(int socket) {
 	if(socket<=0){
 		char* log = string_from_format("El gamecard no se pudo conectar al proceso Broker");
 		log_info(logger, log);
 		free(log);
 	}
+}
+
+void loggear_no_existe_posicion(t_posicion posicion){
+	char* log = string_from_format("No existe la poscion dada x:%d, y:%d",posicion.posicionX, posicion.posicionY );
+	log_info(logger,log);
+	free(log);
+}
+void loggear_no_existe_pokemon(char* especie){
+	char*log=string_from_format("No existe el pokemon %s en el archivo",especie);
+	log_info(logger,log);
+	free(log);
+}
+
+void loggear_archivo_abierto(char* especie){
+	char* log = string_from_format("El archivo de %s esta abierto",especie);
+	log_info(logger,log);
+	free(log);
+}
+void loggear_reintento(char* especie){
+	char* log = string_from_format("Reintento abrir el archivo de: %s",especie);
+		log_info(logger,log);
+		free(log);
 }
 
 char* proceso_to_string(t_proceso id_proceso){

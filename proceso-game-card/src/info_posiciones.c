@@ -108,8 +108,9 @@ t_list* convertir_info_posiciones(char* posiciones_string){
 			list_add(posiciones_reales, posicion_real);
 			i++;
 		}
-		//TODO liberar array de posiciones
+		//TODO liberar array de posiciones_string
 		free(posiciones);
+		free(posiciones_string);
 
 	}
 

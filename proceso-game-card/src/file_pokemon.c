@@ -20,9 +20,10 @@ file_pokemon* file_pokemon_obtener(char* especie){
 	}
 
 	file_pokemon* pokemon_file = malloc(sizeof(file_pokemon));
-	pokemon_file->especie = especie;
-	char* path_poke_file = obtener_pokemon(especie);
-	pokemon_file->file = config_create(path_poke_file);
+	pokemon_file->especie = string_new();
+	string_append(&pokemon_file->especie,especie);
+	pokemon_file->path = obtener_pokemon(especie);
+	pokemon_file->file = config_create(pokemon_file->path);
 	pthread_mutex_init(&pokemon_file->mutex_file,NULL);
 
 	list_add(pokemones_files,pokemon_file);
@@ -44,7 +45,11 @@ void abrir_archivo_dos(file_pokemon* poke_file, int hilo){
 	//En caso que ya este abiero espero x segundos
 	while (string_equals_ignore_case(valor_open, "Y")) {
 
+
+		loggear_archivo_abierto(poke_file->especie);
 		sleep(tiempo_reintento_operacion);
+
+		loggear_reintento(poke_file->especie);
 
 		printf("Soy el hilo %d y reintento abrir archivo\n",hilo);
 
@@ -111,7 +116,7 @@ void agregar_pokemon_dos(file_pokemon* poke_file, t_posicion posicion, int canti
 void cerrar_archivo_dos(file_pokemon* poke_file) {
 //Uso config para leer el archivo metadata
 	pthread_mutex_lock(&poke_file->mutex_file);
-
+	//TODO Address 0x425dca0 is 0 bytes inside a block of size 5 alloc'd [PID: 8835]
 	config_set_value(poke_file->file, "OPEN", "N");
 	config_save(poke_file->file);
 
@@ -130,6 +135,7 @@ int decrementar_cantidad_dos(file_pokemon* poke_file, t_posicion posicion){
 	int existe_posicion = decrementar_info_posicion_en_listado(renglones, posicion);
 
 	if(!existe_posicion){
+		loggear_no_existe_posicion(posicion);
 		free(bloques_array);
 		list_destroy(renglones);
 		return 0;
@@ -210,9 +216,9 @@ char* obtener_pokemon(char* especie) {
 	}
 }
 
-void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad) {
+void agregar_pokemon(file_pokemon* poke_file, t_posicion posicion, int cantidad) {
 
-	t_config* config_metadata = config_create(archivo);
+	t_config* config_metadata = config_create(poke_file->path);
 
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
@@ -262,8 +268,8 @@ void agregar_pokemon(char* archivo, t_posicion posicion, int cantidad) {
  * Decrementa la cantidad de pokemones en la posicion dada para tal archivo pokemon.
  * En caso de que no queden mas luego de decrementar, elimina la posicion del archivo.
  */
-int decrementar_cantidad(char* archivo, t_posicion posicion) {
-	t_config* config_metadata = config_create(archivo);
+int decrementar_cantidad(file_pokemon* poke_file, t_posicion posicion) {
+	t_config* config_metadata = config_create(poke_file->path);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
@@ -314,10 +320,10 @@ int decrementar_cantidad(char* archivo, t_posicion posicion) {
  * Dado un archivo pokemon, devuelve una lista con todas
  * las posiciones en las que se encuentra dicho pokemon
  */
-t_list* obtener_posiciones_pokemon(char* archivo) {
+t_list* obtener_posiciones_pokemon(file_pokemon* poke_file) {
 	t_list* posiciones = list_create();
 
-	t_config* config_metadata = config_create(archivo);
+	t_config* config_metadata = config_create(poke_file->path);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
@@ -338,9 +344,9 @@ t_list* obtener_posiciones_pokemon(char* archivo) {
 	return posiciones;
 }
 
-int existe_posicion(char* archivo, t_posicion posicion) {
+int existe_posicion(file_pokemon* poke_file, t_posicion posicion) {
 
-	t_config* config_metadata = config_create(archivo);
+	t_config* config_metadata = config_create(poke_file->path);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
@@ -349,27 +355,25 @@ int existe_posicion(char* archivo, t_posicion posicion) {
 
 	int bloque = obtener_bloque_con_posicion(bloques_array, posicion, 0);
 
-
-
 	free(bloques_array);
 
 	return bloque > -1;
 }
 
-void abrir_archivo(char* archivo, int hilo){
+void abrir_archivo(file_pokemon* poke_file, int hilo){
 
 	//Uso config para leer el archivo metadata
 
 	//TODO: Habria que tener un diccionario de especies para los mutex.
 	//asi dos entradas de pokemon distintos no usan el mismo mutex y se traban
-	pthread_mutex_lock(&mutex_modificacion_de_archivo);
-	t_config* config_metadata = config_create(archivo);
+	pthread_mutex_lock(&poke_file->mutex_file);
+	t_config* config_metadata = config_create(poke_file->path);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
 	char* valor_open = config_get_string_value(config_metadata, "OPEN");
 
-	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+	pthread_mutex_unlock(&poke_file->mutex_file);
 
 	//En caso que ya este abiero espero x segundos
 	while (string_equals_ignore_case(valor_open, "Y")) {
@@ -377,39 +381,41 @@ void abrir_archivo(char* archivo, int hilo){
 		sleep(tiempo_reintento_operacion);
 		printf("Soy el hilo %d y reintento abrir archivo\n",hilo);
 
-		pthread_mutex_lock(&mutex_modificacion_de_archivo);
-		t_config* config_metadata_actualizado = config_create(archivo);
+		pthread_mutex_lock(&poke_file->mutex_file);
+		t_config* config_metadata_actualizado = config_create(poke_file->path);
 		valor_open = config_get_string_value(config_metadata_actualizado, "OPEN");
 		//config_destroy(config_metadata_actualizado);
-		pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+		pthread_mutex_unlock(&poke_file->mutex_file);
 	}
 
-	pthread_mutex_lock(&mutex_modificacion_de_archivo);
+	pthread_mutex_lock(&poke_file->mutex_file);
 
 	config_destroy(config_metadata);
 
-	config_metadata = config_create(archivo);
+	config_metadata = config_create(poke_file->path);
 	config_set_value(config_metadata, "OPEN", "Y");
 	config_save(config_metadata);
 	config_destroy(config_metadata);
 	//printf("Soy el hilo %d y actualizo el open\n",hilo);
-	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+	pthread_mutex_unlock(&poke_file->mutex_file);
 
 	printf("Soy el hilo %d y se abrio archivo de la especie",hilo);
 }
 
-void cerrar_archivo(char* archivo) {
+void cerrar_archivo(file_pokemon* poke_file) {
 //Uso config para leer el archivo metadata
-	pthread_mutex_lock(&mutex_modificacion_de_archivo);
 
-	t_config* config_metadata = config_create(archivo);
+	pthread_mutex_lock(&poke_file->mutex_file);
+
+	t_config* config_metadata = config_create(poke_file->path);
 	if (config_metadata == NULL)
 		printf("Error al crear config de metadata\n");
 
 	config_set_value(config_metadata, "OPEN", "N");
 	config_save(config_metadata);
 	config_destroy(config_metadata);
-	pthread_mutex_unlock(&mutex_modificacion_de_archivo);
+
+	pthread_mutex_unlock(&poke_file->mutex_file);
 
 	//printf("-Se cerro archivo-\n");
 }
