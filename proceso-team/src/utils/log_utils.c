@@ -31,7 +31,7 @@ void loggear_resultado_deteccion_deadlock(int intercambios_detectados){
 }
 //7. Llegada de un mensaje (indicando el tipo del mismo y sus datos)
 void loggear_nuevo_mensaje(t_mensaje* mensaje){
-	log_info(logger, mensaje_to_string(mensaje));
+	log_info(logger, mensaje_to_string(mensaje)); //TODO 598bytes :O
 }
 
 //8. Resultado del Team (especificado anteriormente)

@@ -247,7 +247,7 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquirido
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	//TODO [ML] Nos tira leak pero tres lineas abajo no y hacemos lo mismo..?
-	char** posiciones_separadas = string_split(posicion, "|");
+	char** posiciones_separadas = string_split(posicion, "|"); //TODO 12bytes
 	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]), atoi(posiciones_separadas[1]));
 	free(posiciones_separadas);
 
@@ -297,7 +297,7 @@ t_list* separar(char* listado){
 	t_list* listado_separado = list_create();
 
 	int len_no_brackets = strlen(listado) - 2;
-	char* listado_sin_brackets = string_substring(listado, 1, len_no_brackets);
+	char* listado_sin_brackets = string_substring(listado, 1, len_no_brackets); //TODO 10bytes
 
 	char* token;
 	while((token = strsep(&listado_sin_brackets, ",")) != NULL){
@@ -312,9 +312,9 @@ t_list* separar(char* listado){
 }
 
 t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
-	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
+	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");//TODO 12bytes
 	char* listado_pokemones_adquiridos = config_get_string_value(config, "POKEMON_ENTRENADORES");
-	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
+	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");//TODO 46bytes
 	//TODO [ML] Memory Leak de las commons??
 
 	int numero_posiciones = array_cantidad_de_elementos(posiciones_entrenadores);
