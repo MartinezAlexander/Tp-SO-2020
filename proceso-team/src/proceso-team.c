@@ -15,6 +15,8 @@
 int main(void) {
 	inicializar_variables();
 
+	//TODO [ML] probar mem leak de leer entrenadores si destruimos el config aca, total no lo usamos mas
+
 	iniciar_hilos_planificacion();
 
 	//Me suscribo a las colas y abro hilos para recibir mensajes
@@ -24,40 +26,32 @@ int main(void) {
 	//Abro socket de escucha para el Gameboy
 	iniciar_puerto_de_escucha();
 
-	//test_sjf_con_desalojo();
+	/*
+	 * Tengo que esperar a que me llegue señal de que mis entrenadores estan
+	 * en EXIT o en DEADLOCK, para poder resolverlo en caso de que sea necesario
+	 */
+	sem_wait(&semaforo_resolucion_deadlock);
 
-	//test_deadlock2();
+	printf("[Deadlock] Comienza la deteccion de deadlock\n");
+	resolver_deadlock();
+
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)
 	//Cuando esto ocurra, tambien significara que el
 	//proceso team termino.
 	esperar_hilos_planificacion();
-	//Una vez que llego a esta zona se que ya todos los entrenadores
-	//estan en estado exit, por lo que puedo liberar las conexiones
-	//con el broker y joinear los hilos que llevaban a cabo
-	//la escucha y el procesamiento de mensajes
-	cerrar_conexion_broker();
+	printf("[Team] Todos sus entrenadores han cumplido su objetivo\n");
 
-	int ciclos_cpu_totales = 0;
-	for(int i = 0 ; i < list_size(entrenadores) ; i++){
-		t_entrenador* entrenador = list_get(entrenadores, i);
-		int ciclos = (int)dictionary_get(diccionario_ciclos_entrenador, string_itoa(entrenador->identificador));
-		ciclos_cpu_totales += ciclos;
-	}
-
-	//Loggear estadisticas
+	loggear_resultado_team();
 
 	//quedaria liberar variables globales
 	terminar_programa(logger, config);
 }
 
-//TODO (estadisticas) Deadlocks producidos y resueltos
-
 void inicializar_variables(){
 	config = leer_config();
 
-	finalizo_team = 0;
 	cambios_de_contexto = 0;
 
 	char* algoritmo_planificacion = config_get_string_value(config, "ALGORITMO_PLANIFICACION");
@@ -81,6 +75,8 @@ void inicializar_variables(){
 
 	pthread_mutex_init(&mutex_procesamiento_pokemon, NULL);
 
+	sem_init(&semaforo_resolucion_deadlock, 0, 0);
+
 	tiempo_de_reconexion = config_get_int_value(config, "TIEMPO_RECONEXION");
 	retardo_cpu = config_get_int_value(config, "RETARDO_CICLO_CPU");
 
@@ -94,6 +90,8 @@ void inicializar_variables(){
 
 	ip_team = config_get_string_value(config, "IP_TEAM");
 	puerto_team = config_get_string_value(config, "PUERTO_TEAM");
+
+	//config_destroy(config);
 }
 
 t_log* iniciar_logger(char* path)
@@ -124,9 +122,5 @@ void terminar_programa(t_log* logger, t_config* config){
 	{
 		log_info(logger, "finalizando programa...");
 		log_destroy(logger);
-	}
-	if(config != NULL)
-	{
-		config_destroy(config);
 	}
 }

@@ -4,10 +4,10 @@ void iniciarlizar_diccionario_catch(){
 	mensajes_catch_pendientes = dictionary_create();
 }
 
-void actualizar_estadistica_entrenador(int id_entrenador){
+void actualizar_estadistica_entrenador(int id_entrenador, int ciclos_a_agregar){
 	char* id = string_itoa(id_entrenador);
 	int ciclos = (int) dictionary_get(diccionario_ciclos_entrenador, id);
-	dictionary_put(diccionario_ciclos_entrenador, id, (void*)ciclos+1);
+	dictionary_put(diccionario_ciclos_entrenador, id, (void*)ciclos+ciclos_a_agregar);
 	free(id);
 }
 
@@ -16,9 +16,9 @@ void actualizar_estadistica_entrenador(int id_entrenador){
  * Se encarga de moverse hacia su objetivo, o realizar el envio de CATCH una vez que llego
  */
 int ejecutar_entrenador(t_entrenador* entrenador){
-	actualizar_estadistica_entrenador(entrenador->identificador);
+	actualizar_estadistica_entrenador(entrenador->identificador, 1);
 
-	int termine = mover_proxima_posicion(entrenador);
+	int termine = mover_proxima_posicion(entrenador, entrenador->objetivo_actual->posicion);
 	loggear_movimiento_entrenador(entrenador->identificador, entrenador->posicion);
 
 	if(termine){
@@ -28,10 +28,64 @@ int ejecutar_entrenador(t_entrenador* entrenador){
 	return termine;
 }
 
+/*
+ * Ejecuta un ciclo de entrenador para realizar el intercambio de deadlock actual
+ */
+int ejecutar_entrenador_intercambio_deadlock(t_entrenador* entrenador){
+	actualizar_estadistica_entrenador(entrenador->identificador, 1);
+
+	int termine = mover_proxima_posicion(entrenador, entrenador->intercambio_actual->entrenadorObjetivo->posicion);
+	loggear_movimiento_entrenador(entrenador->identificador, entrenador->posicion);
+
+	if(termine){
+		char* pokemon_a_recibir = entrenador->intercambio_actual->pokemonARecibir;
+		char* pokemon_a_dar = entrenador->intercambio_actual->pokemonADar;
+		cambiar_pokemon(entrenador->pokemones_adquiridos, pokemon_a_dar, pokemon_a_recibir);
+		cambiar_pokemon(entrenador->intercambio_actual->entrenadorObjetivo->pokemones_adquiridos,
+				pokemon_a_recibir, pokemon_a_dar);
+
+		int ciclos_intercambio = 5;
+
+		sleep(retardo_cpu * ciclos_intercambio);
+
+		actualizar_estadistica_entrenador(entrenador->identificador, ciclos_intercambio);
+
+		loggear_operacion_intercambio(entrenador->identificador,
+						entrenador->intercambio_actual->entrenadorObjetivo, pokemon_a_dar, pokemon_a_recibir);
+
+		actualizar_estado_entrenador(entrenador);
+		actualizar_estado_entrenador(entrenador->intercambio_actual->entrenadorObjetivo);
+
+		/*
+		 * Al terminar el intercambio, como el hilo de mi otro entrenador sigue bloqueado,
+		 * no le doy chance a que salga del while en caso de que quede en EXIT.
+		 * Por eso es que chequeo esto y le mando el signal para que se desbloquee, y
+		 * del otro lado me fijo si esta en EXIT para salir del while
+		 */
+		if(entrenador->intercambio_actual->entrenadorObjetivo->estado == EXIT){
+			sem_post(&entrenador->intercambio_actual->entrenadorObjetivo->semaforo);
+		}
+
+		entrenador->intercambio_actual = NULL;
+
+		encolar_proximo_intercambio(0);
+	}
+
+	return termine;
+}
+
+void actualizar_estado_entrenador(t_entrenador* entrenador){
+	if(cumplio_objetivo_entrenador(entrenador)){
+		entrenador->estado = EXIT;
+	}else if(entrenador_estado_deadlock(entrenador)){
+		entrenador->estado = BLOCKED_DEADLOCK;
+	}
+}
+
 void enviar_catch(t_entrenador* entrenador){
 	sleep(retardo_cpu);
 
-	actualizar_estadistica_entrenador(entrenador->identificador);
+	actualizar_estadistica_entrenador(entrenador->identificador, 1);
 	entrenador->estado = BLOCKED_BY_CATCH;
 	//Cambie de estado, entonces habilito el semaforo
 	//del planificador para que pueda mandar a ejecutar
@@ -45,7 +99,7 @@ void enviar_catch(t_entrenador* entrenador){
 	if(socket < 0){
 		loggear_error_broker("envio de mensaje catch");
 		//Comportamiento default: CATCH positivo
-		resolver_caught_positivo(entrenador);
+		resolver_caught_positivo(entrenador, 0);
 	}else{
 		//Envio mensaje
 		t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
@@ -56,7 +110,7 @@ void enviar_catch(t_entrenador* entrenador){
 		if(envio < 0){
 			loggear_error_broker("envio de mensaje catch");
 			//Comportamiento default: CATCH positivo
-			resolver_caught_positivo(entrenador);
+			resolver_caught_positivo(entrenador, 0);
 		}else{
 			int id = recibir_id(socket);
 			printf("-Enviado el catch, y recibido id de mensaje: %d -\n", id);
@@ -68,7 +122,7 @@ void enviar_catch(t_entrenador* entrenador){
 	}
 }
 
-void resolver_caught_positivo(t_entrenador* entrenador){
+void resolver_caught_positivo(t_entrenador* entrenador, int asincronico){
 
 	printf("Entrenador %d atrapo exitosamente al %s en [%d,%d]\n", entrenador->identificador,
 			entrenador->objetivo_actual->especie, entrenador->objetivo_actual->posicion.posicionX,
@@ -76,15 +130,36 @@ void resolver_caught_positivo(t_entrenador* entrenador){
 
 	entrenador_atrapar_objetivo(entrenador);
 
+
 	//Actualizo el estado del entrenador
 	if(cumplio_objetivo_entrenador(entrenador)){
 		entrenador->estado = EXIT;
+		printf("[Estado] Entrenador %d finalizo su ejecucion\n", entrenador->identificador);
+		//Puede darse el caso de que el entrenador entre en EXIT o DEADLOCK asincronicamente,
+		//osea, cuando me llega la respuesta del CAUGHT (sin hacer comp. default)
+		//Y cuando eso pase, el entrenador no podra salir del loop de ejecucion porque se
+		//bloqueo anteriormente. Entonces debo mandar un signal para que el entrenador pueda
+		//salir del while, sin ejecutar.
+		if(asincronico) sem_post(&entrenador->semaforo);
 	}else{
-		if(entrenador_estado_deadlock(entrenador))
+		if(entrenador_estado_deadlock(entrenador)){
 			entrenador->estado = BLOCKED_DEADLOCK;
-		else{
+			printf("[Estado] Entrenador %d bloqueado por deadlock\n", entrenador->identificador);
+
+			if(asincronico) sem_post(&entrenador->semaforo);
+		}else{
 			bloquear_entrenador(entrenador);
+			printf("[Estado] Entrenador %d bloqueado\n", entrenador->identificador);
 		}
+	}
+
+	/*
+	 * En caso de que todos mis entrenadores hayan terminado la ejecucion
+	 * de atrapar pokemones, debo hacer el signal para que el main continue y
+	 * comience la deteccion de deadlock
+	 */
+	if(list_all_satisfy(entrenadores, entrenador_termino_ejecucion_normal)){
+		sem_post(&semaforo_resolucion_deadlock);
 	}
 }
 
@@ -125,7 +200,7 @@ int entrenador_tiene_objetivo(t_entrenador* entrenador, char* especie){
 
 void agregar_a_objetivos_globales(char* especie){
 	list_add(objetivo_global, especie);
-	list_sort(objetivo_global, strcmp);
+	list_sort(objetivo_global, strcasecmp);
 }
 
 void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
@@ -147,18 +222,18 @@ void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
  * (primero mueve en x, luego en y), devolviendo 1 en caso de que haya alcanzado
  * el mismo, y 0 si debe seguir moviendose
  */
-int mover_proxima_posicion(t_entrenador* entrenador){
-	int dirX = direccion_en_x(entrenador->posicion, entrenador->objetivo_actual->posicion);
+int mover_proxima_posicion(t_entrenador* entrenador, t_posicion objetivo){
+	int dirX = direccion_en_x(entrenador->posicion, objetivo);
 
 	if(dirX == 0){
-		int dirY = direccion_en_y(entrenador->posicion, entrenador->objetivo_actual->posicion);
+		int dirY = direccion_en_y(entrenador->posicion, objetivo);
 		entrenador->posicion.posicionY += dirY;
 	}else{
 		entrenador->posicion.posicionX += dirX;
 	}
 	sleep(retardo_cpu);
 
-	return movimientos_entre_posiciones(entrenador->posicion, entrenador->objetivo_actual->posicion) == 0;
+	return movimientos_entre_posiciones(entrenador->posicion, objetivo) == 0;
 }
 
 //Recibe pokemones en un string separados por pipes y los asigna al entrenador
@@ -168,10 +243,10 @@ void asignar_pokemones(t_entrenador* entrenador, char* pokemones){
 	free(pokemones_adquiridos_array);
 }
 
-t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificador, double estimacion_inicial ){
+t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquiridos, int identificador, double estimacion_inicial ){
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
-	//TODO Nos tira leak pero tres lineas abajo no y hacemos lo mismo..?
+	//TODO [ML] Nos tira leak pero tres lineas abajo no y hacemos lo mismo..?
 	char** posiciones_separadas = string_split(posicion, "|");
 	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]), atoi(posiciones_separadas[1]));
 	free(posiciones_separadas);
@@ -180,12 +255,20 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 	entrenador->objetivos = array_to_list(objetivos_array);
 	free(objetivos_array);
 
+	//Asigno si veo que tiene pokemones de entrada
+	if(adquiridos != NULL){
+		asignar_pokemones(entrenador, adquiridos);
+	}else{
+		entrenador->pokemones_adquiridos = list_create();
+	}
+
 	entrenador->estado = NEW;
 	entrenador->identificador = identificador;
 
 	entrenador->objetivo_actual = NULL;
+	entrenador->intercambio_actual = NULL;
 
-	//TODO Free cuando terminamos los entrenadores?
+	//TODO [ML] Free cuando terminamos los entrenadores?
 	entrenador->estado_sjf = malloc(sizeof(estado_sjf));
 	entrenador->estado_sjf->ultima_rafaga = 0;
 	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
@@ -194,6 +277,8 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, int identificad
 	char* id_entrenador = string_itoa(entrenador->identificador);
 	dictionary_put(diccionario_ciclos_entrenador, id_entrenador, 0);
 	free(id_entrenador);
+
+	actualizar_estado_entrenador(entrenador);
 
 	return entrenador;
 }
@@ -216,7 +301,7 @@ t_list* separar(char* listado){
 
 	char* token;
 	while((token = strsep(&listado_sin_brackets, ",")) != NULL){
-		if(!strcmp(token, "")){
+		if(!strcasecmp(token, "")){
 			list_add(listado_separado, NULL);
 		}else{
 			list_add(listado_separado, token);
@@ -230,7 +315,7 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
 	char* listado_pokemones_adquiridos = config_get_string_value(config, "POKEMON_ENTRENADORES");
 	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
-	//TODO Memory Leak de las commons??
+	//TODO [ML] Memory Leak de las commons??
 
 	int numero_posiciones = array_cantidad_de_elementos(posiciones_entrenadores);
 	int numero_obj_entrenadores = array_cantidad_de_elementos(objetivos_entrenadores);
@@ -247,16 +332,10 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	iniciarlizar_diccionario_catch();
 
 	for(int i = 0 ; i < numero_posiciones ; i++){
-		t_entrenador* entrenador = entrenador_create(posiciones_entrenadores[i],
-				objetivos_entrenadores[i], (i+1), estimacion_inicial);
-
 		char* pokemones = list_get(pokemones_entrenadores, i);
-		//Asigno si veo que tiene pokemones de entrada
-		if(pokemones != NULL){
-			asignar_pokemones(entrenador, pokemones);
-		}else{
-			entrenador->pokemones_adquiridos = list_create();
-		}
+
+		t_entrenador* entrenador = entrenador_create(posiciones_entrenadores[i],
+				objetivos_entrenadores[i], pokemones, (i+1), estimacion_inicial);
 
 		list_add(entrenadores, entrenador);
 	}
@@ -265,6 +344,15 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	free(listado_pokemones_adquiridos);
 	free(objetivos_entrenadores);
 	list_destroy(pokemones_entrenadores);
+
+	/*
+	 * En caso de que todos mis entrenadores empiecen en EXIT o DEADLOCK,
+	 * debo hacer el signal para que el main continue y
+	 * comience la deteccion de deadlock
+	 */
+	if(list_all_satisfy(entrenadores, entrenador_termino_ejecucion_normal)){
+		sem_post(&semaforo_resolucion_deadlock);
+	}
 
 	return entrenadores;
 }
@@ -278,6 +366,11 @@ int entrenador_en_ejecucion(t_entrenador *entrenador)
 int entrenador_en_deadlock(t_entrenador *entrenador)
 {
 	return(entrenador->estado == BLOCKED_DEADLOCK);
+}
+
+int entrenador_termino_ejecucion_normal(t_entrenador *entrenador)
+{
+	return(entrenador->estado == BLOCKED_DEADLOCK || entrenador->estado == EXIT);
 }
 
 void entrenador_atrapar_objetivo(t_entrenador* entrenador){
@@ -296,15 +389,15 @@ int cumplio_objetivo_entrenador(t_entrenador* entrenador){
 	if(list_size(entrenador->objetivos) != list_size(entrenador->pokemones_adquiridos)) return 0;
 
 	//La ordeno para poder compararlas
-	list_sort(entrenador->objetivos, strcmp);
-	list_sort(entrenador->pokemones_adquiridos, strcmp);
+	list_sort(entrenador->objetivos, strcasecmp);
+	list_sort(entrenador->pokemones_adquiridos, strcasecmp);
 
 	//Comparo con los objetivos
 	for(int i = 0 ; i < list_size(entrenador->pokemones_adquiridos) ; i++){
 		char* pk1 = list_get(entrenador->pokemones_adquiridos, i);
 		char* pk2 = list_get(entrenador->objetivos, i);
 
-		if(string_equals_ignore_case(pk1,pk2) != 1) return 0;
+		if(!string_equals_ignore_case(pk1,pk2)) return 0;
 	}
 
 	return 1;

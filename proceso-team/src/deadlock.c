@@ -1,6 +1,7 @@
 #include "deadlock.h"
 
 void resolver_deadlock(){
+	loggear_inicio_deteccion_deadlock();
 
 	//Pasar entrenadores a ent_intercambio
 	t_list* entrenadores_copia = list_create();
@@ -24,10 +25,27 @@ void resolver_deadlock(){
 		queue_push(cola_intercambios_deadlock, intercambio);
 	}
 
-	//TODO
-	//Cuando salgo del while hay que arrancar a resolverlos
+	intercambios_detectados = queue_size(cola_intercambios_deadlock);
+	loggear_resultado_deteccion_deadlock(intercambios_detectados);
+
+	encolar_proximo_intercambio(1);
 }
 
+void encolar_proximo_intercambio(int primer_intercambio){
+	if(queue_is_empty(cola_intercambios_deadlock)){
+		printf("[Deadlock] Se ha terminado la resolucion de deadlock exitosamente\n");
+		return;
+	}
+
+	t_intercambio* intercambio = queue_pop(cola_intercambios_deadlock);
+	t_entrenador* entrenador = intercambio->entrenador;
+	entrenador->intercambio_actual = intercambio;
+	encolar(entrenador);
+
+	printf("[Deadlock] Encolando a entrenador %d para resolver intercambio de deadlock\n", entrenador->identificador);
+
+	if(primer_intercambio) planificar();
+}
 
 t_intercambio* primer_intercambio(t_list* entrenadores_deadlock){
 	t_entrenador_copia* primer_entrenador = list_get(entrenadores_deadlock, 0);
@@ -55,7 +73,6 @@ t_intercambio* primer_intercambio(t_list* entrenadores_deadlock){
 	return convertir_a_intercambio_real(mejor_intercambio);
 }
 
-//TODO: Ver si la clase intercambio_copia me sirve realmente
 
 /*
  * Devuelve el intercambio cuyos movimientos necesarios para llevarse a cabo
@@ -228,8 +245,8 @@ int preparar_entrenador(t_entrenador_copia* entrenador){
 
 	//Necesitamos que esten ordenadas para un toque mas adelante,
 	//OJO, se ordena de Mayor a Menor por algun motivo
-	list_sort(entrenador->adquiridos, strcmp);
-	list_sort(entrenador->objetivos, strcmp);
+	list_sort(entrenador->adquiridos, strcasecmp);
+	list_sort(entrenador->objetivos, strcasecmp);
 
 	return !list_is_empty(entrenador->objetivos);
 }
@@ -268,24 +285,24 @@ t_intercambio* convertir_a_intercambio_real(t_intercambio_copia* intercambio_cop
 
 void realizar_intercambio_simbolico(t_intercambio_copia* intercambio){
 
-	cambiar_pokemon(intercambio->entrenador, intercambio->pokemonADar, intercambio->pokemonARecibir);
-	cambiar_pokemon(intercambio->entrenadorObjetivo, intercambio->pokemonARecibir, intercambio->pokemonADar);
+	cambiar_pokemon(intercambio->entrenador->adquiridos, intercambio->pokemonADar, intercambio->pokemonARecibir);
+	cambiar_pokemon(intercambio->entrenadorObjetivo->adquiridos, intercambio->pokemonARecibir, intercambio->pokemonADar);
 
 	intercambio->entrenador->posicion = intercambio->entrenadorObjetivo->posicion;
 }
 
-void cambiar_pokemon(t_entrenador_copia* entrenador, char* especieASacar, char* especieAMeter){
+void cambiar_pokemon(t_list* listado_pokemon, char* especieASacar, char* especieAMeter){
 
-	for(int i = 0 ; i < list_size(entrenador->adquiridos) ; i++){
-		char* pok = list_get(entrenador->adquiridos, i);
+	for(int i = 0 ; i < list_size(listado_pokemon) ; i++){
+		char* pok = list_get(listado_pokemon, i);
 
 		if(string_equals_ignore_case(pok, especieASacar)){
-			list_remove(entrenador->adquiridos, i);
+			list_remove(listado_pokemon, i);
 			break;
 		}
 	}
 
-	list_add(entrenador->adquiridos, especieAMeter);
+	list_add(listado_pokemon, especieAMeter);
 }
 
 
@@ -314,8 +331,8 @@ t_intercambio_copia* intercambio_copia_create(t_entrenador_copia* entrenador, t_
 t_entrenador_copia* entrenador_copia_create(t_entrenador* entrenador){
 	t_entrenador_copia* entrenador_intercambio = malloc(sizeof(t_entrenador_copia));
 	entrenador_intercambio->entrenador = entrenador;
-	entrenador_intercambio->objetivos = entrenador->objetivos;
-	entrenador_intercambio->adquiridos = entrenador->pokemones_adquiridos;
+	entrenador_intercambio->objetivos = list_duplicate(entrenador->objetivos);
+	entrenador_intercambio->adquiridos = list_duplicate(entrenador->pokemones_adquiridos);
 	entrenador_intercambio->posicion = entrenador->posicion;
 	return entrenador_intercambio;
 }

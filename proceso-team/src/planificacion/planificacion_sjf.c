@@ -109,7 +109,7 @@ t_entrenador* shortest_job(){
 
 
 
-//TODO: ver forma de no repetir codigo
+
 t_entrenador* shortest_job_con_desalojo(){
 	printf("[Replanificacion] Empieza el calculo de estimaciones\n");
 

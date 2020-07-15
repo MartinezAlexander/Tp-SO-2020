@@ -8,7 +8,6 @@
 #include <pthread.h>
 #include "../memoria_cache.h"
 #include "buddy_system.h"
-#include "../logger.h"
 
 t_buddy* buddy_principal;
 pthread_mutex_t mutex_bs;

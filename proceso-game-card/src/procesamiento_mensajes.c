@@ -124,9 +124,8 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 		return;
 	}
 
-	//char* archivo_pokemon = obtener_pokemon(get_pokemon->nombre);
-
 	pthread_mutex_lock(&mutex_obtener_pokemon);
+	//char* archivo_pokemon = obtener_pokemon(get_pokemon->nombre);
 	file_pokemon* poke_file = file_pokemon_obtener(get_pokemon->nombre);
 	pthread_mutex_unlock(&mutex_obtener_pokemon);
 
@@ -157,6 +156,7 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 	t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*) localized_respuesta, LOCALIZED_POKEMON, id);
 	//67 (16 direct, 51 indirect) bytes in 1 blocks are definitely lost
 	enviar_mensaje_al_broker(mensaje);
+
 	mensaje_destroy(mensaje);
 	mensaje_destroy(mensaje_recibido);
 	printf("[Procesamiento] Cerrando hilo %d de procesamiento GET\n",numero_hilo);
