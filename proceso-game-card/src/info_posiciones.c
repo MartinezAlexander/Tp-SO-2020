@@ -68,14 +68,16 @@ char* info_pokemon_to_string(t_posicion posicion, int cantidad){
 	return string_from_format("%d-%d=%d",posicion.posicionX,posicion.posicionY,cantidad);
 }
 
+
 void freeargpointer(char** array)
 {
-    int i;
-    for ( i = 0; array[i]; i++ )
+    int i=0;
+    while( array[i]!= NULL){
         free( array[i] );
+        i++;
+    }
     free( array );
 }
-
 info_posicion* info_posicion_from_string(char* posicion){
 
 	info_posicion* posicion_real = malloc(sizeof(info_posicion));
@@ -86,12 +88,8 @@ info_posicion* info_posicion_from_string(char* posicion){
 	char** posicion_aux2 = string_split(posicion_aux[1],"=");
 	posicion_real->posicion.posicionY = atoi(posicion_aux2[0]);
 	posicion_real->cantidad = atoi(posicion_aux2[1]);
-
-	/*puts("Free 1");
 	freeargpointer(posicion_aux);
-	puts("Free 2");
-	freeargpointer(posicion_aux2);*/
-
+	freeargpointer(posicion_aux2);
 	return posicion_real;
 }
 
@@ -108,8 +106,7 @@ t_list* convertir_info_posiciones(char* posiciones_string){
 			list_add(posiciones_reales, posicion_real);
 			i++;
 		}
-		//TODO liberar array de posiciones_string
-		free(posiciones);
+		freeargpointer(posiciones);
 		free(posiciones_string);
 
 	}
@@ -129,6 +126,7 @@ char* lista_info_posicion_to_string(t_list* posiciones){
 		char* posicion_string = info_pokemon_to_string(posicion->posicion,posicion->cantidad);
 		string_append(&string,posicion_string);
 		string_append(&string,"\n");
+		free(posicion_string);
 	}
 
 	return string;

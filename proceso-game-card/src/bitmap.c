@@ -9,12 +9,9 @@
 
 void bitmap_cargar(){
 	estado_bloques = malloc(sizeof(bitmap));
-
-
-	// TODO PREGUNTA posibilidad de que el bitmap no este pero haya bloques creados (caso extremo)
-	// habria que cargar bitmap en base a nombre de archivos de bloques
-
-	if (!existe_archivo_en("Bitmap.bin",obtener_directorio_metadata())) {
+	char* directorio_metadata = obtener_directorio_metadata();
+	if (!existe_archivo_en("Bitmap.bin",directorio_metadata)) {
+		//TODO puede que este al pedo
 		estado_bloques->path = obtener_directorio_bitmap();
 
 		FILE* fd = fopen(estado_bloques->path,"a");
@@ -35,7 +32,7 @@ void bitmap_cargar(){
 
 	int file_descriptor = open(estado_bloques->path, O_RDWR);
 	estado_bloques->bitarray = mmap(NULL,blocks,PROT_WRITE,MAP_SHARED,file_descriptor,0);
-
+	free(directorio_metadata);
 }
 
 void ocupar_bloque(int nuevo_bloque){

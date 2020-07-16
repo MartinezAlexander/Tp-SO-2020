@@ -39,16 +39,7 @@ t_list* obtener_posiciones_pokemon_dos(file_pokemon* poke_file);
 
 char* obtener_pokemon(char* especie);
 char* pokemon_file_create(char* especie);
-
-void agregar_pokemon(file_pokemon* poke_file, t_posicion posicion, int cantidad);
-
-t_list* obtener_posiciones_pokemon(file_pokemon* poke_file);
-int decrementar_cantidad(file_pokemon* poke_file, t_posicion posicion);
-int existe_posicion(file_pokemon* poke_file, t_posicion posicion);
-
-void abrir_archivo(file_pokemon* poke_file, int hilo);
-void cerrar_archivo(file_pokemon* poke_file);
-
 void crear_metadata(char* ruta);
+
 
 #endif /* FILE_POKEMON_H_ */

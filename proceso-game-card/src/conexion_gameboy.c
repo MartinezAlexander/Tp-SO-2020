@@ -8,16 +8,11 @@ void iniciar_puerto_de_escucha(){
 
 
 void procesar_mensajes_directos(int* socket){
+	//TODO LIBERAR SOCKET CUANDO CAMBIE LA BIBLIOTECA
 	t_mensaje* mensaje = recibir_mensaje(*socket);
-	//Syscall param socketcall.recv(args) points to uninitialised byte(s)
-	//133 (48 direct, 85 indirect) bytes in 3 blocks are definitely lost
-
-	//loggear_nuevo_mensaje(mensaje);
 
 	if(mensaje!=NULL){
 		enviar_ACK(*socket);
-
-		//Syscall param socketcall.send(args) points to uninitialised byte(s)
 
 		switch(mensaje->codigo){
 			case NEW_POKEMON:

@@ -16,8 +16,6 @@ int main(void) {
 
 	inicializar_filesystem();
 
-	//test_agregar_cantidad_a_archivo();
-
 	iniciar_conexion_broker();
 
 	iniciar_puerto_de_escucha();
@@ -46,15 +44,12 @@ void inicializar_variables_globales() {
 
 void inicializar_filesystem() {
 
-	//TODO PREGUNTAR el metadata si o si debe existir, sino deberiamos inventar blocks y blocks_size
-
 	metadata_cargar();
 
 	bitmap_cargar();
 
 	pthread_mutex_init(&mutex_modificacion_de_archivo, NULL);
 	pthread_mutex_init(&mutex_listar_directorios, NULL);
-	//TODO Lock at 0x8051214 was first observed [PID: 8835]
 	pthread_mutex_init(&mutex_obtener_pokemon,NULL);
 
 	pokemones_files = list_create();

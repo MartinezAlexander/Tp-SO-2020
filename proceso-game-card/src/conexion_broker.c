@@ -1,29 +1,41 @@
 #include "conexion_broker.h"
 
 void iniciar_conexion_broker(){
-	//Primero, inicializo los semaforos de cada hilo de procesamiento.
-	//Basicamente quiero poder frenar los hilos que reciben y procesan
-	//cada mensaje en caso de que tenga que reconectarme al broker, para
-	//eso utilizo estos semaforos
+	/*
+	 * Primero, inicializo los semaforos de cada hilo de procesamiento.
+	 * Basicamente quiero poder frenar los hilos que reciben y procesan
+	 * cada mensaje en caso de que tenga que reconectarme al broker, para
+	 * eso utilizo estos semaforos
+	 */
 	sem_init(&semaforo_procesamiento_catch, 0, 0);
 	sem_init(&semaforo_procesamiento_get, 0, 0);
 	sem_init(&semaforo_procesamiento_new, 0, 0);
-	//Luego, inicio los hilos para procesar cada mensaje.
-	//Cada hilo lo que va a hacer es suscribirse a su cola del broker
-	//y luego quedara en un loop recibiendo mensajes y procesandolos
+	/*
+	 * Luego, inicio los hilos para procesar cada mensaje.
+	 * Cada hilo lo que va a hacer es suscribirse a su cola del broker
+	 * y luego quedara en un loop recibiendo mensajes y procesandolos
+	*/
+	//TODO posible creacion de pthread_detach
 	pthread_create(&hilo_catch, NULL, (void*)procesar_cola, (void*)CATCH_POKEMON);
 	sleep(1);
+	//TODO posible creacion de pthread_detach
 	pthread_create(&hilo_get, NULL, (void*)procesar_cola, (void*)GET_POKEMON);
 	sleep(1);
+	//TODO posible creacion de pthread_detach
 	pthread_create(&hilo_new, NULL, (void*)procesar_cola, (void*)NEW_POKEMON);
-	//Finalmente, inicializo el hilo de reconexion. Este empezara bloqueado
-	//por su semaforo, y se activara cuando detecte que se corto la conexion
-	//con el broker. Llevara a cabo la reconexion, y desbloqueara a los hilos
-	//de procesamiento para que puedan seguir recibiendo mensajes.
+	/*
+	 * Finalmente, inicializo el hilo de reconexion. Este empezara bloqueado
+	 * por su semaforo, y se activara cuando detecte que se corto la conexion
+	 * con el broker. Llevara a cabo la reconexion, y desbloqueara a los hilos
+	 * de procesamiento para que puedan seguir recibiendo mensajes.
+	*/
 	sem_init(&semaforo_reconexion, 0, 0);
+	//TODO Crear pthread_detach
 	pthread_create(&hilo_reconexion, NULL, (void*)reconectar, NULL);
-	//Ademas, necesito iniciar un mutex que servira para que los 3 hilos no manden
-	//la señal de activacion al hilo de reconexion 3 veces.
+	/*
+	 *  Ademas, necesito iniciar un mutex que servira para que los 3 hilos no manden
+	 * la señal de activacion al hilo de reconexion 3 veces.
+	 */
 	pthread_mutex_init(&mutex_reconexion, NULL);
 	estoy_reconectando = 0;
 }
@@ -55,19 +67,14 @@ void suscribirse_a_cola(int* socket, op_code cola){
 	*socket = crear_conexion(ip_broker, puerto_broker);
 	//Reintento conexion
 	while(*socket < 0){
-		//loggear_inicio_reintento_broker();
 		sleep(tiempo_reintento_conexion);
 		*socket = crear_conexion(ip_broker, puerto_broker);
-		//loggear_resultado_reintento_broker(*socket > 0);
 	}
 
 	int envio = enviar_mensaje(mensaje, *socket);
-	//Es necesario???
 	while(envio < 0){
-		//loggear_inicio_reintento_broker();
 		sleep(tiempo_reintento_conexion);
 		envio = enviar_mensaje(mensaje, *socket);
-		//loggear_resultado_reintento_broker(envio > 0);
 	}
 
 	int confirmacion = recibir_confirmacion_suscripcion(*socket);
@@ -85,7 +92,6 @@ void procesar_catch(){
 			iniciar_reconexion();
 			sem_wait(&semaforo_procesamiento_catch);
 		}else{
-			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_catch);
 			procesar_mensaje(mensaje, ejecutar_catch);
 		}
@@ -100,7 +106,6 @@ void procesar_get(){
 			iniciar_reconexion();
 			sem_wait(&semaforo_procesamiento_get);
 		}else{
-			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_get);
 			procesar_mensaje(mensaje, ejecutar_get);
 		}
@@ -115,7 +120,6 @@ void procesar_new(){
 			iniciar_reconexion();
 			sem_wait(&semaforo_procesamiento_new);
 		}else{
-			//loggear_nuevo_mensaje(mensaje);
 			enviar_ACK(socket_new);
 			procesar_mensaje(mensaje, ejecutar_new);
 		}
@@ -123,12 +127,14 @@ void procesar_new(){
 	liberar_conexion(socket_new);
 }
 
-//Esta funcion la debo llamar cuando detecto que se cayo el broker
-//y quiero empezar a reconectarme. La idea es que como tranquilamente
-//puede pasar que los 3 hilos detecten que se cayo al mismo tiempo
-//rodearlo con un mutex, y controlar a traves de una variable si debo
-//mandar la señal al hilo de reconexion o no, para que esto se haga una
-//vez y no mande 3 signal al mismo tiempo.
+/*
+ * Esta funcion la debo llamar cuando detecto que se cayo el broker
+ * y quiero empezar a reconectarme. La idea es que como tranquilamente
+ * puede pasar que los 3 hilos detecten que se cayo al mismo tiempo
+ * rodearlo con un mutex, y controlar a traves de una variable si debo
+ * mandar la señal al hilo de reconexion o no, para que esto se haga una
+ * vez y no mande 3 signal al mismo tiempo.
+ */
 void iniciar_reconexion(){
 	pthread_mutex_lock(&mutex_reconexion);
 	if(!estoy_reconectando){
@@ -141,14 +147,12 @@ void iniciar_reconexion(){
 void reconectar(){
 	while(1){
 		sem_wait(&semaforo_reconexion);
-		//loggear inicio reintento
 		suscribirse_a_cola(&socket_catch, CATCH_POKEMON);
 		sem_post(&semaforo_procesamiento_catch);
 		suscribirse_a_cola(&socket_get, GET_POKEMON);
 		sem_post(&semaforo_procesamiento_get);
 		suscribirse_a_cola(&socket_new, NEW_POKEMON);
 		sem_post(&semaforo_procesamiento_new);
-		//loggear resultado reintento
 		estoy_reconectando = 0;
 	}
 }

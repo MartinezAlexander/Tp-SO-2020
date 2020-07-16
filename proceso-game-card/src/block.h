@@ -27,34 +27,13 @@ t_list* bloques;
 char* crear_nombre_bloque_numero(int numero);
 char* crear_directorio_bloque();
 void crear_block(int numero);
-t_config* obtener_bloque_por_indice(int numero_bloque);
-int bloque_esta_libre(int numero_bloque);
-int obtener_tamanio_ocupado_por_bloque(int numero_bloque);
-int bytes_libres_bloque(int numero_bloque);
-int entra_en_bloque(t_posicion posicion,int cantidad, int numero_bloque);
-int agregar_registro_a_bloque(t_posicion posicion,int cantidad, int numero_bloque);
-void guardar_registro_en(char* registro,int numero_bloque);
-void guardar_registro_por_partes_en(char* registro,int numero_bloque,int bloque_nuevo);
 char* leer_bloque(int bloque);
+
 t_list* obtener_posiciones_de_bloques(char** bloques);
-int actualizar_bloques(char** bloques, t_list* posiciones);
-char* obtener_path_bloque_de_lista(char** bloques,int indice_numero_bloque);
-
-void agregar_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad);
-void agregar_nuevo_pokemon_a_bloque(int bloque, t_posicion posicion, int cantidad);
-
-int obtener_primer_bloque_con_espacio(char** bloques, t_posicion posicion, int cantidad);
-
-int obtener_bloque_con_posicion(char** bloques, t_posicion posicion, int cantidad);
-char* posicion_to_key(t_posicion posicion);
-
-int eliminar_pokemon_de_bloque(int bloque, t_posicion posicion);
-t_list* obtener_posiciones_de_bloque(int bloque);
-
-int obtener_tamanio_listado_de_bloques(char** bloques);
-
-char* obtener_string_bloques_sin(char** bloques_array, int bloque_a_sacar);
 
 int array_cantidad_de_elementos(char** array) ;
+char* obtener_path_bloque_de_lista(char** bloques,int indice_numero_bloque);
+void vaciar_bloques(char** bloques);
+int actualizar_bloques(char** bloques, t_list* posiciones);
 
 #endif /* BLOCK_H_ */

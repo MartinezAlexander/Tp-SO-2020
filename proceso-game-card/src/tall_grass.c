@@ -4,13 +4,12 @@
  * Toma dos strings, y devuelve la concatenacion de ambos
  * con el caracter '/' en el medio
  */
-//TODO Locks held: none [PID: 8835]
+
 char* path(char* direccion, char* direccion2) {
 	char* path = string_duplicate(direccion);
 	string_append(&path, "/");
-	//TODO Address 0x423ffb0 is 32 bytes inside a block of size 47 alloc'd [PID: 8835]
 	string_append(&path, direccion2);
-	//(aprox 40 en promedio) 56 bytes in 1 blocks are definitely lost (x casi infinitas veces)
+
 	return path;
 }
 
@@ -61,7 +60,6 @@ t_list* listar_directorio(char* path) {
 			char* nombre = string_new();
 			string_append(&nombre, elemento->d_name);
 			list_add(lista_directorios, nombre);
-			//puts(nombre);
 			elemento = readdir(directorio);
 		}
 	}
@@ -110,15 +108,6 @@ char* obtener_directorio_metadata() {
 
 	if (!existe_archivo_en("Metadata", punto_de_montaje_tallgrass)) {
 		crear_directorio(punto_de_montaje_tallgrass, "Metadata");
-
-		//DUDA, ESTO ES VIEJO?
-
-		//TODO Crear archivo metadata propio y cargarlo con valores default?
-
-		//TODO (luego de responder duda) Crear archivo metadata propio y cargarlo con valores default?
-
-		//crear_archivo(punto_de_montaje_tallgrass,"Metadata.bin");
-		//cargar archivo metadata
 	}
 
 	return path_metadata;
@@ -132,6 +121,7 @@ char* obtener_directorio_bitmap() {
 		FILE* fd = crear_archivo(path_metadata, "Bitmap.bin");
 		fclose(fd);
 	}
+	free(path_metadata);
 
 	return path_bitmap;
 }

@@ -20,8 +20,6 @@
 #include "conexion_broker.h"
 #include "tall_grass.h"
 
-#include "test.h"
-
 void inicializar_variables_globales();
 
 t_config* leer_config(void);
