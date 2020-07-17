@@ -33,7 +33,7 @@ int main(int arg, char** args) {
 	sem_wait(&semaforo_resolucion_deadlock);
 
 	printf("[Deadlock] Comienza la deteccion de deadlock\n");
-	resolver_deadlock();
+	resolver_deadlock_nuevo();
 
 
 	//Antes de terminar el programa, debo esperar a que

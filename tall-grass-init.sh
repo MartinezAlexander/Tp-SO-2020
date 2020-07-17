@@ -1,3 +1,4 @@
+cd ..
 mkdir Escritorio
 cd Escritorio
 mkdir tall-grass 

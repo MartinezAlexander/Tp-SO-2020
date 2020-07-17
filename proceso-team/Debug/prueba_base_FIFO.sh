@@ -1,0 +1,1 @@
+./proceso-team ../src/Prueba_Base_Team.config
