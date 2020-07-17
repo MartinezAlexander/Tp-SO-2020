@@ -12,8 +12,8 @@
 #include "proceso-team.h"
 
 
-int main(void) {
-	inicializar_variables();
+int main(int arg, char** args) {
+	inicializar_variables((char*)args[1]);
 
 	//TODO [ML] probar mem leak de leer entrenadores si destruimos el config aca, total no lo usamos mas
 
@@ -49,8 +49,8 @@ int main(void) {
 	terminar_programa(logger, config);
 }
 
-void inicializar_variables(){
-	config = leer_config();
+void inicializar_variables(char* path_config){
+	config = leer_config(path_config);
 
 	cambios_de_contexto = 0;
 
@@ -105,11 +105,11 @@ t_log* iniciar_logger(char* path)
 	return logger;
 }
 
-t_config* leer_config(void)
+t_config* leer_config(char* path_config)
 {
 	t_config *config;
-	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
-	{														//hay que agregar ../ al path
+	if((config = config_create(path_config)) == NULL)//Nota: para correr desde Debug hay que agregar ../ al path
+	{
 		printf("No pude leer la config\n");
 		exit(2);
 	}

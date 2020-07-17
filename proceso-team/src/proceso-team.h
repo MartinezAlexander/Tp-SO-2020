@@ -27,7 +27,7 @@
 #include"tests/test_deadlock.h"
 
 void terminar_programa(t_log* logger, t_config* config);
-t_config* leer_config(void);
+t_config* leer_config(char* path_config);
 t_log* iniciar_logger(char*);
 void inicializar_variables();
 
