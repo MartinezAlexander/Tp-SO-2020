@@ -1,0 +1,1 @@
+./proceso-broker ../src/PD_FIFO_FF_COMPACTACION1.config
