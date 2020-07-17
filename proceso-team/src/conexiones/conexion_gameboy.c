@@ -17,7 +17,7 @@ void correr_servidor_gameboy(){
 //Supuestamente solo puedo recibir un APPEARED del gameboy, pero como ya
 //tenemos las funciones hechas dejamos los otros dos casos tambien, por las dudas
 void procesar_mensajes_directos(int* socket){
-	t_mensaje* mensaje = recibir_mensaje(*socket); //TODO 187bytes
+	t_mensaje* mensaje = recibir_mensaje(*socket);
 
 	if(mensaje == NULL){
 		printf("[Gameboy] Se recibio un mensaje NULL de gameboy\n");
@@ -41,4 +41,6 @@ void procesar_mensajes_directos(int* socket){
 			printf("\n--Mensaje directo recibido no procesable--\n");
 			break;
 	}
+
+	mensaje_destroy(mensaje);
 }

@@ -31,7 +31,9 @@ void loggear_resultado_deteccion_deadlock(int intercambios_detectados){
 }
 //7. Llegada de un mensaje (indicando el tipo del mismo y sus datos)
 void loggear_nuevo_mensaje(t_mensaje* mensaje){
-	log_info(logger, mensaje_to_string(mensaje)); //TODO 598bytes :O
+	char* mensaje_string = mensaje_to_string(mensaje);
+	log_info(logger, mensaje_string);
+	free(mensaje_string);
 }
 
 //8. Resultado del Team (especificado anteriormente)
@@ -59,7 +61,7 @@ void loggear_resultado_team(){
 		log_info(logger, "[Team] Entrenador %d => %d ciclos de cpu\n", i+1, ciclos);
 	}
 
-	log_info(logger, "[Team] Deadlocks producidos y resueltos: %d\n", intercambios_detectados);
+	log_info(logger, "[Team] Deadlocks producidos y resueltos: %d\n", deadlocks_detectados);
 
 }
 
