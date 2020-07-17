@@ -56,7 +56,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 
 		if(!string_equals_ignore_case(pokemon, ultima_especie_enviada)){
 			t_get_pokemon* mensaje_get = get_pokemon_create(pokemon);
-			t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON);
+			t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON); //TODO 125 bytes
 
 			int socket = crear_conexion(ip_broker, puerto_broker);
 

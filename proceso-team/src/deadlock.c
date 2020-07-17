@@ -4,7 +4,7 @@ void resolver_deadlock(){
 	loggear_inicio_deteccion_deadlock();
 
 	//Pasar entrenadores a ent_intercambio
-	t_list* entrenadores_copia = list_create();
+	t_list* entrenadores_copia = list_create();//TODO 8bytes
 
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores, i);
@@ -148,7 +148,7 @@ int hay_doble_intercambio(t_intercambio_copia* intercambio){
  */
 t_list* obtener_posibles_intercambios(t_list* candidatos, t_entrenador_copia* entrenador_intercambio, char* especieARecibir){
 
-	t_list* intercambios = list_create();
+	t_list* intercambios = list_create(); //TODO 68bytes
 
 	for(int i = 0 ; i < list_size(candidatos) ; i++){
 		t_entrenador_copia* entrenador_candidato = list_get(candidatos, i);
@@ -176,7 +176,7 @@ t_list* obtener_posibles_intercambios(t_list* candidatos, t_entrenador_copia* en
 }
 
 t_list* filtrar_entrenadores_con_pokemon(int desde_index, t_list* entrenadores_deadlock, char* especie){
-	t_list* filtrados = list_create();
+	t_list* filtrados = list_create();//TODO 52bytes
 
 	for(int i = desde_index ; i < list_size(entrenadores_deadlock) ; i++){
 		t_entrenador_copia* entrenador = list_get(entrenadores_deadlock, i);
@@ -309,7 +309,7 @@ void cambiar_pokemon(t_list* listado_pokemon, char* especieASacar, char* especie
 //------------------------CREATES-----------------------------
 
 t_intercambio* intercambio_create(t_entrenador* entrenador, t_entrenador* entrenadorObjetivo, char* pokemonADar, char* pokemonARecibir){
-	t_intercambio* intercambio = malloc(sizeof(t_intercambio));
+	t_intercambio* intercambio = malloc(sizeof(t_intercambio)); //TODO 16bytes (Detecto un cambio solo)
 	intercambio->entrenador = entrenador;
 	intercambio->entrenadorObjetivo = entrenadorObjetivo;
 	intercambio->pokemonADar = pokemonADar;
@@ -329,7 +329,7 @@ t_intercambio_copia* intercambio_copia_create(t_entrenador_copia* entrenador, t_
 }
 
 t_entrenador_copia* entrenador_copia_create(t_entrenador* entrenador){
-	t_entrenador_copia* entrenador_intercambio = malloc(sizeof(t_entrenador_copia));
+	t_entrenador_copia* entrenador_intercambio = malloc(sizeof(t_entrenador_copia)); //TODO 36bytes
 	entrenador_intercambio->entrenador = entrenador;
 	entrenador_intercambio->objetivos = list_duplicate(entrenador->objetivos);
 	entrenador_intercambio->adquiridos = list_duplicate(entrenador->pokemones_adquiridos);
