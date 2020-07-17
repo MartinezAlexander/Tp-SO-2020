@@ -14,3 +14,12 @@ int array_cantidad_de_elementos(char** array){
 	while(array[cantidad] != NULL) cantidad++;
 	return cantidad;
 }
+
+void free_string_array(char** string_array){
+	int i;
+	for(i = 0 ; string_array[i] ; i++){
+		free(string_array[i]);
+	}
+
+	free(string_array);
+}

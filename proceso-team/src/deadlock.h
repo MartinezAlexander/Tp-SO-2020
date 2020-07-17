@@ -99,7 +99,15 @@ void encolar_proximo_intercambio(int primer_intercambio);
 
 
 
+//Nuevos
+void resolver_deadlock_nuevo();
+char* que_especie_le_puedo_cambiar(t_list* listado_pokemones, t_entrenador_copia* entrenador);
+void resolver_espera_circular(t_list* espera_circular);
+int entrenador_le_puede_pedir_algo_a(t_entrenador_copia* primero, t_entrenador_copia* segundo);
+t_list* entrenadores_que_le_pueden_pedir_a(t_entrenador_copia* candidato, t_list* listado, t_list* entrenadores_deadlock);
 
+t_list* detectar_espera(t_list* espera_circular, t_entrenador_copia* candidato, t_entrenador_copia* entrenador_a_solucionar, t_list* entrenadores_en_deadlock);
+int detectar_esperas_circulares(t_list* entrenadores_en_deadlock);
 
 
 

@@ -340,9 +340,11 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 		list_add(entrenadores, entrenador);
 	}
 
-	free(posiciones_entrenadores);
+	//free(posiciones_entrenadores);
+	free_string_array(posiciones_entrenadores);
+	free_string_array(objetivos_entrenadores);
 	free(listado_pokemones_adquiridos);
-	free(objetivos_entrenadores);
+
 	list_destroy(pokemones_entrenadores);
 
 	/*

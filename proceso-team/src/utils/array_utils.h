@@ -14,6 +14,7 @@
 
 t_list* array_to_list(char** array);
 int array_cantidad_de_elementos(char** array);
+void free_string_array(char** string_array);
 
 
 #endif /* ARRAY_UTILS_H_ */

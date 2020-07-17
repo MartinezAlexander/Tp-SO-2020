@@ -33,8 +33,7 @@ int main(void) {
 	sem_wait(&semaforo_resolucion_deadlock);
 
 	printf("[Deadlock] Comienza la deteccion de deadlock\n");
-	resolver_deadlock();
-
+	resolver_deadlock_nuevo();
 
 	//Antes de terminar el programa, debo esperar a que
 	//terminen de ejecutar todos los entrenadores (hilos)
@@ -98,7 +97,7 @@ t_log* iniciar_logger(char* path)
 {
 	t_log* logger;
 	if((logger = log_create(path,"team",true,LOG_LEVEL_INFO)) == NULL)
-	{
+	{//TODO cambiar el true por false para que no imprima por consola los logs
 		printf("No se pudo crear el log\n");
 		exit(1);
 	}
@@ -108,7 +107,7 @@ t_log* iniciar_logger(char* path)
 t_config* leer_config(void)
 {
 	t_config *config;
-	if((config = config_create("../src/team.config")) == NULL)//Nota: para correr desde Debug
+	if((config = config_create("src/team.config")) == NULL)//Nota: para correr desde Debug
 	{														//hay que agregar ../ al path
 		printf("No pude leer la config\n");
 		exit(2);
