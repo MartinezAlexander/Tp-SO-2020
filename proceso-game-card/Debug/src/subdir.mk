@@ -13,8 +13,7 @@ C_SRCS += \
 ../src/logger.c \
 ../src/procesamiento_mensajes.c \
 ../src/proceso-game-card.c \
-../src/tall_grass.c \
-../src/test.c 
+../src/tall_grass.c 
 
 OBJS += \
 ./src/bitmap.o \
@@ -26,8 +25,7 @@ OBJS += \
 ./src/logger.o \
 ./src/procesamiento_mensajes.o \
 ./src/proceso-game-card.o \
-./src/tall_grass.o \
-./src/test.o 
+./src/tall_grass.o 
 
 C_DEPS += \
 ./src/bitmap.d \
@@ -39,8 +37,7 @@ C_DEPS += \
 ./src/logger.d \
 ./src/procesamiento_mensajes.d \
 ./src/proceso-game-card.d \
-./src/tall_grass.d \
-./src/test.d 
+./src/tall_grass.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

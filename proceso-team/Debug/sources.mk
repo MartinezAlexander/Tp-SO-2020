@@ -17,5 +17,6 @@ src/conexiones \
 src \
 src/mensajes \
 src/planificacion \
+src/tests \
 src/utils \
 
