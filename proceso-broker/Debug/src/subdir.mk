@@ -7,6 +7,7 @@ C_SRCS += \
 ../src/administrador_mensajes.c \
 ../src/cola.c \
 ../src/config.c \
+../src/dump.c \
 ../src/logger.c \
 ../src/manejador_suscripciones.c \
 ../src/memoria_cache.c \
@@ -18,6 +19,7 @@ OBJS += \
 ./src/administrador_mensajes.o \
 ./src/cola.o \
 ./src/config.o \
+./src/dump.o \
 ./src/logger.o \
 ./src/manejador_suscripciones.o \
 ./src/memoria_cache.o \
@@ -29,6 +31,7 @@ C_DEPS += \
 ./src/administrador_mensajes.d \
 ./src/cola.d \
 ./src/config.d \
+./src/dump.d \
 ./src/logger.d \
 ./src/manejador_suscripciones.d \
 ./src/memoria_cache.d \
