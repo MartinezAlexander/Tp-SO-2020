@@ -1,7 +1,7 @@
 #include "config.h"
 
-void iniciar_config(){
-	if((config = config_create("../src/broker.config")) == NULL)
+void iniciar_config(char* path_config){
+	if((config = config_create(path_config)) == NULL)
 	{
 		printf("No pude leer la config\n");
 		exit(2);

@@ -126,6 +126,7 @@ int es_hora_de_compactar(){
 
 void fifo_eliminar(){
 	t_particion* particion_victima = queue_pop(particiones_victimas);
+	loggear_eliminacion_particion(particion_victima->base);
 	particion_liberar(particion_victima);
 	combinar_particiones_contiguas_a(particion_victima);
 }
@@ -145,6 +146,7 @@ void actualizar_lru(t_particion* particion){
 void lru_eliminar(){
 	//TODO Una sola linea
 	t_particion* particion_victima = list_get(particiones_victimas_lru,0);
+	loggear_eliminacion_particion(particion_victima->base);
 	list_remove(particiones_victimas_lru,0);
 	particion_liberar(particion_victima);
 	combinar_particiones_contiguas_a(particion_victima);

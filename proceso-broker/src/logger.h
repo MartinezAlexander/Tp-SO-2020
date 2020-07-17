@@ -20,6 +20,7 @@ void loggear_conexion_al_broker(int socket_cliente);
 void loggear_mensaje_cacheado(char* mensaje, int base_particion);
 void loggear_compactacion(int tamanio_libre, int base_libre);
 void loggear_asociacion_bloques(int base_bloque1, int base_bloque2);
+void loggear_eliminacion_particion(int base_eliminada);
 void loggear_ejecucion_dump();
 void logger_destroy();
 

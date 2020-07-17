@@ -1,7 +1,7 @@
 #include "logger.h"
 
 void iniciar_logger(char* path){
-	if((logger = log_create(path,"proceso-broker.c",true,LOG_LEVEL_INFO)) == NULL)
+	if((logger = log_create(path,"proceso-broker.c",false,LOG_LEVEL_INFO)) == NULL)
 	{
 		printf("No se pudo crear el log\n");
 		exit(1);
@@ -64,6 +64,10 @@ void loggear_compactacion(int tamanio_libre, int base_libre){
 	log_info(logger,"[Compactacion] Ejecutado: Tamanio de particion libre final %d - Base de particion libre final %d\n-----------------------------------------------------------------",tamanio_libre,base_libre);
 }
 
+void loggear_eliminacion_particion(int base_eliminada){
+	log_info(logger,"[Eliminacion] Ejecutado: Elimino particion con base: %d \n-----------------------------------------------------------------",base_eliminada);
+}
+
 void loggear_asociacion_bloques(int base_bloque1, int base_bloque2){
 	log_info(logger,"[Asociacion de bloques] Ejecutado: Base particiones asociadas %d %d\n-----------------------------------------------------------------",base_bloque1,base_bloque2);
 }
@@ -74,12 +78,13 @@ void loggear_ejecucion_dump(){
 
 void logger_destroy(){
 	if(logger != NULL){
+		log_info(logger,"/////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
 		log_destroy(logger);
 	}
 }
 
 void iniciar_log_personal(char* path){
-	if((logger_personal = log_create(path,"proceso-broker.c",true,LOG_LEVEL_INFO)) == NULL)
+	if((logger_personal = log_create(path,"proceso-broker.c",false,LOG_LEVEL_INFO)) == NULL)
 	{
 		printf("No se pudo crear el log personal\n");
 		exit(1);

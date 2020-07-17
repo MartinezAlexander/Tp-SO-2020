@@ -21,7 +21,7 @@ char* ip_broker;
 char* puerto_broker;
 char* path_logger;
 
-void iniciar_config();
+void iniciar_config(char* path_config);
 void obtener_info_del_config();
 void finalizar_config();
 #endif

@@ -54,6 +54,7 @@ t_list* obtener_mensajes_cacheados_por_cola_bs(op_code cola){
 
 void fifo(){
 	t_buddy* buddy_victima = queue_pop(buddies_victimas_fifo);
+	loggear_eliminacion_particion(buddy_victima->base);
 	buddy_liberar(buddy_victima);
 }
 
@@ -71,6 +72,7 @@ void lru_actualizar(t_buddy* buddy){
 
 void lru(){
 	t_buddy* buddy_victima = list_get(buddies_victimas_lru,0);
+	loggear_eliminacion_particion(buddy_victima->base);
 	list_remove(buddies_victimas_lru,0);
 	buddy_liberar(buddy_victima);
 }

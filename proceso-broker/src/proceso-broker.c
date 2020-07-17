@@ -54,12 +54,12 @@ void finalizar_procesador_localized(){
 	pthread_detach(cola_mensajeria_localized->hilo);
 }
 
-int main(void){
+int main(int arg, char** args){
 
 	signal(SIGUSR1, controlador_de_seniales);
 	signal(SIGINT, controlador_de_seniales);
 
-	iniciar_config();
+	iniciar_config(args[1]);
 
 	obtener_info_del_config();
 
