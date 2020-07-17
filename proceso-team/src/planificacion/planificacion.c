@@ -33,6 +33,18 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 		queue_push(cola_pokemones_en_espera, pokemon);
 		pthread_mutex_unlock(&mutex_cola_espera);
 
+		/*
+		 * Recordemos que cuando yo detectaba que un pokemon entrante me servia,
+		 * lo sacaba de la lista de objetivos como para dejar marcado que ya estoy
+		 * procesando esa especie.
+		 *
+		 * Ahora en el caso de que, cuando trate de procesarla, detecte que no hay
+		 * entrenadores disponibles, debo volver a agregar esa especie a los objetivos
+		 * porque sino, la proxima vez que trate de procesar este pokemon en espera
+		 * lo va a descartar o va a pensar que es de repuesto.
+		 */
+		agregar_a_objetivos_globales(pokemon->especie);
+
 		printf("[Pokemon] Pokemon puesto en espera, motivo: sin entrenadores disponibles\n");
 		return;
 		//Ademas no voy a seguir con el procedimiento normal
