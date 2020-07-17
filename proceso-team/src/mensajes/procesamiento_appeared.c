@@ -53,6 +53,7 @@ void procesar_pokemon(t_pokemon* pokemon){
 				pthread_mutex_unlock(&mutex_cola_espera);
 
 				puts("[Pokemon] Pokemon puesto en espera, motivo: repuesto\n");
+				pthread_mutex_unlock(&mutex_procesamiento_pokemon);
 				return;
 			}
 		}
