@@ -1,0 +1,1 @@
+./proceso-team ../src/Prueba_Final_RR_Q2.config

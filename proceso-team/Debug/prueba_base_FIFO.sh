@@ -1,1 +1,1 @@
-./proceso-team ../src/Prueba_Base_FIFO.config
+./proceso-team ../src/Prueba_Base.config
