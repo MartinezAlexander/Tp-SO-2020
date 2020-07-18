@@ -1,1 +1,0 @@
-./proceso-broker ../src/Prueba_Completa_Broker.config

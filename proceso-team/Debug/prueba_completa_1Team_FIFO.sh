@@ -1,0 +1,1 @@
+./proceso-team ../src/Prueba_Completa_1Team_FIFO.config

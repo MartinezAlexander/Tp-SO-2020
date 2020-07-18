@@ -1,0 +1,1 @@
+./proceso-team ../src/Prueba_Completa_2Team_RR_Q1.config

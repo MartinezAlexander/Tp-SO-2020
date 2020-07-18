@@ -1,1 +1,0 @@
-./proceso-team ../src/Prueba_Completa_1Team.config
