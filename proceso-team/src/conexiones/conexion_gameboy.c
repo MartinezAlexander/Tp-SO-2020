@@ -17,6 +17,7 @@ void correr_servidor_gameboy(){
 //Supuestamente solo puedo recibir un APPEARED del gameboy, pero como ya
 //tenemos las funciones hechas dejamos los otros dos casos tambien, por las dudas
 void procesar_mensajes_directos(int* socket){
+	//TODO DEFINETLY LOST..
 	t_mensaje* mensaje = recibir_mensaje(*socket);
 
 	if(mensaje == NULL){
@@ -42,5 +43,5 @@ void procesar_mensajes_directos(int* socket){
 			break;
 	}
 
-	mensaje_destroy(mensaje);
+	//mensaje_destroy(mensaje);
 }

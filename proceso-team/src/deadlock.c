@@ -341,7 +341,9 @@ t_intercambio_copia* intercambio_copia_create(t_entrenador_copia* entrenador, t_
 t_entrenador_copia* entrenador_copia_create(t_entrenador* entrenador){
 	t_entrenador_copia* entrenador_intercambio = malloc(sizeof(t_entrenador_copia));
 	entrenador_intercambio->entrenador = entrenador;
+	//TODO MEMORY LEAK
 	entrenador_intercambio->objetivos = list_duplicate(entrenador->objetivos);
+	//TODO MEMORY LEAK
 	entrenador_intercambio->adquiridos = list_duplicate(entrenador->pokemones_adquiridos);
 	entrenador_intercambio->posicion = entrenador->posicion;
 	return entrenador_intercambio;
@@ -381,6 +383,7 @@ int detectar_esperas_circulares(t_list* entrenadores_en_deadlock){
 
 	t_entrenador_copia* primer_entrenador = list_get(entrenadores_en_deadlock, 0);
 
+	//TODO MEMORY LEAK
 	t_list* espera_circular = list_create();
 	list_add(espera_circular, primer_entrenador);
 
@@ -432,6 +435,7 @@ t_list* detectar_espera(t_list* espera_circular, t_entrenador_copia* candidato, 
 
 	for(int i = 0 ; i < list_size(entrenadores_que_le_pueden_pedir) ; i++){
 		t_entrenador_copia* entrenador = list_get(entrenadores_que_le_pueden_pedir,i);
+		//TODO MEMORY LEAK
 		t_list* copia_espera = list_duplicate(espera_circular);
 		list_add(espera_circular, entrenador);
 
@@ -453,6 +457,7 @@ t_list* detectar_espera(t_list* espera_circular, t_entrenador_copia* candidato, 
  * Ademas, devuelve solo los que no estan en la espera circular ya.
  */
 t_list* entrenadores_que_le_pueden_pedir_a(t_entrenador_copia* candidato, t_list* listado, t_list* entrenadores_deadlock){
+	//TODO MEMORY LEAK
 	t_list* pueden_pedir = list_create();
 
 	for(int i = 0 ; i < list_size(entrenadores_deadlock) ; i++){

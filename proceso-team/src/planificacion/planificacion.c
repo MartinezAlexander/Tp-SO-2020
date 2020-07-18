@@ -23,6 +23,7 @@ void esperar_hilos_planificacion(){
 void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 
 	//Filtro entrenadores disponibles
+	//TODO MEMORY LEAK
 	t_list* entrenadores_disponibles = list_filter(entrenadores, (void*)entrenador_disponible);
 
 	//Puede pasar que todos mis entrenadores esten ocupados, en ese caso

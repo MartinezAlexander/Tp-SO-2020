@@ -5,6 +5,7 @@ void descartar_caught(t_caught_pokemon* mensaje){
 }
 
 void procesar_caught(t_caught_pokemon* caught_pokemon, int32_t id_correlativo){
+	//TODO MEMORY LEAK
 	char* key_id = string_itoa(id_correlativo);
 
 	//Valido id de mensaje

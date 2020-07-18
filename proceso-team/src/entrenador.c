@@ -106,6 +106,7 @@ void enviar_catch(t_entrenador* entrenador){
 		//Envio mensaje
 		t_catch_pokemon* mensaje_catch = catch_pokemon_create(entrenador->objetivo_actual->especie,
 				entrenador->objetivo_actual->posicion.posicionX, entrenador->objetivo_actual->posicion.posicionY);
+		//TODO 358 (128 direct, 230 indirect) bytes in 8 blocks are definitely lost in loss record 61 of 61 [PID: 11255]
 		t_mensaje* mensaje = mensaje_simple_create(mensaje_catch, CATCH_POKEMON);
 
 		int envio = enviar_mensaje(mensaje, socket);
@@ -117,6 +118,7 @@ void enviar_catch(t_entrenador* entrenador){
 			int id = recibir_id(socket);
 			printf("[Catch] Enviado CATCH => %s ; ID %d\n", mensaje_catch->pokemon->especie, id);
 			//Agrego el id con mi entrenador al diccionario
+			//TODO MEMORY LEAK
 			char* key_id = string_itoa(id);
 			dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
 		}
@@ -239,12 +241,14 @@ int mover_proxima_posicion(t_entrenador* entrenador, t_posicion objetivo){
 
 //Recibe pokemones en un string separados por pipes y los asigna al entrenador
 void asignar_pokemones(t_entrenador* entrenador, char* pokemones){
+	//TODO MEMORY LEAK
 	char** pokemones_adquiridos_array = string_split(pokemones, "|");
 	entrenador->pokemones_adquiridos = array_to_list(pokemones_adquiridos_array);
 	free(pokemones_adquiridos_array);
 }
 
 t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquiridos, int identificador, double estimacion_inicial ){
+	//TODO 358 (128 direct, 230 indirect) bytes in 8 blocks are definitely lost in loss record 61 of 61 [PID: 11255]
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	//TODO [ML] Nos tira leak pero tres lineas abajo no y hacemos lo mismo..?
@@ -252,7 +256,7 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquirido
 	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]), atoi(posiciones_separadas[1]));
 	//free(posiciones_separadas);
 	free_string_array(posiciones_separadas);
-
+	//TODO MEMORY LEAK
 	char** objetivos_array = string_split(objetivos, "|");
 	entrenador->objetivos = array_to_list(objetivos_array);
 	//free(objetivos_array);
@@ -299,6 +303,7 @@ t_list* separar(char* listado){
 	t_list* listado_separado = list_create();
 
 	int len_no_brackets = strlen(listado) - 2;
+	//TODO MEMORY LEAK
 	char* listado_sin_brackets = string_substring(listado, 1, len_no_brackets);
 
 	char* token;
@@ -318,6 +323,7 @@ t_list* separar(char* listado){
 t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
 	char* listado_pokemones_adquiridos = config_get_string_value(config, "POKEMON_ENTRENADORES");
+	//TODO MEMORY LEAK
 	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
 	//TODO [ML] Memory Leak de las commons??
 
@@ -443,8 +449,11 @@ t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion po
 }
 
 void entrenador_destroy(t_entrenador* e){
+	//TODO Address 0x423ebf0 is 0 bytes inside a block of size 9 free'd [PID: 11255]
 	list_destroy_and_destroy_elements(e->pokemones_adquiridos, free);
+	//TODO invalid free
 	list_destroy_and_destroy_elements(e->objetivos, free);
+
 	free(e->estado_sjf);
 
 	if(e->objetivo_actual != NULL){

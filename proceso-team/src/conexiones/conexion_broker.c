@@ -109,6 +109,7 @@ void iniciar_suscripcion_broker(op_code cola){
 
 void suscribirse_a_cola(int* socket, op_code cola){
 	t_suscripcion* suscripcion = suscripcion_proceso_create(TEAM, team_id, cola);
+	//TODO MEMORY LEAK
 	t_mensaje* mensaje = mensaje_simple_create((void*) suscripcion, SUSCRIPCION);
 
 	*socket = crear_conexion(ip_broker, puerto_broker);
@@ -159,7 +160,7 @@ void suscribirse_a_cola(int* socket, op_code cola){
  */
 void recibir_appeared(){
 	while(1){
-
+		//TODO MEMORY LEAK
 		t_mensaje* mensaje = recibir_mensaje(socket_appeared);
 		//Cuando detectamos que el mensaje es NULL (significa que se cayo el socket),
 		//disparamos el hilo de reconexion y pausamos cada uno de
@@ -179,6 +180,7 @@ void recibir_appeared(){
 
 void recibir_caught(){
 	while(1){
+		//TODO 140 (112 direct, 28 indirect) bytes in 7 blocks are definitely lost in loss record 56 of 61 [PID: 11255]
 		t_mensaje* mensaje = recibir_mensaje(socket_caught);
 		if(mensaje == NULL){
 			iniciar_reconexion();
