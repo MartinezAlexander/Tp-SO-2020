@@ -18,7 +18,10 @@ void crear_directorio(char* en_donde_crear, char* nombre_directorio) {
 	if (mkdir(ruta, 0777) == -1) {
 		puts("No se pudo crear el directorio /n");
 	}
+	FILE* metadata = crear_archivo(ruta, "Metadata.bin");
+	txt_write_in_file(metadata, "DIRECTORY=Y\n");
 	free(ruta);
+	txt_close_file(metadata);
 }
 
 FILE* crear_archivo(char* directorio, char* archivo) {
