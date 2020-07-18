@@ -32,6 +32,10 @@ FILE* crear_archivo(char* directorio, char* archivo) {
 }
 
 void metadata_cargar() {
+
+	crear_directorio(punto_de_montaje_tallgrass, "Blocks");
+	crear_directorio(punto_de_montaje_tallgrass, "Files");
+
 	char* metadata_dir = path(punto_de_montaje_tallgrass, "Metadata");
 	char* metadata_path = path(metadata_dir, "Metadata.bin");
 	free(metadata_dir);
