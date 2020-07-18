@@ -108,7 +108,7 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 	if (!existe_archivo_en(get_pokemon->nombre, directorio_files)) {
 		printf("[Get] El filesystem no tiene al pokemon dado\n");
 
-		loggear_no_existe_pokemon(get_pokemon->nombre);
+		//loggear_no_existe_pokemon(get_pokemon->nombre);
 		return;
 	}
 	free(directorio_files);
@@ -138,7 +138,8 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 		t_mensaje* mensaje = mensaje_con_id_correlativo_create((void*) localized_respuesta, LOCALIZED_POKEMON, id);
 		enviar_mensaje_al_broker(mensaje);
 
-		list_destroy_and_destroy_elements(pokemon_posiciones,free);
+		//TODO solo liberar los elementos de la lista
+		//list_destroy_and_destroy_elements(pokemon_posiciones,free);
 		mensaje_destroy(mensaje);
 		mensaje_destroy(mensaje_recibido);
 		printf("[Procesamiento] Cerrando hilo %d de procesamiento GET\n",numero_hilo);
