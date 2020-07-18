@@ -55,14 +55,16 @@ void enviar_get_objetivo(t_list* objetivo_global){
 		char* pokemon = list_get(objetivo_global, i);
 
 		if(!string_equals_ignore_case(pokemon, ultima_especie_enviada)){
-			t_get_pokemon* mensaje_get = get_pokemon_create(pokemon);
-			t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON); //TODO 125 bytes
-
 			int socket = crear_conexion(ip_broker, puerto_broker);
 
 			int conexion_exitosa = handshake(TEAM, BROKER, socket);
 
 			if(conexion_exitosa){
+
+				t_get_pokemon* mensaje_get = get_pokemon_create(pokemon);
+				t_mensaje* mensaje = mensaje_simple_create(mensaje_get,GET_POKEMON);
+
+
 				int envio = enviar_mensaje(mensaje, socket);
 
 				if(envio < 0){
@@ -72,6 +74,7 @@ void enviar_get_objetivo(t_list* objetivo_global){
 				}
 
 				liberar_conexion(socket);
+				mensaje_destroy(mensaje);
 
 				printf("[GET] Enviado mensaje GET al broker: %s\n", pokemon);
 			}else{

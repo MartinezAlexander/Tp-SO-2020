@@ -5,7 +5,7 @@ void resolver_deadlock(){
 	loggear_inicio_deteccion_deadlock();
 
 	//Pasar entrenadores a ent_intercambio
-	t_list* entrenadores_copia = list_create();//TODO 8bytes
+	t_list* entrenadores_copia = list_create();
 
 	for(int i = 0 ; i < list_size(entrenadores) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores, i);
@@ -26,8 +26,10 @@ void resolver_deadlock(){
 		queue_push(cola_intercambios_deadlock, intercambio);
 	}
 
-	intercambios_detectados = queue_size(cola_intercambios_deadlock);
-	loggear_resultado_deteccion_deadlock(intercambios_detectados);
+	list_destroy(entrenadores_copia);
+
+	deadlocks_detectados = queue_size(cola_intercambios_deadlock);
+	loggear_resultado_deteccion_deadlock(deadlocks_detectados);
 
 	encolar_proximo_intercambio(1);
 }
@@ -56,10 +58,12 @@ t_intercambio* primer_intercambio(t_list* entrenadores_deadlock){
 	t_list* entrenadores_posibles = filtrar_entrenadores_con_pokemon(1, entrenadores_deadlock, pokemonARecibir);
 
 	t_list* posibles_intercambios = obtener_posibles_intercambios(entrenadores_posibles, primer_entrenador, pokemonARecibir);
+	list_destroy(entrenadores_posibles);
 
 	t_list* intercambios = filtrar_dobles_intercambios(posibles_intercambios);
 
 	t_intercambio_copia* mejor_intercambio = obtener_intercambio_mas_cercano(intercambios);
+	list_destroy(intercambios);
 
 	//Antes de terminar tengo que realizar el cambio 'simbolicamente'
 	//asi tengo esto en cuenta para detectar los proximos intercambios
@@ -149,7 +153,7 @@ int hay_doble_intercambio(t_intercambio_copia* intercambio){
  */
 t_list* obtener_posibles_intercambios(t_list* candidatos, t_entrenador_copia* entrenador_intercambio, char* especieARecibir){
 
-	t_list* intercambios = list_create(); //TODO 68bytes
+	t_list* intercambios = list_create();
 
 	for(int i = 0 ; i < list_size(candidatos) ; i++){
 		t_entrenador_copia* entrenador_candidato = list_get(candidatos, i);
@@ -177,7 +181,7 @@ t_list* obtener_posibles_intercambios(t_list* candidatos, t_entrenador_copia* en
 }
 
 t_list* filtrar_entrenadores_con_pokemon(int desde_index, t_list* entrenadores_deadlock, char* especie){
-	t_list* filtrados = list_create();//TODO 52bytes
+	t_list* filtrados = list_create();
 
 	for(int i = desde_index ; i < list_size(entrenadores_deadlock) ; i++){
 		t_entrenador_copia* entrenador = list_get(entrenadores_deadlock, i);
@@ -212,6 +216,7 @@ void preparar_entrenadores(t_list* entrenadoresDL){
 
 		if(!quedan_objetivos){
 			list_remove(entrenadoresDL, i);
+			free(entrenador);
 			i--;
 		}
 	}
@@ -310,7 +315,7 @@ void cambiar_pokemon(t_list* listado_pokemon, char* especieASacar, char* especie
 //------------------------CREATES-----------------------------
 
 t_intercambio* intercambio_create(t_entrenador* entrenador, t_entrenador* entrenadorObjetivo, char* pokemonADar, char* pokemonARecibir){
-	t_intercambio* intercambio = malloc(sizeof(t_intercambio)); //TODO 16bytes (Detecto un cambio solo)
+	t_intercambio* intercambio = malloc(sizeof(t_intercambio));
 	intercambio->entrenador = entrenador;
 	intercambio->entrenadorObjetivo = entrenadorObjetivo;
 	intercambio->pokemonADar = pokemonADar;
@@ -330,7 +335,7 @@ t_intercambio_copia* intercambio_copia_create(t_entrenador_copia* entrenador, t_
 }
 
 t_entrenador_copia* entrenador_copia_create(t_entrenador* entrenador){
-	t_entrenador_copia* entrenador_intercambio = malloc(sizeof(t_entrenador_copia)); //TODO 36bytes
+	t_entrenador_copia* entrenador_intercambio = malloc(sizeof(t_entrenador_copia));
 	entrenador_intercambio->entrenador = entrenador;
 	entrenador_intercambio->objetivos = list_duplicate(entrenador->objetivos);
 	entrenador_intercambio->adquiridos = list_duplicate(entrenador->pokemones_adquiridos);
@@ -526,7 +531,7 @@ char* que_especie_le_puedo_cambiar(t_list* listado_pokemones, t_entrenador_copia
 void resolver_deadlock_nuevo(){
 	loggear_inicio_deteccion_deadlock();
 
-	t_list* entrenadores_copia = list_create();//TODO 8bytes
+	t_list* entrenadores_copia = list_create();
 
 	cola_intercambios_deadlock = queue_create();
 
@@ -538,9 +543,10 @@ void resolver_deadlock_nuevo(){
 
 	preparar_entrenadores(entrenadores_copia);
 
-	int deadlocks = detectar_esperas_circulares(entrenadores_copia);
+	deadlocks_detectados = detectar_esperas_circulares(entrenadores_copia);
+	list_destroy(entrenadores_copia);
 
-	loggear_resultado_deteccion_deadlock(deadlocks);
+	loggear_resultado_deteccion_deadlock(deadlocks_detectados);
 	printf("[Deadlock] Intercambios programados: %d\n", queue_size(cola_intercambios_deadlock));
 
 	encolar_proximo_intercambio(1);

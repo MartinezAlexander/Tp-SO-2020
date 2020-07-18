@@ -1,1 +1,0 @@
-./proceso-team ../src/Prueba_Base_SJF_CD.config

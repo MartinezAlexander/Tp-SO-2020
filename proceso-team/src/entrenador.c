@@ -51,7 +51,7 @@ int ejecutar_entrenador_intercambio_deadlock(t_entrenador* entrenador){
 		actualizar_estadistica_entrenador(entrenador->identificador, ciclos_intercambio);
 
 		loggear_operacion_intercambio(entrenador->identificador,
-						entrenador->intercambio_actual->entrenadorObjetivo, pokemon_a_dar, pokemon_a_recibir);
+						entrenador->intercambio_actual->entrenadorObjetivo->identificador, pokemon_a_dar, pokemon_a_recibir);
 
 		actualizar_estado_entrenador(entrenador);
 		actualizar_estado_entrenador(entrenador->intercambio_actual->entrenadorObjetivo);
@@ -66,6 +66,9 @@ int ejecutar_entrenador_intercambio_deadlock(t_entrenador* entrenador){
 			sem_post(&entrenador->intercambio_actual->entrenadorObjetivo->semaforo);
 		}
 
+		printf("[Prueba] hago free intercambio\n");
+		free(entrenador->intercambio_actual);
+		printf("[Prueba] sigo vivo despues del free intercambio\n");
 		entrenador->intercambio_actual = NULL;
 
 		encolar_proximo_intercambio(0);
@@ -247,13 +250,15 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquirido
 	t_entrenador* entrenador = malloc(sizeof(t_entrenador));
 
 	//TODO [ML] Nos tira leak pero tres lineas abajo no y hacemos lo mismo..?
-	char** posiciones_separadas = string_split(posicion, "|"); //TODO 12bytes
+	char** posiciones_separadas = string_split(posicion, "|");
 	entrenador->posicion = posicion_create( atoi(posiciones_separadas[0]), atoi(posiciones_separadas[1]));
-	free(posiciones_separadas);
+	//free(posiciones_separadas);
+	free_string_array(posiciones_separadas);
 
 	char** objetivos_array = string_split(objetivos, "|");
 	entrenador->objetivos = array_to_list(objetivos_array);
-	free(objetivos_array);
+	//free(objetivos_array);
+	free_string_array(objetivos_array);
 
 	//Asigno si veo que tiene pokemones de entrada
 	if(adquiridos != NULL){
@@ -297,7 +302,7 @@ t_list* separar(char* listado){
 	t_list* listado_separado = list_create();
 
 	int len_no_brackets = strlen(listado) - 2;
-	char* listado_sin_brackets = string_substring(listado, 1, len_no_brackets); //TODO 10bytes
+	char* listado_sin_brackets = string_substring(listado, 1, len_no_brackets);
 
 	char* token;
 	while((token = strsep(&listado_sin_brackets, ",")) != NULL){
@@ -308,13 +313,15 @@ t_list* separar(char* listado){
 		}
 	}
 
+	free(listado_sin_brackets);
+
 	return listado_separado;
 }
 
 t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
-	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");//TODO 12bytes
+	char** posiciones_entrenadores = config_get_array_value(config, "POSICIONES_ENTRENADORES");
 	char* listado_pokemones_adquiridos = config_get_string_value(config, "POKEMON_ENTRENADORES");
-	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");//TODO 46bytes
+	char** objetivos_entrenadores = config_get_array_value(config, "OBJETIVOS_ENTRENADORES");
 	//TODO [ML] Memory Leak de las commons??
 
 	int numero_posiciones = array_cantidad_de_elementos(posiciones_entrenadores);
