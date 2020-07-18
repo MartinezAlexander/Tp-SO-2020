@@ -70,5 +70,6 @@ void encolar(t_entrenador* entrenador);
 
 tipo_planificacion obtener_algoritmo(char* algoritmo);
 t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t estimacion_inicial, double alpha);
+void planificador_destroy(t_planificador* p);
 
 #endif /* PLANIFICADOR_H_ */

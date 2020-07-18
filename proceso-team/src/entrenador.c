@@ -271,7 +271,6 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquirido
 	entrenador->objetivo_actual = NULL;
 	entrenador->intercambio_actual = NULL;
 
-	//TODO [ML] Free cuando terminamos los entrenadores?
 	entrenador->estado_sjf = malloc(sizeof(estado_sjf));
 	entrenador->estado_sjf->ultima_rafaga = 0;
 	entrenador->estado_sjf->ultima_estimacion = estimacion_inicial;
@@ -441,4 +440,22 @@ t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion po
 	}
 
 	return list_get(entrenadores, index_mas_cercano);
+}
+
+void entrenador_destroy(t_entrenador* e){
+	list_destroy_and_destroy_elements(e->pokemones_adquiridos, free);
+	list_destroy_and_destroy_elements(e->objetivos, free);
+	free(e->estado_sjf);
+
+	if(e->objetivo_actual != NULL){
+		printf("[ERROR] Entrenador sigue teniendo objetivo actual al finalizar el programa\n");
+	}
+
+	sem_destroy(&e->semaforo);
+}
+
+void entrenadores_destroy(){
+	dictionary_destroy(mensajes_catch_pendientes);
+
+	list_destroy_and_destroy_elements(entrenadores, entrenador_destroy);
 }

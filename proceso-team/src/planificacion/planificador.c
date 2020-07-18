@@ -57,3 +57,18 @@ void encolar(t_entrenador* entrenador)
 	queue_push(planificador->cola, entrenador);
 }
 
+void planificador_destroy(t_planificador* p){
+	queue_destroy(p->cola);
+
+	if(p->entrenador_en_exec != NULL){
+		printf("[ERROR] Error al destruir planificador, todavia guarda una referencia a entrenador\n");
+	}
+
+	pthread_mutex_destroy(&p->mutex_desalojo);
+	pthread_mutex_destroy(&p->mutex_planificacion);
+
+	sem_destroy(&p->semaforo_desalojo);
+	sem_destroy(&p->semaforo_post_desalojo);
+
+	free(p);
+}
