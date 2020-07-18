@@ -241,3 +241,17 @@ void reconectar_al_broker(){
 		estoy_reconectando = 0;
 	}
 }
+
+/*
+ * Los hilos de escucha y reconexion estan en detach asi que se liberan solos.
+ * Aca se liberan variables complementarias como semaforos y etc..
+ */
+void conexion_broker_destroy(){
+	sem_destroy(&semaforo_reconexion);
+	pthread_mutex_destroy(&mutex_reconexion);
+
+	sem_destroy(&semaforo_procesamiento_appeared);
+	sem_destroy(&semaforo_procesamiento_caught);
+	sem_destroy(&semaforo_procesamiento_localized);
+}
+

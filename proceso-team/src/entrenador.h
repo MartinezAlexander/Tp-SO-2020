@@ -111,4 +111,8 @@ int cumplio_objetivo_entrenador(t_entrenador* entrenador);
 t_entrenador* obtener_entrenador_mas_cercano(t_list* entrenadores, t_posicion posicion);
 void actualizar_estado_entrenador(t_entrenador* entrenador);
 
+
+void entrenador_destroy(t_entrenador* e);
+void entrenadores_destroy();
+
 #endif

@@ -57,4 +57,6 @@ void recibir_localized();
 
 void enviar_get_objetivo(t_list* objetivo_global);
 
+void conexion_broker_destroy();
+
 #endif /* CONEXION_BROKER_H_ */

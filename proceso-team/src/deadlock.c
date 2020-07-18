@@ -2,6 +2,8 @@
 
 
 void resolver_deadlock(){
+	sem_destroy(&semaforo_resolucion_deadlock);
+
 	loggear_inicio_deteccion_deadlock();
 
 	//Pasar entrenadores a ent_intercambio
@@ -37,6 +39,8 @@ void resolver_deadlock(){
 void encolar_proximo_intercambio(int primer_intercambio){
 	if(queue_is_empty(cola_intercambios_deadlock)){
 		printf("[Deadlock] Se ha terminado la resolucion de deadlock exitosamente\n");
+
+		queue_destroy(cola_intercambios_deadlock);
 		return;
 	}
 
@@ -529,6 +533,8 @@ char* que_especie_le_puedo_cambiar(t_list* listado_pokemones, t_entrenador_copia
 
 
 void resolver_deadlock_nuevo(){
+	sem_destroy(&semaforo_resolucion_deadlock);
+
 	loggear_inicio_deteccion_deadlock();
 
 	t_list* entrenadores_copia = list_create();

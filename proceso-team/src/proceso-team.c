@@ -121,4 +121,26 @@ void terminar_programa(t_log* logger, t_config* config){
 		log_info(logger, "finalizando programa...");
 		log_destroy(logger);
 	}
+
+	//liberar variables globales
+	sem_destroy(&semaforo_planificacion);
+	list_destroy(objetivo_global);
+	free(ip_broker);
+	free(ip_team);
+	free(puerto_broker);
+	free(puerto_team);
+
+	pthread_mutex_destroy(&mutex_diccionario_especies);
+	pthread_mutex_destroy(&mutex_cola_espera);
+	pthread_mutex_destroy(&mutex_cola_espera);
+
+	dictionary_destroy(diccionario_especies_recibidas);
+	dictionary_destroy(diccionario_ciclos_entrenador);
+	queue_destroy(cola_pokemones_en_espera);
+
+	planificador_destroy(planificador);
+
+	entrenadores_destroy();
+
+	conexion_broker_destroy();
 }
