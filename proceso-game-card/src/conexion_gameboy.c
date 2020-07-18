@@ -8,7 +8,6 @@ void iniciar_puerto_de_escucha(){
 
 
 void procesar_mensajes_directos(int* socket){
-	//TODO LIBERAR SOCKET CUANDO CAMBIE LA BIBLIOTECA
 	t_mensaje* mensaje = recibir_mensaje(*socket);
 
 	if(mensaje!=NULL){
