@@ -1,12 +1,11 @@
 #include "log_utils.h"
 
 
-//TODO [Log]: 1. Cambio de un entrenador de cola de planificacion (indicando razon porque)
-	//Preguntar a que se refiere con cambio
-	//Cuando encolo, cuando pongo alguien en ejecucion, cuando saco a alguien???
-void loggear_planificacion(){
-
+//1. Cambio de un entrenador de cola de planificacion
+void loggear_planificacion(int id_entrenador){
+	log_info(logger, "[Planificacion] Entrenador %d pasa a EXEC\n", id_entrenador);
 }
+
 //2. Movimiento de un entrenador (indicando la ubicacion a la que se movio)
 void loggear_movimiento_entrenador(int identificador_entrenador, t_posicion posicion){
 	printf("[Ejecucion] Entrenador de id: %d se movio a la posicion [%d,%d]\n",

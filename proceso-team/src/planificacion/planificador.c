@@ -40,6 +40,8 @@ void entrar_a_ejecucion(t_entrenador* entrenador){
 	entrenador->estado = EXEC;
 	//Estadisticas
 	cambios_de_contexto++;
+
+	loggear_planificacion(entrenador->identificador);
 }
 
 void sacar_de_ejecucion(){

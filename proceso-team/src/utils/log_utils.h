@@ -18,7 +18,7 @@
 #include<mensajes/pokemon.h>
 #include "../variables_globales.h"
 
-void loggear_planificacion();
+void loggear_planificacion(int id_entrenador);
 void loggear_movimiento_entrenador(int identificador_entrenador, t_posicion posicion);
 void loggear_operacion_atrapar(t_pokemon* pokemon);
 void loggear_operacion_intercambio(int entrenador, int otro_entrenador, char* especie, char* otra_especie);

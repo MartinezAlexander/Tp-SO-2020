@@ -12,10 +12,8 @@
 #include "proceso-team.h"
 
 
-int main(/*int arg, char** args*/) {
-	//inicializar_variables((char*)args[1]);
-	inicializar_variables("src/team.config");
-	//TODO [ML] probar mem leak de leer entrenadores si destruimos el config aca, total no lo usamos mas
+int main(int arg, char** args) {
+	inicializar_variables((char*)args[1]);
 
 	iniciar_hilos_planificacion();
 
@@ -140,7 +138,9 @@ void terminar_programa(t_log* logger, t_config* config){
 
 	planificador_destroy(planificador);
 
-	entrenadores_destroy();
+	//entrenadores_destroy();
 
 	conexion_broker_destroy();
+
+	printf("Finaliza el programa\n");
 }

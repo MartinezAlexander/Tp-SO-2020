@@ -40,7 +40,7 @@ void encolar_proximo_intercambio(int primer_intercambio){
 	if(queue_is_empty(cola_intercambios_deadlock)){
 		printf("[Deadlock] Se ha terminado la resolucion de deadlock exitosamente\n");
 
-		queue_destroy(cola_intercambios_deadlock);
+		//queue_destroy(cola_intercambios_deadlock);
 		return;
 	}
 
