@@ -6,38 +6,43 @@
  */
 #include "bitmap.h"
 
-
 void bitmap_cargar(){
+
 	estado_bloques = malloc(sizeof(bitmap));
+	int bitarray_size = blocks / 8;
+	char* bits = malloc(bitarray_size);
+	estado_bloques->bitarray = bitarray_create_with_mode(bits,bitarray_size,LSB_FIRST);
+
+	for (int i = 0; i < blocks; i++){
+		bitarray_clean_bit(estado_bloques->bitarray,i);
+	}
+
 	char* directorio_metadata = obtener_directorio_metadata();
 	if (!existe_archivo_en("Bitmap.bin",directorio_metadata)) {
-		//TODO puede que este al pedo
 		estado_bloques->path = obtener_directorio_bitmap();
 
 		FILE* fd = fopen(estado_bloques->path,"a");
 
-		char x = '0';
-
 		if (fd != NULL) {
-			for (int i = 0; i < blocks; i++) {
-				fputc(x, fd);
+			for (int i = 0; i < bitarray_size; i++) {
+				fputc(estado_bloques->bitarray->bitarray[i], fd);
 			}
 		}
 
 		fclose(fd);
+		int file_descriptor = open(estado_bloques->path, O_RDWR);
+		estado_bloques->bitarray->bitarray = mmap(NULL,bitarray_size,PROT_WRITE,MAP_SHARED,file_descriptor,0);
 
 	}else{
 		estado_bloques->path = obtener_directorio_bitmap();
+		int file_descriptor = open(estado_bloques->path, O_RDWR);
+		estado_bloques->bitarray->bitarray = mmap(NULL,bitarray_size,PROT_WRITE,MAP_SHARED,file_descriptor,0);
 	}
-
-	int file_descriptor = open(estado_bloques->path, O_RDWR);
-	estado_bloques->bitarray = mmap(NULL,blocks,PROT_WRITE,MAP_SHARED,file_descriptor,0);
-	free(directorio_metadata);
 }
 
 void ocupar_bloque(int nuevo_bloque){
 	if(nuevo_bloque >= 0 && nuevo_bloque < blocks){
-		estado_bloques->bitarray[nuevo_bloque] = '1';
+		bitarray_set_bit(estado_bloques->bitarray,nuevo_bloque);
 	}else{
 		printf("[Bloque] Error al ocupar bloque, no existe el bloque %d\n", nuevo_bloque);
 	}
@@ -45,21 +50,18 @@ void ocupar_bloque(int nuevo_bloque){
 
 void liberar_bloque(int numero_bloque){
 	if(numero_bloque >= 0 && numero_bloque < blocks){
-		estado_bloques->bitarray[numero_bloque] = '0';
+		bitarray_clean_bit(estado_bloques->bitarray, numero_bloque);
 	}else{
 		printf("[Bloque] Error al liberar bloque, no existe el bloque %d\n", numero_bloque);
-		//TODO Error bloque no existe
-
 	}
 }
 
 int obtener_bloque_disponible(){
-	for(int i = 0 ; i < blocks ; i++){
-		if(estado_bloques->bitarray[i]=='0') return i;
+	int i = 0;
+	while(bitarray_test_bit(estado_bloques->bitarray,i)){
+		i++;
 	}
-	printf("No se encontraron bloques disponibles");
-	return -1;
-
-	//TODO LEER ENUNCIADO / PREGUNTAR Si nos dicen que hacer en este caso en el enunciado resolver error.
-
+	return i;
 }
+
+

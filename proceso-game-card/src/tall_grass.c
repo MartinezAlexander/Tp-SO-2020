@@ -16,7 +16,7 @@ char* path(char* direccion, char* direccion2) {
 void crear_directorio(char* en_donde_crear, char* nombre_directorio) {
 	char* ruta = path(en_donde_crear, nombre_directorio);
 	if (mkdir(ruta, 0777) == -1) {
-		puts("No se pudo crear el directorio /n");
+		puts("No se pudo crear el directorio");
 	}
 	FILE* metadata = crear_archivo(ruta, "Metadata.bin");
 	txt_write_in_file(metadata, "DIRECTORY=Y\n");
@@ -33,8 +33,12 @@ FILE* crear_archivo(char* directorio, char* archivo) {
 
 void metadata_cargar() {
 
-	crear_directorio(punto_de_montaje_tallgrass, "Blocks");
-	crear_directorio(punto_de_montaje_tallgrass, "Files");
+	if(!existe_archivo_en("Blocks", punto_de_montaje_tallgrass)){
+		crear_directorio(punto_de_montaje_tallgrass, "Blocks");
+	}
+	if(!existe_archivo_en("Files", punto_de_montaje_tallgrass)){
+		crear_directorio(punto_de_montaje_tallgrass, "Files");
+	}
 
 	char* metadata_dir = path(punto_de_montaje_tallgrass, "Metadata");
 	char* metadata_path = path(metadata_dir, "Metadata.bin");

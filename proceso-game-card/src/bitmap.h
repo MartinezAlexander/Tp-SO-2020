@@ -18,8 +18,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+
 typedef struct{
-	char* bitarray;
+	t_bitarray* bitarray;
 	char* path;
 }bitmap;
 
@@ -29,5 +30,7 @@ void bitmap_cargar();
 void ocupar_bloque(int nuevo_bloque);
 void liberar_bloque(int numero_bloque);
 int obtener_bloque_disponible();
+
+
 
 #endif /* BITMAP_H_ */
