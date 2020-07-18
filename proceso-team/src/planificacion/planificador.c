@@ -1,10 +1,10 @@
 #include "planificador.h"
 
 tipo_planificacion obtener_algoritmo(char* algoritmo){
-	if(string_equals_ignore_case(algoritmo,"FIFO") == 0) return FIFO;
-	else if(string_equals_ignore_case(algoritmo,"RR") == 0) return RR;
-	else if(string_equals_ignore_case(algoritmo,"SJF-CD") == 0) return SJF_CD;
-	else if(string_equals_ignore_case(algoritmo,"SJF-SD") == 0) return SJF_SD;
+	if(string_equals_ignore_case(algoritmo,"FIFO")) return FIFO;
+	else if(string_equals_ignore_case(algoritmo,"RR")) return RR;
+	else if(string_equals_ignore_case(algoritmo,"SJF-CD")) return SJF_CD;
+	else if(string_equals_ignore_case(algoritmo,"SJF-SD")) return SJF_SD;
 	else{
 		printf("\n[Planificacion] --Algoritmo de planificacion invalido--\n\n");
 		exit(2);
