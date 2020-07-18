@@ -523,7 +523,7 @@ char* que_especie_le_puedo_cambiar(t_list* listado_pokemones, t_entrenador_copia
 			return especie;
 		}
 	}
-	return "Hola";
+	return "Especie Invalida";
 }
 
 

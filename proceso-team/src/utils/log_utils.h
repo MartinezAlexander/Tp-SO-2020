@@ -21,13 +21,13 @@
 void loggear_planificacion();
 void loggear_movimiento_entrenador(int identificador_entrenador, t_posicion posicion);
 void loggear_operacion_atrapar(t_pokemon* pokemon);
-void loggear_operacion_intercambio();
+void loggear_operacion_intercambio(int entrenador, int otro_entrenador, char* especie, char* otra_especie);
 void loggear_inicio_deteccion_deadlock();
-void loggear_resultado_deteccion_deadlock();
+void loggear_resultado_deteccion_deadlock(int deadlocks);
 void loggear_nuevo_mensaje(t_mensaje* mensaje);
 void loggear_resultado_team();
-void loggear_error_broker();
+void loggear_error_broker(char* tipo_operacion);
 void loggear_inicio_reintento_broker();
-void loggear_resultado_reintento_broker();
+void loggear_resultado_reintento_broker(int resultado);
 
 #endif /* UTILS_LOG_UTILS_H_ */

@@ -6,7 +6,7 @@ tipo_planificacion obtener_algoritmo(char* algoritmo){
 	else if(string_equals_ignore_case(algoritmo,"SJF-CD") == 0) return SJF_CD;
 	else if(string_equals_ignore_case(algoritmo,"SJF-SD") == 0) return SJF_SD;
 	else{
-		printf("\n --Algoritmo de planificacion invalido--\n\n");
+		printf("\n[Planificacion] --Algoritmo de planificacion invalido--\n\n");
 		exit(2);
 	}
 }
@@ -52,7 +52,7 @@ void sacar_de_ejecucion(){
 
 void encolar(t_entrenador* entrenador)
 {
-	printf("Encolado entrenador en [%d , %d]\n", entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
+	printf("[Planificacion] Encolado entrenador %d en [%d , %d]\n", entrenador->identificador, entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
     entrenador->estado = READY;
 	queue_push(planificador->cola, entrenador);
 }

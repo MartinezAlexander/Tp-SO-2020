@@ -45,7 +45,7 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 		 */
 		agregar_a_objetivos_globales(pokemon->especie);
 
-		printf("[Pokemon] Pokemon puesto en espera, motivo: sin entrenadores disponibles\n");
+		printf("[Planificacion] Pokemon puesto en espera, motivo: sin entrenadores disponibles\n");
 		return;
 		//Ademas no voy a seguir con el procedimiento normal
 	}

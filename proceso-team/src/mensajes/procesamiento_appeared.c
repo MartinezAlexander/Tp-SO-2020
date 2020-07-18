@@ -5,8 +5,7 @@ void descartar_pokemon(t_pokemon* pokemon){
 }
 
 void procesar_appeared(t_appeared_pokemon* appeared_pokemon){
-	printf("Procesando mensaje APPEARED\n");
-	printf("Recibo %s\n\n", appeared_pokemon->pokemon->especie);
+	printf("[Appeared] Recibido: %s\n\n", appeared_pokemon->pokemon->especie);
 
 	procesar_pokemon(appeared_pokemon->pokemon);
 
@@ -52,7 +51,7 @@ void procesar_pokemon(t_pokemon* pokemon){
 				queue_push(cola_pokemones_en_espera, pokemon);
 				pthread_mutex_unlock(&mutex_cola_espera);
 
-				puts("[Pokemon] Pokemon puesto en espera, motivo: repuesto\n");
+				printf("[Planificacion] Pokemon puesto en espera, motivo: repuesto\n");
 				pthread_mutex_unlock(&mutex_procesamiento_pokemon);
 				return;
 			}
@@ -74,7 +73,7 @@ void procesar_pokemon_en_espera(){
 		t_pokemon* pokemon = queue_pop(cola_pokemones_en_espera);
 		pthread_mutex_unlock(&mutex_cola_espera);
 
-		puts("[Pokemon] Procesamiento pokemon en espera debido a que se libero un entrenador\n");
+		printf("[Planificacion] Procesamiento pokemon en espera debido a que se libero un entrenador\n");
 		procesar_pokemon(pokemon);
 	}else{
 		pthread_mutex_unlock(&mutex_cola_espera);

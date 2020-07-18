@@ -101,7 +101,7 @@ void iniciar_suscripcion_broker(op_code cola){
 			recibir_localized();
 			break;
 		default:
-			printf("Error: Se realizo una suscripcion a una cola no correspondiente\n");
+			printf("[Broker] Error: Se realizo una suscripcion a una cola no correspondiente\n");
 			return;
 	}
 }
@@ -141,10 +141,10 @@ void suscribirse_a_cola(int* socket, op_code cola){
 
 	int confirmacion = recibir_confirmacion_suscripcion(*socket);
 	if(confirmacion == 0){
-		printf("Error: el broker no acepto la suscripcion a la cola %d\n", cola);
+		printf("[Broker] Error: el broker no acepto la suscripcion a la cola %d\n", cola);
 	}
 
-	printf("Suscripcion a la cola %d del broker exitosa\n", cola);
+	printf("[Broker] Suscripcion a la cola %d del broker exitosa\n", cola);
 }
 
 /*

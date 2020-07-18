@@ -66,9 +66,7 @@ int ejecutar_entrenador_intercambio_deadlock(t_entrenador* entrenador){
 			sem_post(&entrenador->intercambio_actual->entrenadorObjetivo->semaforo);
 		}
 
-		printf("[Prueba] hago free intercambio\n");
 		free(entrenador->intercambio_actual);
-		printf("[Prueba] sigo vivo despues del free intercambio\n");
 		entrenador->intercambio_actual = NULL;
 
 		encolar_proximo_intercambio(0);
@@ -117,18 +115,17 @@ void enviar_catch(t_entrenador* entrenador){
 			resolver_caught_positivo(entrenador, 0);
 		}else{
 			int id = recibir_id(socket);
-			printf("-Enviado el catch, y recibido id de mensaje: %d -\n", id);
+			printf("[Catch] Enviado CATCH => %s ; ID %d\n", mensaje_catch->pokemon->especie, id);
 			//Agrego el id con mi entrenador al diccionario
 			char* key_id = string_itoa(id);
 			dictionary_put(mensajes_catch_pendientes, key_id, entrenador);
-			printf("TODO OK\n");
 		}
 	}
 }
 
 void resolver_caught_positivo(t_entrenador* entrenador, int asincronico){
 
-	printf("Entrenador %d atrapo exitosamente al %s en [%d,%d]\n", entrenador->identificador,
+	printf("[Caught] Entrenador %d atrapo exitosamente al %s en [%d,%d]\n", entrenador->identificador,
 			entrenador->objetivo_actual->especie, entrenador->objetivo_actual->posicion.posicionX,
 			entrenador->objetivo_actual->posicion.posicionY);
 
@@ -168,7 +165,7 @@ void resolver_caught_positivo(t_entrenador* entrenador, int asincronico){
 }
 
 void resolver_caught_negativo(t_entrenador* entrenador){
-	printf("Entrenador %d no pudo atrapar su pokemon\n", entrenador->identificador);
+	printf("[Caught] Entrenador %d no pudo atrapar su pokemon\n", entrenador->identificador);
 
 	agregar_a_objetivos_globales(entrenador->objetivo_actual->especie);
 	entrenador_resetear_objetivo(entrenador);
@@ -217,7 +214,7 @@ void sacar_de_objetivos_globales(char* especie, t_list* objetivos){
 			}
 		}
 	}else{
-		puts("Se intento sacar un Poke de la Lista de objetivos globales pero estaba vacia");
+		printf("[Error] Se intento sacar un pokemon de la Lista de objetivos globales pero estaba vacia\n");
 	}
 }
 
@@ -332,7 +329,7 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 
 	//Error si no coinciden las cantidades
 	if(numero_posiciones != numero_obj_entrenadores){
-		printf("Error: no coindiden las cantidades de pos-obj de entrenadores en config!");
+		printf("[Config] Error: no coindiden las cantidades de pos-obj de entrenadores en config!");
 	}
 
 	t_list* entrenadores = list_create();
