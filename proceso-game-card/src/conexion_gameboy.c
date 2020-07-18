@@ -2,7 +2,7 @@
 
 void iniciar_puerto_de_escucha(){
 
-	iniciar_servidor(ip_gamecard, puerto_gamecard,(void*) procesar_mensajes_directos);
+	iniciar_servidor(ip_gamecard, puerto_gamecard,(void*) procesar_mensajes_directos, GAMECARD);
 	printf("[Gameboy] Iniciando puerto de escucha directo al gameboy\n");
 }
 

@@ -191,25 +191,29 @@ t_mensaje* procesar_mensaje(char** mensaje, op_code codigo, t_proceso id) {
 
 void enviar_a(t_proceso id, t_mensaje* mensaje) {
 	int socket;
+	int conexion;
 	switch (id) {
 	case BROKER:
 		socket = crear_conexion(ip_broker, puerto_broker);
-		loggear_conexion(id,socket);
+		conexion = handshake(GAMEBOY, BROKER, socket);
+		loggear_conexion(id,conexion);
 		enviar_mensaje(mensaje, socket);
 		recibir_id(socket);
 		liberar_conexion(socket);
 		break;
 	case TEAM:
 		socket = crear_conexion(ip_team, puerto_team);
+		conexion = handshake(GAMEBOY, TEAM, socket);
 		enviar_mensaje(mensaje, socket);
-		loggear_conexion(id,socket);
+		loggear_conexion(id,conexion);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
 	case GAMECARD:
 		socket = crear_conexion(ip_gamecard, puerto_gamecard);
+		conexion = handshake(GAMEBOY, GAMECARD, socket);
 		enviar_mensaje(mensaje, socket);
-		loggear_conexion(id,socket);
+		loggear_conexion(id,conexion);
 		recibir_ACK(socket);
 		liberar_conexion(socket);
 		break;
@@ -244,7 +248,8 @@ int main(int arg, char** args) {
 		char* tiempo_string = filtrar_string_dejar_solo_caracteres_validos(args[3]);
 		tiempo_conexion = atoi(tiempo_string);
 		int socket = crear_conexion(ip_broker, puerto_broker);
-		loggear_conexion(id_proceso,socket);
+		int conexion = handshake(SUSCRIPTOR, BROKER, socket);
+		loggear_conexion(id_proceso,conexion);
 		enviar_mensaje(mensaje_procesado, socket);
 		int estoy_suscripto = recibir_confirmacion_suscripcion(socket);
 

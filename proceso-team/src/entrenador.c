@@ -99,7 +99,8 @@ void enviar_catch(t_entrenador* entrenador){
 
 	//Conecto con broker
 	int socket = crear_conexion(ip_broker, puerto_broker);
-	if(socket < 0){
+	int conexion_exitosa = handshake(TEAM, BROKER, socket);
+	if(conexion_exitosa <= 0){
 		loggear_error_broker("envio de mensaje catch");
 		//Comportamiento default: CATCH positivo
 		resolver_caught_positivo(entrenador, 0);
@@ -258,7 +259,7 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquirido
 	char** objetivos_array = string_split(objetivos, "|");
 	entrenador->objetivos = array_to_list(objetivos_array);
 	//free(objetivos_array);
-	free_string_array(objetivos_array);
+	//free_string_array(objetivos_array);
 
 	//Asigno si veo que tiene pokemones de entrada
 	if(adquiridos != NULL){
@@ -349,7 +350,7 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 
 	//free(posiciones_entrenadores);
 	free_string_array(posiciones_entrenadores);
-	free_string_array(objetivos_entrenadores);
+	//free_string_array(objetivos_entrenadores);
 	free(listado_pokemones_adquiridos);
 
 	list_destroy(pokemones_entrenadores);

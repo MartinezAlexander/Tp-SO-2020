@@ -148,7 +148,9 @@ void ejecutar_get(t_mensaje* mensaje_recibido) {
 
 void enviar_mensaje_al_broker(t_mensaje* mensaje) {
 	int socket = crear_conexion(ip_broker, puerto_broker);
-	if (socket >= 0) {
+	int conexion_exitosa = handshake(GAMECARD, BROKER, socket);
+
+	if (conexion_exitosa > 0) {
 		enviar_mensaje(mensaje, socket);
 		recibir_id(socket);
 		liberar_conexion(socket);

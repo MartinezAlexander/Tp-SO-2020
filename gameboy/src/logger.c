@@ -19,8 +19,8 @@ void loggear_info(char* info) {
 	log_info(logger, info);
 }
 
-void loggear_conexion(t_proceso id_proceso,int socket) {
-	if(socket>=0){
+void loggear_conexion(t_proceso id_proceso,int conexion) {
+	if(conexion > 0){
 	char* log = string_from_format("El gameboy se conecto al proceso %s", proceso_to_string(id_proceso));
 	log_info(logger, log);
 	}
