@@ -55,6 +55,7 @@ typedef struct{
 	pthread_mutex_t mutex_planificacion;
 }t_planificador;
 
+pthread_mutex_t mutex_pokemones_ready;
 
 t_planificador *planificador;
 

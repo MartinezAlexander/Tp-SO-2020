@@ -12,15 +12,16 @@ void planificar_sjf_sd(){
 		sem_post(&(planificador->entrenador_en_exec->semaforo));
 	}else{
 		sacar_de_ejecucion();
-
+		pthread_mutex_lock(&mutex_pokemones_ready);
 		if(!queue_is_empty(planificador->cola)){
+			pthread_mutex_unlock(&mutex_pokemones_ready);
 			//Calculo la estimacion mas corta y
 			//reseteo la rafaga del entrenador elegido
 			t_entrenador* entrenador = shortest_job();
 			entrar_a_ejecucion(entrenador);
 			entrenador->estado_sjf->ultima_rafaga = 1;
 			sem_post(&(entrenador->semaforo));
-		}
+		}else pthread_mutex_unlock(&mutex_pokemones_ready);
 	}
 }
 
@@ -58,8 +59,9 @@ void planificar_sjf_cd(){
 		}
 		//Una vez que lo desmarque, ya lo puedo sacar del planificador
 		sacar_de_ejecucion();
-
+		pthread_mutex_lock(&mutex_pokemones_ready);
 		if(!queue_is_empty(planificador->cola)){
+			pthread_mutex_unlock(&mutex_pokemones_ready);
 			//Calculo la estimacion mas corta y
 			//reseteo la rafaga del entrenador elegido
 			t_entrenador* entrenador = shortest_job_con_desalojo();
@@ -68,7 +70,7 @@ void planificar_sjf_cd(){
 			//Marco al entrenador a ejecutar
 			entrenador->estado_sjf->empezo_a_ejecutar = 1;
 			sem_post(&(entrenador->semaforo));
-		}
+		}else pthread_mutex_unlock(&mutex_pokemones_ready);
 	}
 }
 
@@ -85,11 +87,12 @@ void planificar_sjf_cd(){
 //la proxima vez que calcule voy a estar calculando con valores incorrectos
 t_entrenador* shortest_job(){
 	printf("[SJF-SD] Empieza el calculo de estimaciones\n");
+	pthread_mutex_lock(&mutex_pokemones_ready);
 	t_list* entrenadores_en_ready = planificador->cola->elements;
-
+	pthread_mutex_unlock(&mutex_pokemones_ready);
 	int index_mas_corto = 0;
 	double estimacion_mas_corta = 100;
-
+	pthread_mutex_lock(&mutex_pokemones_ready);
 	for(int i = 0 ; i < list_size(entrenadores_en_ready) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores_en_ready, i);
 		double estimacion = calcular_estimacion(entrenador);
@@ -98,9 +101,10 @@ t_entrenador* shortest_job(){
 			index_mas_corto = i;
 			estimacion_mas_corta = estimacion;
 		}
-	}
-
+	}pthread_mutex_unlock(&mutex_pokemones_ready);
+	pthread_mutex_lock(&mutex_pokemones_ready);
 	t_entrenador* entrenador_mas_corto = list_remove(planificador->cola->elements, index_mas_corto);
+	pthread_mutex_unlock(&mutex_pokemones_ready);
 	//Solo actualizamos la estimacion al que sabemos que va a ejecutar,
 	//los demas quedan con la estimacion anterior
 	entrenador_mas_corto->estado_sjf->ultima_estimacion = estimacion_mas_corta;
@@ -112,12 +116,12 @@ t_entrenador* shortest_job(){
 
 t_entrenador* shortest_job_con_desalojo(){
 	printf("[SJF-CD] Empieza el calculo de estimaciones\n");
-
+	pthread_mutex_lock(&mutex_pokemones_ready);
 	t_list* entrenadores_en_ready = planificador->cola->elements;
-
+	pthread_mutex_unlock(&mutex_pokemones_ready);
 	int index_mas_corto = 0;
 	double estimacion_mas_corta = 100;
-
+	pthread_mutex_lock(&mutex_pokemones_ready);
 	for(int i = 0 ; i < list_size(entrenadores_en_ready) ; i++){
 		t_entrenador* entrenador = list_get(entrenadores_en_ready, i);
 		double estimacion = calcular_estimacion_con_desalojo(entrenador);
@@ -126,10 +130,10 @@ t_entrenador* shortest_job_con_desalojo(){
 			index_mas_corto = i;
 			estimacion_mas_corta = estimacion;
 		}
-	}
-
+	}pthread_mutex_unlock(&mutex_pokemones_ready);
+	pthread_mutex_lock(&mutex_pokemones_ready);
 	t_entrenador* entrenador_mas_corto = list_remove(planificador->cola->elements, index_mas_corto);
-
+	pthread_mutex_unlock(&mutex_pokemones_ready);
 	//Solo actualizamos la estimacion al que sabemos que va a ejecutar,
 	//los demas quedan con la estimacion anterior,
 	//Siempre y cuando elegi uno que no habia comenzado a ejecutar

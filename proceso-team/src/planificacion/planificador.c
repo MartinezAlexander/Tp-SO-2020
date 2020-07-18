@@ -27,6 +27,7 @@ t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t 
 	sem_init(&(semaforo_planificacion), 0, 0);
 	pthread_mutex_init(&(planificador->mutex_planificacion), NULL);
 	planificador->quantum_actual = 0;
+	pthread_mutex_init(&mutex_pokemones_ready, NULL);
     return planificador;
 }
 
@@ -56,7 +57,9 @@ void encolar(t_entrenador* entrenador)
 {
 	printf("[Planificacion] Encolado entrenador %d en [%d , %d]\n", entrenador->identificador, entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
     entrenador->estado = READY;
+	pthread_mutex_lock(&mutex_pokemones_ready);
 	queue_push(planificador->cola, entrenador);
+	pthread_mutex_unlock(&mutex_pokemones_ready);
 }
 
 void planificador_destroy(t_planificador* p){
