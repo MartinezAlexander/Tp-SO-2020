@@ -16,8 +16,8 @@
 
 pthread_t thread;
 
-void iniciar_servidor(char* ip, char* puerto,void (*serve_client)(int *socket));
-void esperar_cliente(int socket_servidor,void (*serve_client)(int *socket));
+void iniciar_servidor(char* ip, char* puerto,void (*serve_client)(int *socket), t_proceso proceso_servidor);
+void esperar_cliente(int socket_servidor,void (*serve_client)(int *socket), t_proceso proceso_servidor);
 void administrar_mensajes(int* socket);
 
 

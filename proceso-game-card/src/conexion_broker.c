@@ -65,10 +65,41 @@ void suscribirse_a_cola(int* socket, op_code cola){
 	t_mensaje* mensaje = mensaje_simple_create((void*) suscripcion, SUSCRIPCION);
 
 	*socket = crear_conexion(ip_broker, puerto_broker);
+
+	int conexion_exitosa = 0;
+	t_proceso proceso = GAMECARD;
+	int codigo = send(*socket, &proceso, sizeof(t_proceso),MSG_NOSIGNAL);
+	if(codigo > 0){
+		t_proceso proceso_socket;
+		int se_recibio = recv(*socket, &proceso_socket, sizeof(t_proceso), MSG_WAITALL);
+		if(se_recibio > 0){
+			if(proceso_socket == BROKER){
+				int ack = enviar_ACK(*socket);
+				if (ack > 0){
+					conexion_exitosa = 1;
+				}
+			}
+		}
+	}
+
 	//Reintento conexion
-	while(*socket < 0){
+	while(conexion_exitosa == 0){
 		sleep(tiempo_reintento_conexion);
 		*socket = crear_conexion(ip_broker, puerto_broker);
+
+		int codigo = send(*socket, &proceso, sizeof(t_proceso),MSG_NOSIGNAL);
+		if(codigo > 0){
+			t_proceso proceso_socket;
+			int se_recibio = recv(*socket, &proceso_socket, sizeof(t_proceso), MSG_WAITALL);
+			if(se_recibio > 0){
+				if(proceso_socket == BROKER){
+					int ack = enviar_ACK(*socket);
+					if (ack > 0){
+						conexion_exitosa = 1;
+					}
+				}
+			}
+		}
 	}
 
 	int envio = enviar_mensaje(mensaje, *socket);

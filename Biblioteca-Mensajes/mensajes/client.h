@@ -7,6 +7,7 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include <string.h>
+#include "mensajes.h"
 
 /*
 crear_conexion crea un socket cliente a un servidor que se encuentra en
@@ -19,5 +20,7 @@ int crear_conexion(char* ip, char* puerto);
 liberar_conexion destruye el socket creado
 */
 void liberar_conexion(int socket_cliente);
+
+int handshake(t_proceso yo, t_proceso otro, int socket);
 
 #endif

@@ -60,7 +60,9 @@ void enviar_get_objetivo(t_list* objetivo_global){
 
 			int socket = crear_conexion(ip_broker, puerto_broker);
 
-			if(socket >= 0){
+			int conexion_exitosa = handshake(TEAM, BROKER, socket);
+
+			if(conexion_exitosa){
 				int envio = enviar_mensaje(mensaje, socket);
 
 				if(envio < 0){
@@ -101,17 +103,24 @@ void iniciar_suscripcion_broker(op_code cola){
 	}
 }
 
+
 void suscribirse_a_cola(int* socket, op_code cola){
 	t_suscripcion* suscripcion = suscripcion_proceso_create(TEAM, team_id, cola);
 	t_mensaje* mensaje = mensaje_simple_create((void*) suscripcion, SUSCRIPCION);
 
 	*socket = crear_conexion(ip_broker, puerto_broker);
+
+	int conexion_exitosa = handshake(TEAM, BROKER, *socket);
+
+
 	//Reintento conexion
-	while(*socket < 0){
+	while(conexion_exitosa == 0){
 		loggear_inicio_reintento_broker();
 
 		sleep(tiempo_de_reconexion);
 		*socket = crear_conexion(ip_broker, puerto_broker);
+
+		conexion_exitosa = handshake(TEAM, BROKER, *socket);
 
 		loggear_resultado_reintento_broker(*socket > 0);
 	}

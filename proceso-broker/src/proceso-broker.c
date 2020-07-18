@@ -83,7 +83,7 @@ int main(int arg, char** args){
 
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
-	iniciar_servidor(ip_broker,puerto_broker,administrar_mensajes);
+	iniciar_servidor(ip_broker,puerto_broker,administrar_mensajes, BROKER);
 
 	return EXIT_SUCCESS;
 }
