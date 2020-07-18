@@ -113,7 +113,6 @@ void procesar_get(){
 		}else{
 			enviar_ACK(socket_get);
 			procesar_mensaje(mensaje, ejecutar_get);
-			puts("aaaaaaaaaa");
 		}
 	}
 	liberar_conexion(socket_get);
