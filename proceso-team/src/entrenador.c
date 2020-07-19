@@ -88,10 +88,11 @@ void enviar_catch(t_entrenador* entrenador){
 
 	actualizar_estadistica_entrenador(entrenador->identificador, 1);
 	entrenador->estado = BLOCKED_BY_CATCH;
+
 	//Cambie de estado, entonces habilito el semaforo
 	//del planificador para que pueda mandar a ejecutar
 	//a alguien mas, ya que yo me quedo esperando nada mas
-	sem_post(&semaforo_planificacion);
+	//sem_post(&semaforo_planificacion);
 
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
 

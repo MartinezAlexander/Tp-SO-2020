@@ -55,7 +55,7 @@ void planificar_sjf_cd(){
 		//Cuando saco a alguien de ejecucion, debo desmarcarlo asi le informo que
 		//el calculo de estimacion va a ser normal
 		if(planificador->entrenador_en_exec != NULL){
-			planificador->entrenador_en_exec->estado_sjf = 0;
+			planificador->entrenador_en_exec->estado_sjf->empezo_a_ejecutar = 0;
 		}
 		//Una vez que lo desmarque, ya lo puedo sacar del planificador
 		sacar_de_ejecucion();

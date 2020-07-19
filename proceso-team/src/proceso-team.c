@@ -30,6 +30,7 @@ int main(int arg, char** args) {
 	 */
 	sem_wait(&semaforo_resolucion_deadlock);
 
+	puts("\n ------------------------------------------ \n");
 	resolver_deadlock_nuevo();
 
 	//Antes de terminar el programa, debo esperar a que
@@ -39,6 +40,7 @@ int main(int arg, char** args) {
 	esperar_hilos_planificacion();
 	printf("[Team] Todos sus entrenadores han cumplido su objetivo\n");
 
+	puts("\n ------------------------------------------ \n");
 	loggear_resultado_team();
 
 	//quedaria liberar variables globales

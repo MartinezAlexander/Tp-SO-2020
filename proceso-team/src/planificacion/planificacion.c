@@ -58,7 +58,9 @@ void entrenador_entrar_a_planificacion(t_pokemon* pokemon){
 	//Le doy el objetivo actual al entrenador
 	entrenador_mas_cercano->objetivo_actual = pokemon;
 
-	int debo_planificar = !hay_alguien_en_ejecucion();
+	pthread_mutex_lock(&mutex_pokemones_ready);
+	int debo_planificar = !hay_alguien_en_ejecucion() && queue_is_empty(planificador->cola);
+	pthread_mutex_unlock(&mutex_pokemones_ready);
 
 	//En caso de que este usando planificacion SJF con desalojo
 	//antes de encolar el nuevo, debo desalojar el entrenador actual
@@ -172,7 +174,8 @@ void ejecutar_hilo(t_entrenador* entrenador){
 			break;
 		}
 
-		int termino_ejecucion = ejecutar_entrenador(entrenador);
+		//int termino_ejecucion = ejecutar_entrenador(entrenador);
+		ejecutar_entrenador(entrenador);
 
 		//Aca me fijo si me deben desalojar
 		//En ese caso, me encolo y me saco de exec
@@ -180,14 +183,15 @@ void ejecutar_hilo(t_entrenador* entrenador){
 		pthread_mutex_lock(&(planificador->mutex_desalojo));
 		if(planificador->debo_desalojar_al_fin_de_ciclo){
 			sacar_de_ejecucion();
-			encolar(entrenador);
+
 			sem_post(&planificador->semaforo_desalojo);
 			//WAIT antes de seguir a que se encole el nuevo,
 			//asi no entro a re-planificar antes
 			sem_wait(&planificador->semaforo_post_desalojo);
+			encolar(entrenador);
 		}
 		pthread_mutex_unlock(&(planificador->mutex_desalojo));
-
+/*
 		//Ahora tengo que habilitar el semaforo del
 		//planificador para que vea que hacer,
 		//pero solo lo voy a habilitar si sigo en EXEC,
@@ -196,6 +200,7 @@ void ejecutar_hilo(t_entrenador* entrenador){
 		if(!termino_ejecucion){
 			sem_post(&semaforo_planificacion);
 		}
+*/		sem_post(&semaforo_planificacion);
 	}
 
 	//La idea es que primero ejecute normalmente, y cuando termine de ejecutar
