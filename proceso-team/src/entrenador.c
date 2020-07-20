@@ -77,9 +77,13 @@ int ejecutar_entrenador_intercambio_deadlock(t_entrenador* entrenador){
 
 void actualizar_estado_entrenador(t_entrenador* entrenador){
 	if(cumplio_objetivo_entrenador(entrenador)){
+		pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
 		entrenador->estado = EXIT;
+		pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 	}else if(entrenador_estado_deadlock(entrenador)){
+		pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
 		entrenador->estado = BLOCKED_DEADLOCK;
+		pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 	}
 }
 
@@ -87,12 +91,14 @@ void enviar_catch(t_entrenador* entrenador){
 	sleep(retardo_cpu);
 
 	actualizar_estadistica_entrenador(entrenador->identificador, 1);
+	pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
 	entrenador->estado = BLOCKED_BY_CATCH;
+	pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 
 	//Cambie de estado, entonces habilito el semaforo
 	//del planificador para que pueda mandar a ejecutar
 	//a alguien mas, ya que yo me quedo esperando nada mas
-	//sem_post(&semaforo_planificacion);
+	sem_post(&semaforo_planificacion);
 
 	loggear_operacion_atrapar(entrenador->objetivo_actual);
 
@@ -137,7 +143,9 @@ void resolver_caught_positivo(t_entrenador* entrenador, int asincronico){
 
 	//Actualizo el estado del entrenador
 	if(cumplio_objetivo_entrenador(entrenador)){
+		pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
 		entrenador->estado = EXIT;
+		pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 		printf("[Estado] Entrenador %d finalizo su ejecucion\n", entrenador->identificador);
 		//Puede darse el caso de que el entrenador entre en EXIT o DEADLOCK asincronicamente,
 		//osea, cuando me llega la respuesta del CAUGHT (sin hacer comp. default)
@@ -147,13 +155,15 @@ void resolver_caught_positivo(t_entrenador* entrenador, int asincronico){
 		if(asincronico) sem_post(&entrenador->semaforo);
 	}else{
 		if(entrenador_estado_deadlock(entrenador)){
+			pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
 			entrenador->estado = BLOCKED_DEADLOCK;
+			pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 			printf("[Estado] Entrenador %d bloqueado por deadlock\n", entrenador->identificador);
 
 			if(asincronico) sem_post(&entrenador->semaforo);
 		}else{
-			bloquear_entrenador(entrenador);
 			printf("[Estado] Entrenador %d bloqueado\n", entrenador->identificador);
+			bloquear_entrenador(entrenador);
 		}
 	}
 
@@ -180,15 +190,23 @@ void bloquear_entrenador(t_entrenador* entrenador){
 	//queda en estado bloqueado, asi la proxima
 	//vez que aparezca un pokemon, este entrenador
 	//este en los candidatos a ir a buscarlo
+	pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
 	entrenador->estado = BLOCKED;
+	pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 	//Tambien al liberar el entrenador debo fijarme si tengo algun pokemon
 	//en cola de espera y planificarlo o descartarlo segun corresponda.
 
 	//Para esto debo chequear tambien que el pokemon en espera que procese no sea descartado
 	//ya que en ese caso deberia tratar de procesar el proximo en la cola hasta que
 	//pueda planificar a alguien o hasta que descarte todos los de la cola.
-	while(entrenador->objetivo_actual == NULL && !queue_is_empty(cola_pokemones_en_espera)){
+	pthread_mutex_lock(&mutex_cola_espera);
+	int puedo_procesar = entrenador->objetivo_actual == NULL && !queue_is_empty(cola_pokemones_en_espera);
+	pthread_mutex_unlock(&mutex_cola_espera);
+	while(puedo_procesar){
 		procesar_pokemon_en_espera();
+		pthread_mutex_lock(&mutex_cola_espera);
+		puedo_procesar = entrenador->objetivo_actual == NULL && !queue_is_empty(cola_pokemones_en_espera);
+		pthread_mutex_unlock(&mutex_cola_espera);
 	}
 }
 
@@ -285,6 +303,8 @@ t_entrenador* entrenador_create(char* posicion, char* objetivos, char* adquirido
 	dictionary_put(diccionario_ciclos_entrenador, id_entrenador, 0);
 	free(id_entrenador);
 
+	pthread_mutex_init(&entrenador->mutex_lectura_entrenador, NULL);
+
 	actualizar_estado_entrenador(entrenador);
 
 	return entrenador;
@@ -373,17 +393,26 @@ t_list* leer_entrenadores(t_config* config, double estimacion_inicial){
 
 int entrenador_en_ejecucion(t_entrenador *entrenador)
 {
-	return(entrenador->estado == EXEC);
+	pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
+	int disponible = entrenador->estado == EXEC;
+	pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
+	return disponible;
 }
 
 int entrenador_en_deadlock(t_entrenador *entrenador)
 {
-	return(entrenador->estado == BLOCKED_DEADLOCK);
+	pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
+	int disponible = entrenador->estado == BLOCKED_DEADLOCK;
+	pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
+	return disponible;
 }
 
 int entrenador_termino_ejecucion_normal(t_entrenador *entrenador)
 {
-	return(entrenador->estado == BLOCKED_DEADLOCK || entrenador->estado == EXIT);
+	pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
+	int disponible = entrenador->estado == BLOCKED_DEADLOCK || entrenador->estado == EXIT;
+	pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
+	return disponible;
 }
 
 void entrenador_atrapar_objetivo(t_entrenador* entrenador){

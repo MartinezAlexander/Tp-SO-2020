@@ -53,6 +53,7 @@ typedef struct{
 	pthread_t hilo_planificacion;
 
 	pthread_mutex_t mutex_planificacion;
+	pthread_mutex_t mutex_entrenador;
 }t_planificador;
 
 pthread_mutex_t mutex_pokemones_ready;

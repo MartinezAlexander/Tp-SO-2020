@@ -26,19 +26,33 @@ t_planificador* planificador_create(char* algoritmo, uint32_t quantum, uint32_t 
 	pthread_mutex_init(&(planificador->mutex_desalojo), NULL);
 	sem_init(&(semaforo_planificacion), 0, 0);
 	pthread_mutex_init(&(planificador->mutex_planificacion), NULL);
+	pthread_mutex_init(&(planificador->mutex_entrenador), NULL);
 	planificador->quantum_actual = 0;
 	pthread_mutex_init(&mutex_pokemones_ready, NULL);
     return planificador;
 }
 
 int hay_alguien_en_ejecucion(){
-	if(planificador->entrenador_en_exec == NULL) return 0;
-	else return entrenador_en_ejecucion(planificador->entrenador_en_exec);
+	pthread_mutex_lock(&planificador->mutex_entrenador);
+	if(planificador->entrenador_en_exec == NULL){
+		pthread_mutex_unlock(&planificador->mutex_entrenador);
+		return 0;
+	}
+	else {
+		int resultado = entrenador_en_ejecucion(planificador->entrenador_en_exec);
+		pthread_mutex_unlock(&planificador->mutex_entrenador);
+		return resultado;
+	}
 }
 
 void entrar_a_ejecucion(t_entrenador* entrenador){
+	pthread_mutex_lock(&planificador->mutex_entrenador);
 	planificador->entrenador_en_exec = entrenador;
+	pthread_mutex_unlock(&planificador->mutex_entrenador);
+
+	pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
 	entrenador->estado = EXEC;
+	pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 	//Estadisticas
 	cambios_de_contexto++;
 
@@ -47,16 +61,22 @@ void entrar_a_ejecucion(t_entrenador* entrenador){
 
 void sacar_de_ejecucion(){
 	//Estadisticas
+	pthread_mutex_lock(&planificador->mutex_entrenador);
 	if(planificador->entrenador_en_exec != NULL){
 		cambios_de_contexto++;
 	}
 	planificador->entrenador_en_exec = NULL;
+	pthread_mutex_unlock(&planificador->mutex_entrenador);
 }
 
 void encolar(t_entrenador* entrenador)
 {
 	printf("[Planificacion] Encolado entrenador %d en [%d , %d]\n", entrenador->identificador, entrenador->posicion.posicionX,  entrenador->posicion.posicionY);
-    entrenador->estado = READY;
+
+	pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
+	entrenador->estado = READY;
+	pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
+
 	pthread_mutex_lock(&mutex_pokemones_ready);
 	queue_push(planificador->cola, entrenador);
 	pthread_mutex_unlock(&mutex_pokemones_ready);

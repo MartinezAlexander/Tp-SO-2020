@@ -62,6 +62,7 @@ typedef struct unEntrenador{
 
 	pthread_t hilo; //Hilo de ejecucion
 	sem_t semaforo; //Para controlar su hilo de ejecucion
+	pthread_mutex_t mutex_lectura_entrenador;
 } t_entrenador;
 
 //Aca se guardan todos los ids de catch que enviamos junto con el entrenador

@@ -170,12 +170,14 @@ void ejecutar_hilo(t_entrenador* entrenador){
 		//por lo que no saldria del while hasta el proximo ciclo.
 		//Decidimos entonces que cuando llega un caught y cambio el estado mando signal
 		//al semaforo de arriba para salir si corresponde
+		pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
 		if(entrenador->estado == EXIT || entrenador->estado == BLOCKED_DEADLOCK){
+			pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 			break;
-		}
+		}else pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
 
-		//int termino_ejecucion = ejecutar_entrenador(entrenador);
-		ejecutar_entrenador(entrenador);
+		int termino_ejecucion = ejecutar_entrenador(entrenador);
+		//ejecutar_entrenador(entrenador);
 
 		//Aca me fijo si me deben desalojar
 		//En ese caso, me encolo y me saco de exec
@@ -191,7 +193,7 @@ void ejecutar_hilo(t_entrenador* entrenador){
 			encolar(entrenador);
 		}
 		pthread_mutex_unlock(&(planificador->mutex_desalojo));
-/*
+
 		//Ahora tengo que habilitar el semaforo del
 		//planificador para que vea que hacer,
 		//pero solo lo voy a habilitar si sigo en EXEC,
@@ -200,7 +202,7 @@ void ejecutar_hilo(t_entrenador* entrenador){
 		if(!termino_ejecucion){
 			sem_post(&semaforo_planificacion);
 		}
-*/		sem_post(&semaforo_planificacion);
+		//sem_post(&semaforo_planificacion);
 	}
 
 	//La idea es que primero ejecute normalmente, y cuando termine de ejecutar
@@ -245,5 +247,8 @@ void planificar(){
 
 int entrenador_disponible(t_entrenador *entrenador)
 {
-	return entrenador->estado == NEW || entrenador->estado == BLOCKED;
+	pthread_mutex_lock(&entrenador->mutex_lectura_entrenador);
+	int disponible = entrenador->estado == NEW || entrenador->estado == BLOCKED;
+	pthread_mutex_unlock(&entrenador->mutex_lectura_entrenador);
+	return disponible;
 }
