@@ -50,12 +50,14 @@ void inicializar_filesystem() {
 
 	char* directorio_bloque = obtener_directorio_blocks();
 
-	for(int i=0; i<blocks; i++){
-		char* nombre_bloque = string_itoa(i);
-		string_append(&nombre_bloque,".bin");
-		FILE* fd = crear_archivo(directorio_bloque,nombre_bloque);
-		fclose(fd);
-		free(nombre_bloque);
+	if(!existe_archivo_en("0.bin",directorio_bloque)){
+		for(int i=0; i<blocks; i++){
+			char* nombre_bloque = string_itoa(i);
+			string_append(&nombre_bloque,".bin");
+			FILE* fd = crear_archivo(directorio_bloque,nombre_bloque);
+			fclose(fd);
+			free(nombre_bloque);
+		}
 	}
 
 	pthread_mutex_init(&mutex_modificacion_de_archivo, NULL);
