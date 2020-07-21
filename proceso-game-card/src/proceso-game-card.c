@@ -48,6 +48,16 @@ void inicializar_filesystem() {
 
 	bitmap_cargar();
 
+	char* directorio_bloque = obtener_directorio_blocks();
+
+	for(int i=0; i<blocks; i++){
+		char* nombre_bloque = string_itoa(i);
+		string_append(&nombre_bloque,".bin");
+		FILE* fd = crear_archivo(directorio_bloque,nombre_bloque);
+		fclose(fd);
+		free(nombre_bloque);
+	}
+
 	pthread_mutex_init(&mutex_modificacion_de_archivo, NULL);
 	pthread_mutex_init(&mutex_listar_directorios, NULL);
 	pthread_mutex_init(&mutex_obtener_pokemon,NULL);
