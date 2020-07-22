@@ -184,13 +184,26 @@ void ejecutar_hilo(t_entrenador* entrenador){
 		//y le doy signal al semaforo para que encole al nuevo
 		pthread_mutex_lock(&(planificador->mutex_desalojo));
 		if(planificador->debo_desalojar_al_fin_de_ciclo){
-			sacar_de_ejecucion();
+
+			if(!termino_ejecucion)
+				sacar_de_ejecucion();
 
 			sem_post(&planificador->semaforo_desalojo);
 			//WAIT antes de seguir a que se encole el nuevo,
 			//asi no entro a re-planificar antes
 			sem_wait(&planificador->semaforo_post_desalojo);
-			encolar(entrenador);
+
+			if(!termino_ejecucion) encolar(entrenador);
+
+			/*
+			 * Hay un caso especial que puede ocurrir.
+			 * Es cuando trato de desalojar (como siempre espero a que ejecute el ciclo actual)
+			 * y estpy terminando la ejecucion. En ese caso, no me voy a encolar de nuevo
+			 * ni me voy a sacar de ejecucion, y  ademas, en ese caso quiero que se haga el post,
+			 * asi que tengo que settear la variable de termino_ejecucion para que haga el post
+			 * al final del ciclo
+			 */
+			if(termino_ejecucion) termino_ejecucion = 0;
 		}
 		pthread_mutex_unlock(&(planificador->mutex_desalojo));
 

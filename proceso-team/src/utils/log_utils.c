@@ -3,7 +3,9 @@
 
 //1. Cambio de un entrenador de cola de planificacion
 void loggear_planificacion(int id_entrenador){
-	log_info(logger, "[Planificacion] Entrenador %d pasa a EXEC\n", id_entrenador);
+	printf("[Planificacion] Entrenador %d pasa a EXEC\n", id_entrenador);
+
+	log_info(logger, "[Planificacion] Entrenador %d pasa a EXEC", id_entrenador);
 }
 
 //2. Movimiento de un entrenador (indicando la ubicacion a la que se movio)
