@@ -56,8 +56,6 @@ void finalizar_procesador_localized(){
 
 int main(int arg, char** args){
 
-	puts("segmentation fault");
-
 	signal(SIGUSR1, controlador_de_seniales);
 	signal(SIGINT, controlador_de_seniales);
 
@@ -98,8 +96,6 @@ void finalizar_programa(){
 	finalizar_config();
 	logger_destroy();
 	log_personal_destroy();
-
-	puts("faultmentation seg");
 
 	exit(0);
 }
